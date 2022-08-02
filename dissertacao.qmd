@@ -1,0 +1,200 @@
+---
+title: ""
+format:
+    pdf:
+        include-in-header: config/preamble.tex
+csl: config/abnt.csl
+bibliography: config/bib.bib
+fontsize: 12pt
+geometry: margin=1in
+spacing: onehalfspacing
+---
+
+<!-- capa -->
+
+\thispagestyle{empty}
+\begin{center}
+{\Large \MakeUppercase{\universidade\\ campus \campus\\ \curso}}
+\end{center}
+\vspace{1cm}
+\begin{center}
+{\Large \MakeUppercase{\nome\>\sobrenome}}
+\end{center}
+\vspace{5cm}
+\begin{center}
+\Large \MakeUppercase{\textbf{\titulo}}
+\end{center}
+\vspace{5cm}
+
+\begin{center}
+\uppercase{\cidade}\\ \ano
+\end{center}
+
+<!-- folha de rosto -->
+
+\newpage
+\thispagestyle{empty}
+\setcounter{page}{1}
+
+\begin{center}
+{\Large \MakeUppercase{\nome\>\sobrenome}}
+
+\vspace{6cm}
+
+\Large \MakeUppercase{\textbf{\titulo}}
+
+\normalsize
+
+\vspace{3cm}
+\end{center}
+
+\hspace{7cm}{\begin{minipage}{8.5cm}{
+\tipo\>apresentada à coordenadoria do \curso\>da \universidade, Campus \campus, como requisito parcial para a obtenção do título de \grau.\\
+
+Orientador: \parbox[t]{6.0cm}{\orientador}}
+\end{minipage}}
+
+\vspace{3cm}
+
+\begin{center}
+\cidade\\
+\ano
+\end{center}
+
+<!-- folha de aprovação -->
+
+\newpage
+\thispagestyle{empty}
+
+\begin{center}
+{\large \MakeUppercase{\nome\>\sobrenome}}
+
+\vspace{1cm}
+
+\Large \MakeUppercase{\textbf{\titulo}}
+
+\normalsize
+
+\vspace{1cm}
+\end{center}
+
+\hspace{7.5cm}{\begin{minipage}{8.5cm}{
+\tipo\>apresentada à coordenadoria do \curso\>do \universidade, Campus \campus, como requisito parcial para a obtenção do título de \grau.\\}
+\end{minipage}}
+
+\vspace{1cm}
+
+\hspace{9cm} {\uppercase{\textbf{Banca Examinadora}}}
+
+\vspace{1cm}
+\begin{center}
+
+\hspace{7cm}{\underline{\hspace{7cm}} \\}
+\hspace{7cm}{\orientador \\}
+\hspace{7cm}{\universidade}
+
+\hspace{7cm}{\underline{\hspace{7cm}} \\}
+\hspace{7cm}{\bancap \\}
+\hspace{7cm}{\universidade}
+
+\hspace{7cm}{\underline{\hspace{7cm}} \\}
+\hspace{7cm}{\bancas \\}
+\hspace{7cm}{\universidade}
+
+
+\cidade, \dia\>de \mes\>de \ano.
+\end{center}
+
+<!-- resumo -->
+
+\newpage
+\thispagestyle{empty}
+\begin{singlespace}
+\noindent \MakeUppercase{\sobrenome}, \nome. \textbf{\titulo}. \ano. xx folhas. \tipo\>(\curso) -- \universidade, \cidade, \ano.
+
+\vspace{1pc}
+\begin{center}
+\textbf{RESUMO}
+\end{center}
+\vspace{1pc}
+
+\noindent
+No máximo 500 palavaras em espaço simples e sem parágrafos. Deve apresentar de forma concisa os objetivos, metodologia e os resultado alcançados, utilizar o verbo na voz ativa. Espaçamento simples, sem recuo de parágrafos.
+
+\vspace{2pc}
+\noindent
+{\textbf{Palavras-chave}:}  Palavra 1. Palavra 2. Palavra 3. Palavra 4. Palavra 5.
+
+\end{singlespace}
+
+<!-- abstract -->
+
+\newpage
+\thispagestyle{empty}
+
+\begin{singlespace}
+\noindent \MakeUppercase{\sobrenome}, \nome. \tituloingles. \ano. xx folhas. \tipoingles\>(\cursoingles) -- \universidade, \cidade, \ano.
+
+\vspace{1pc}
+\begin{center}
+\textbf{ABSTRACT}
+\end{center}
+\vspace{1pc}
+
+\noindent 
+Tradução do resumo.
+
+\vspace{2pc}
+\noindent
+{\textbf{Keywords}:}  Tradução das palavras chave.
+\end{singlespace}
+
+<!-- sumário -->
+
+\newpage
+\thispagestyle{empty}
+\begin{flushleft}
+\begingroup
+\let\clearpage\relax
+
+\newpage
+\begin{center}
+\MakeUppercase{\textbf{Sumário}}
+\end{center}
+\begin{center}
+\tableofcontents
+\end{center}
+\end{flushleft}
+
+<!-- lista de figuras -->
+
+\newpage
+\thispagestyle{empty}
+\begin{center}
+\MakeUppercase{\textbf{LISTA DE FIGURAS}}
+\end{center}
+\begin{center}
+\listoffigures
+\end{center}
+
+<!-- lista de tabelas -->
+
+\newpage
+\begin{center}
+\MakeUppercase{\textbf{LISTA DE TABELAS}}
+\end{center}
+\begin{center}
+\listoftables
+\end{center}
+\thispagestyle{empty}
+\endgroup
+
+<!-- elementos textuais -->
+
+\newpage
+# INTRODUÇÃO
+
+
+\newpage
+# REFERÊNCIAS
+

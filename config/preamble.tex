@@ -1,0 +1,71 @@
+% variáveis
+\newcommand{\nome}{Alberson da Silva}
+\newcommand{\sobrenome}{Miranda}
+\newcommand{\tipo}{Dissertação}
+\newcommand{\tipoingles}{Dissertation}
+\newcommand{\titulo}{Reconciliação Ótima Probabilística em Séries Temporais Hierárquicas}
+\newcommand{\tituloingles}{Probabilistic Optimal Conciliation in Hierarquic Time Series}
+\newcommand{\universidade}{Universidade Federal do Espírito Santo}
+\newcommand{\campus}{Vitória}
+\newcommand{\curso}{Mestrado em Economia}
+\newcommand{\cursoingles}{MSc. in Economics}
+\newcommand{\orientador}{Prof. Dr. Guilherme A. A. Pereira}
+\newcommand{\cidade}{Vitória}
+\newcommand{\dia}{xx}
+\newcommand{\mes}{setembro}
+\newcommand{\ano}{2022}
+\newcommand{\grau}{Mestre em Economia}
+\newcommand{\bancap}{Prof. Dr. Componente Banca}
+\newcommand{\bancas}{Prof. Dr. Componente Banca}
+
+% pacotes
+\usepackage{bbm, times, quoting, setspace, lscape}
+\usepackage{indentfirst, float, graphicx, psfrag, fancyhdr}
+\usepackage{times, amsmath, amsfonts, amssymb, amsthm}
+\usepackage{xcolor, url, placeins, sectsty, enumitem}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage[skip = 2pt, size = normalsize]{caption}
+\usepackage[labelfont = bf]{caption}
+
+% fontes
+\sectionfont{\fontsize{12}{15}\selectfont}
+\subsectionfont{\fontsize{12}{15}\selectfont}
+
+% cabeçalho e rodapé
+\lhead{}
+\chead{}
+\rhead{\thepage}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+\renewcommand{\headrulewidth}{0pt}
+
+% espaçamento
+\onehalfspacing
+\linespread{1.5}
+
+% ambiente citação
+\newenvironment{citacao}
+    {\begin{quoting}[rightmargin=0cm,leftmargin=4cm]
+    \begin{singlespace}
+    \footnotesize
+    }
+    {\end{singlespace}
+    \end{quoting}
+}
+
+% legenda
+\captionsetup[figure]{font=scriptsize}
+\captionsetup{labelsep = endash, format = hang, width = \textwidth}
+\addto\captionsbrazil{\renewcommand{\contentsname}{}}
+\addto\captionsbrazil{\renewcommand{\listfigurename}{}}
+\addto\captionsbrazil{\renewcommand{\listtablename}{}}
+\addto\captionsbrazil{\renewcommand{\bibname}{}}
+
+% posição das figuras
+\floatplacement{figure}{H}
+\floatplacement{table}{H}
+
+% estilo
+\pagestyle{fancy}
