@@ -14,7 +14,7 @@ spacing: onehalfspacing
 
 \thispagestyle{empty}
 \begin{center}
-{\Large \MakeUppercase{\universidade\\ campus \campus\\ \curso}}
+{\Large \MakeUppercase{\universidade\\ \campus\\ \curso}}
 \end{center}
 \vspace{1cm}
 \begin{center}
@@ -49,7 +49,7 @@ spacing: onehalfspacing
 \end{center}
 
 \hspace{7cm}{\begin{minipage}{8.5cm}{
-\tipo\>apresentada à coordenadoria do \curso\>da \universidade, Campus \campus, como requisito parcial para a obtenção do título de \grau.\\
+\tipo\>apresentada ao \curso\>da \universidade, como requisito para a obtenção do título de \grau.\\
 
 Orientador: \parbox[t]{6.0cm}{\orientador}}
 \end{minipage}}
@@ -79,7 +79,7 @@ Orientador: \parbox[t]{6.0cm}{\orientador}}
 \end{center}
 
 \hspace{7.5cm}{\begin{minipage}{8.5cm}{
-\tipo\>apresentada à coordenadoria do \curso\>do \universidade, Campus \campus, como requisito parcial para a obtenção do título de \grau.\\}
+\tipo\>apresentada ao \curso\>da \universidade como requisito para a obtenção do título de \grau.\\}
 \end{minipage}}
 
 \vspace{1cm}
@@ -133,7 +133,7 @@ No máximo 500 palavaras em espaço simples e sem parágrafos. Deve apresentar d
 \thispagestyle{empty}
 
 \begin{singlespace}
-\noindent \MakeUppercase{\sobrenome}, \nome. \tituloingles. \ano. xx folhas. \tipoingles\>(\cursoingles) -- \universidade, \cidade, \ano.
+\noindent \MakeUppercase{\sobrenome}, \nome. \textbf{\tituloingles}. \ano. xx folhas. \tipoingles\>(\cursoingles) -- \universidade, \cidade, \ano.
 
 \vspace{1pc}
 \begin{center}
