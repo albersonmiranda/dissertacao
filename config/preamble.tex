@@ -2,7 +2,7 @@
 \newcommand{\nome}{Alberson da Silva}
 \newcommand{\sobrenome}{Miranda}
 \newcommand{\tipo}{Dissertação}
-\newcommand{\tipoingles}{Dissertation}
+\newcommand{\tipoingles}{Thesis}
 \newcommand{\titulo}{Reconciliação Ótima Probabilística em Séries Temporais Hierárquicas}
 \newcommand{\tituloingles}{Probabilistic Optimal Conciliation in Hierarquic Time Series}
 \newcommand{\universidade}{Universidade Federal do Espírito Santo}
@@ -24,9 +24,12 @@
 \usepackage{times, amsmath, amsfonts, amssymb, amsthm}
 \usepackage{xcolor, url, placeins, sectsty, enumitem}
 \usepackage[T1]{fontenc}
-\usepackage[brazil]{babel}
+\usepackage{polyglossia}
 \usepackage[skip = 2pt, size = normalsize]{caption}
 \usepackage[labelfont = bf]{caption}
+
+% linguagem
+\setdefaultlanguage[variant=brazilian]{portuguese}
 
 % fontes
 \sectionfont{\fontsize{12}{15}\selectfont}
@@ -58,10 +61,9 @@
 % legenda
 \captionsetup[figure]{font=scriptsize}
 \captionsetup{labelsep = endash, format = hang, width = \textwidth}
-\addto\captionsbrazil{\renewcommand{\contentsname}{}}
-\addto\captionsbrazil{\renewcommand{\listfigurename}{}}
-\addto\captionsbrazil{\renewcommand{\listtablename}{}}
-\addto\captionsbrazil{\renewcommand{\bibname}{}}
+\deftocheading{toc}{}%
+\deftocheading{lof}{}%
+\deftocheading{lot}{}%
 
 % posição das figuras
 \floatplacement{figure}{H}

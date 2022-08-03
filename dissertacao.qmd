@@ -194,6 +194,25 @@ Tradução do resumo.
 \newpage
 # INTRODUÇÃO
 
+Citações geram referência ao final: @R.
+
+Exemplo de tabela referenciada na lista de tabelas:
+```{r}
+#| echo: false
+#| label: mtcars
+#| tbl-cap: "primeiras linhas de mtcars"
+
+knitr::kable(head(mtcars))
+```
+
+Exemplo de gráfico referenciado na lista de figuras:
+```{r}
+#| echo: false
+#| label: plot_mtcars
+#| fig-cap: "disp x mpg"
+
+plot(mtcars$disp, mtcars$mpg)
+```
 
 \newpage
 # REFERÊNCIAS
