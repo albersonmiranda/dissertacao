@@ -4,11 +4,32 @@ format:
     pdf:
         include-in-header: config/preamble.tex
 csl: config/abnt.csl
-bibliography: config/bib.bib
 fontsize: 12pt
 geometry: margin=1in
-spacing: onehalfspacing
+number-sections: true
 ---
+
+```{r config}
+#| include = FALSE
+# opções
+knitr::opts_chunk$set(
+    out.width = "70%",
+    echo = FALSE
+)
+
+# reprodutibilidade
+set.seed(1)
+
+# pacotes
+library(kableExtra)
+library(ggplot2)
+
+# tema ggplot
+tema = theme_classic() +
+    theme(
+        text = element_text(family = "serif")
+    )
+```
 
 <!-- capa -->
 
@@ -79,12 +100,12 @@ Orientador: \parbox[t]{6.0cm}{\orientador}}
 \end{center}
 
 \hspace{7.5cm}{\begin{minipage}{8.5cm}{
-\tipo\>apresentada ao \curso\>da \universidade como requisito para a obtenção do título de \grau.\\}
+\tipo\>apresentada ao \curso\>da \universidade\>como requisito para a obtenção do título de \grau.\\}
 \end{minipage}}
 
 \vspace{1cm}
 
-\hspace{9cm} {\uppercase{\textbf{Banca Examinadora}}}
+\hspace{9cm} \uppercase{\textbf{Banca Examinadora}}
 
 \vspace{1cm}
 \begin{center}
@@ -192,28 +213,13 @@ Tradução do resumo.
 <!-- elementos textuais -->
 
 \newpage
-# INTRODUÇÃO
+# INTRODUÇÃO {-}
 
-Citações geram referência ao final: @R.
+[...]
 
-Exemplo de tabela referenciada na lista de tabelas:
-```{r}
-#| echo: false
-#| label: mtcars
-#| tbl-cap: "primeiras linhas de mtcars"
-
-knitr::kable(head(mtcars))
-```
-
-Exemplo de gráfico referenciado na lista de figuras:
-```{r}
-#| echo: false
-#| label: plot_mtcars
-#| fig-cap: "disp x mpg"
-
-plot(mtcars$disp, mtcars$mpg)
-```
+# REVISÃO DA LITERATURA
 
 \newpage
-# REFERÊNCIAS
+# REFERÊNCIAS {-}
 
+\bibliography{config/bib.bib}

@@ -23,17 +23,30 @@
 \usepackage{indentfirst, float, graphicx, psfrag, fancyhdr}
 \usepackage{times, amsmath, amsfonts, amssymb, amsthm}
 \usepackage{xcolor, url, placeins, sectsty, enumitem}
+\usepackage{polyglossia, natbib, dcolumn}
 \usepackage[T1]{fontenc}
-\usepackage{polyglossia}
 \usepackage[skip = 2pt, size = normalsize]{caption}
 \usepackage[labelfont = bf]{caption}
 
-% linguagem
-\setdefaultlanguage[variant=brazilian]{portuguese}
-
 % fontes
+\setmainfont{Times New Roman}
+\setmonofont[Scale=0.9, Scale=MatchLowercase]{Consolas}
 \sectionfont{\fontsize{12}{15}\selectfont}
 \subsectionfont{\fontsize{12}{15}\selectfont}
+%\renewenvironment{Shaded}
+%    {\begin{snugshade}
+%    \begin{singlespace}
+%    \linespread{0.5}
+%    }
+%    {\end{singlespace}
+%    \end{snugshade}
+%}
+
+% linguagem
+\setdefaultlanguage{portuguese}
+\deftocheading{toc}{}%
+\deftocheading{lot}{}%
+\deftocheading{lof}{}%
 
 % cabeçalho e rodapé
 \lhead{}
@@ -61,9 +74,6 @@
 % legenda
 \captionsetup[figure]{font=scriptsize}
 \captionsetup{labelsep = endash, format = hang, width = \textwidth}
-\deftocheading{toc}{}%
-\deftocheading{lof}{}%
-\deftocheading{lot}{}%
 
 % posição das figuras
 \floatplacement{figure}{H}
@@ -71,3 +81,6 @@
 
 % estilo
 \pagestyle{fancy}
+
+% bibliografia
+\renewcommand{\bibsection}{}
