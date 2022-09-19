@@ -3,7 +3,8 @@ title: ""
 format:
     pdf:
         include-in-header: config/preamble.tex
-csl: config/abnt.csl
+biblio-style: apalike
+cite-method: natbib
 fontsize: 12pt
 geometry: margin=1in
 number-sections: true
@@ -11,6 +12,7 @@ number-sections: true
 
 ```{r config}
 #| include = FALSE
+
 # opções
 knitr::opts_chunk$set(
     out.width = "70%",
@@ -217,155 +219,20 @@ Tradução do resumo.
 
 Neste trabalho, 
 
-Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagregadas naturalmente em uma estrutura. Para ilustrar, tome a série do Pib brasileiro. Ela pode ser desagregada por estado, que por sua vez, podem ser desagregadas por município.
+## SÉRIES HIERÁRQUICAS X SÉRIES AGRUPADAS {-}
+
+Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagregadas naturalmente em uma estrutura [@hyndman2021]. Para ilustrar, tome a série do Pib brasileiro. Ela pode ser desagregada por estado, que por sua vez, podem ser desagregadas por município.
 
 ```{r diagrammer_intro}
+#| fig-cap: "Séries Hierárquicas"
+#| out.width: "100%"
 
-# total
-node_total = DiagrammeR::create_node_df(
-    n = 1,
-    label = "Total",
-    type = "total"
-)
-
-# estados
-node_es = DiagrammeR::create_node_df(
-    n = 4,
-    label = c(
-        "Espírito Santo",
-        "Vitória",
-        "Vila Velha",
-        "..."
-    ),
-    rank = c(
-        "estados",
-        rep("municipios", 3)
-    ),
-    type = "hierarquia",
-    estado = "ES",
-    width = 2
-)
-
-node_rj = DiagrammeR::create_node_df(
-    n = 4,
-    label = c(
-        "Rio de Janeiro",
-        "Rio de Janeiro",
-        "Duque de Caxias",
-        "..."
-    ),
-    rank = c(
-        "estados",
-        rep("municipios", 3)
-    ),
-    type = "hierarquia",
-    estado = "RJ",
-    width = 2
-)
-
-node_sp = DiagrammeR::create_node_df(
-    n = 4,
-    label = c(
-        "São Paulo",
-        "São Paulo",
-        "Taubaté",
-        "..."
-    ),
-    rank = c(
-        "estados",
-        rep("municipios", 3)
-    ),
-    type = "hierarquia",
-    estado = "SP",
-    width = 2
-)
-
-node_etc = DiagrammeR::create_node_df(
-    n = 4,
-    label = c(
-        "...",
-        "..."
-    ),
-    rank = c(
-        "estados",
-        "municipios"
-    ),
-    type = "hierarquia",
-    estado = "etc",
-    width = 2
-)
-
-# combinar nodes
-nodes = DiagrammeR::combine_ndfs(
-    node_total,
-    node_es,
-    node_rj,
-    node_sp,
-    node_etc
-)
-
-# edges
-edge_estados = DiagrammeR::create_edge_df(
-    from = 1,
-    to = nodes[which(nodes$rank == "estados"), "id"],
-    arrowhead = "none",
-    color = azul
-)
-
-edge_es = DiagrammeR::create_edge_df(
-    from = nodes[which(nodes$rank == "estados" & nodes$estado == "ES"), "id"],
-    to = nodes[which(nodes$rank == "municipios" & nodes$estado == "ES"), "id"],
-    arrowhead = "none",
-    color = azul
-)
-
-edge_sp = DiagrammeR::create_edge_df(
-    from = nodes[which(nodes$rank == "estados" & nodes$estado == "SP"), "id"],
-    to = nodes[which(nodes$rank == "municipios" & nodes$estado == "SP"), "id"],
-    arrowhead = "none",
-    color = azul
-)
-
-edge_rj = DiagrammeR::create_edge_df(
-    from = nodes[which(nodes$rank == "estados" & nodes$estado == "RJ"), "id"],
-    to = nodes[which(nodes$rank == "municipios" & nodes$estado == "RJ"), "id"],
-    arrowhead = "none",
-    color = azul
-)
-
-edge_sp = DiagrammeR::create_edge_df(
-    from = nodes[which(nodes$rank == "estados" & nodes$estado == "SP"), "id"],
-    to = nodes[which(nodes$rank == "municipios" & nodes$estado == "SP"), "id"],
-    arrowhead = "none",
-    color = azul
-)
-
-edge_etc = DiagrammeR::create_edge_df(
-    from = nodes[which(nodes$rank == "estados" & nodes$estado == "etc"), "id"],
-    to = nodes[which(nodes$rank == "municipios" & nodes$estado == "etc"), "id"],
-    arrowhead = "none",
-    color = azul
-)
-
-edges = DiagrammeR::combine_edfs(
-    edge_es,
-    edge_sp,
-    edge_rj,
-    edge_etc
-)
-
-graph = DiagrammeR::create_graph(
-  nodes,
-  edges,
-  attr_theme = "tb")
-
-DiagrammeR::render_graph(graph)
+source("scripts/hierarq.R")
+knitr::include_graphics("img/hierarq.png")
 ```
 
 
 # REVISÃO DA LITERATURA
-
-
 
 
 \newpage
