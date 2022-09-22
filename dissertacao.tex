@@ -249,7 +249,7 @@
 \date{}
 
 \begin{document}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, frame hidden, boxrule=0pt, sharp corners, interior hidden, breakable, enhanced]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, breakable, borderline west={3pt}{0pt}{shadecolor}, enhanced, interior hidden, frame hidden, sharp corners]}{\end{tcolorbox}}\fi
 
 \thispagestyle{empty}
 \begin{center}
@@ -437,11 +437,11 @@ por estado, que por sua vez, podem ser desagregadas por município.
 
 \begin{figure}
 
-{\centering \includegraphics[width=1\textwidth,height=\textheight]{img/hierarq.png}
+{\centering \includegraphics{img/hierarq.png}
 
 }
 
-\caption{Séries Hierárquicas}
+\caption{\label{fig-h}Séries Hierárquicas}
 
 \end{figure}
 
@@ -456,19 +456,19 @@ agrupadas.
 
 \begin{figure}
 
-{\centering \includegraphics[width=1\textwidth,height=\textheight]{img/agrupadas.png}
+{\centering \includegraphics{img/agrupadas.png}
 
 }
 
-\caption{Séries Agrupadas}
+\caption{\label{fig-a}Séries Agrupadas}
 
 \end{figure}
 
 Combinando as duas, temos a estrutura de séries hierárquicas agrupadas.
 Ao contrário da estrutura hierárquica, que só pode ser agregada de uma
 forma --- como com os municípios abaixo dos estados ---, a adição da
-estrutura agrupada pode ocorrer tanto acima (Figure~\ref{fig-ha1})
-quanto abaixo (Figure~\ref{fig-ha2}) da hierárquica.
+estrutura agrupada pode ocorrer tanto acima (figura~\ref{fig-ha1})
+quanto abaixo (figura~\ref{fig-ha2}) da hierárquica.
 
 \begin{figure}
 
@@ -489,6 +489,25 @@ quanto abaixo (Figure~\ref{fig-ha2}) da hierárquica.
 \caption{\label{fig-ha2}Séries Hierárquicas Agrupadas (b)}
 
 \end{figure}
+
+\hypertarget{abordagem-top-down-x-bottom-up}{%
+\subsection*{ABORDAGEM TOP-DOWN X
+BOTTOM-UP}\label{abordagem-top-down-x-bottom-up}}
+\addcontentsline{toc}{subsection}{ABORDAGEM TOP-DOWN X BOTTOM-UP}
+
+Talvez as formas mais intuitivas de se pensar em previsões para esses
+tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a
+estrutura descrita na figura~\ref{fig-h}, por exemplo. Podemos realizar
+a previsão para o horizonte de tempo \(h\) do agregado do Pib
+brasileiro, representado no topo da hierarquia por \emph{Total}
+\eqref{eq:1}, e então distribuir os valores previstos proporcionalmente
+entre os estados.
+
+\begin{equation}
+\hat{Y}_{Total, T+h | T} = E[Y_{Total, T+h} | \Omega_T] \label{eq:1}
+\end{equation}
+
+Então, se o Pib do Espírito Santo é 2,9\% do nacional,
 
 \hypertarget{revisuxe3o-da-literatura}{%
 \section{REVISÃO DA LITERATURA}\label{revisuxe3o-da-literatura}}
