@@ -3,6 +3,7 @@ title: ""
 format:
     pdf:
         include-in-header: config/preamble.tex
+        keep-tex: true
 biblio-style: apalike
 cite-method: natbib
 fontsize: 12pt
@@ -230,6 +231,7 @@ Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagreg
 ```{r diagrammer_intro_1}
 #| fig-cap: "Séries Hierárquicas"
 #| out.width: "100%"
+#| label: diagrammer_intro_1
 
 source("scripts/hierarq.R")
 knitr::include_graphics("img/hierarq.png")
@@ -240,25 +242,16 @@ Por outro lado, o Pib pode ser também desagregado de forma cruzada de acordo co
 ```{r diagrammer_intro_2}
 #| fig-cap: "Séries Agrupadas"
 #| out.width: "100%"
+#| label: diagrammer_intro_2
 
 knitr::include_graphics("img/agrupadas.png")
 ```
 
-Combinando as duas, temos a estrutura de séries hierárquicas agrupadas. Ao contrário da estrutura hierárquica, que só pode ser agregada de uma forma --- como os municípios abaixo dos estados ---, a adição da estrutura agrupada pode ocorrer tanto acima quanto abaixo da hierárquica.
+Combinando as duas, temos a estrutura de séries hierárquicas agrupadas. Ao contrário da estrutura hierárquica, que só pode ser agregada de uma forma --- como com os municípios abaixo dos estados ---, a adição da estrutura agrupada pode ocorrer tanto acima (@fig-ha1) quanto abaixo (@fig-ha2) da hierárquica.
 
-```{r diagrammer_intro_3}
-#| fig-cap: "Séries Hierárquicas Agrupadas"
-#| out.width: "100%"
+![Séries Hierárquicas Agrupadas (a)](img/hier_agrup.png){#fig-ha1}
 
-knitr::include_graphics("img/hier_agrup.png")
-```
-
-```{r diagrammer_intro_4}
-#| fig-cap: "Séries Hierárquicas Agrupadas"
-#| out.width: "100%"
-
-knitr::include_graphics("img/hier_agrup_2.png")
-```
+![Séries Hierárquicas Agrupadas (b)](img/hier_agrup_2.png){#fig-ha2}
 
 # REVISÃO DA LITERATURA
 
