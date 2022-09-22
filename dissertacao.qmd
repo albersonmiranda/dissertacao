@@ -235,7 +235,7 @@ source("scripts/hierarq.R")
 knitr::include_graphics("img/hierarq.png")
 ```
 
-Por outro lado, o Pib pode ser também desagregado de forma cruzada de acordo com a atividade econômica --- lavoura, rebanho, indústria de transformação, extrativa, bens de capital, bens intermediários, comércio de vestuário, automotivos, serviços etc. Essa estrutura não pode ser desagregada naturalmente de uma única forma, como é a hierarquia de estados e municípios. Não pode ser aninhada por um atributo como a própria geografia. Esse tipo de estrutura é chamada de séries agrupadas.
+Por outro lado, o Pib pode ser também desagregado de forma cruzada de acordo com a atividade econômica --- lavoura, rebanho, indústria de transformação, extrativa, bens de capital, bens intermediários, comércio de vestuário, automotivos, serviços etc. Essa estrutura não pode ser desagregada naturalmente de uma única forma, como é a hierarquia de estados e municípios. Não pode ser aninhada por um atributo como a própria geografia. A esse tipo de estrutura dá-se o nome de séries agrupadas.
 
 ```{r diagrammer_intro_2}
 #| fig-cap: "Séries Agrupadas"
@@ -244,13 +244,20 @@ Por outro lado, o Pib pode ser também desagregado de forma cruzada de acordo co
 knitr::include_graphics("img/agrupadas.png")
 ```
 
-Combinando as duas, temos a estrutura de séries hierárquicas agrupadas.
+Combinando as duas, temos a estrutura de séries hierárquicas agrupadas. Ao contrário da estrutura hierárquica, que só pode ser agregada de uma forma --- como os municípios abaixo dos estados ---, a adição da estrutura agrupada pode ocorrer tanto acima quanto abaixo da hierárquica.
 
 ```{r diagrammer_intro_3}
 #| fig-cap: "Séries Hierárquicas Agrupadas"
 #| out.width: "100%"
 
 knitr::include_graphics("img/hier_agrup.png")
+```
+
+```{r diagrammer_intro_4}
+#| fig-cap: "Séries Hierárquicas Agrupadas"
+#| out.width: "100%"
+
+knitr::include_graphics("img/hier_agrup_2.png")
 ```
 
 # REVISÃO DA LITERATURA

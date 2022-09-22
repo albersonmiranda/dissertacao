@@ -191,3 +191,70 @@ create_graph(attr_theme = "tb") |>
         file_name = "img/hier_agrup.png",
         file_type = "PNG",
         width = 1200)
+
+# séries agrupadas em outra ordem
+nodes_ha = tibble::tribble(
+    ~id, ~tipo, ~label,
+    1, "total", "Total",
+    2, "setor", "Agro",
+    3, "setor", "Ind",
+    4, "setor", "...",
+    5, "estado", "ES",
+    6, "estado", "RJ",
+    7, "estado", "...",
+    8, "setor", "Agro",
+    9, "setor", "Ind",
+    10, "setor", "...",
+    11, "setor", "Agro",
+    12, "setor", "Ind",
+    13, "setor", "...",
+)
+
+nodes_ha = within(nodes_ha, {
+    shape = "rectangle"
+    fontname = "Times New Roman"
+    fillcolor = "#003468"
+    fillcolor = ifelse(tipo == "setor", "#56AF31", fillcolor)
+    fillcolor = ifelse(tipo == "estado", "#004B8D", fillcolor)
+    fillcolor = ifelse(tipo == "municipio", "white", fillcolor)
+    fontcolor = ifelse(tipo == "municipio", "#004B8D", "white")
+    color = ifelse(tipo == "municipio", "#004B8D", fillcolor)
+    width = 1
+})
+
+edges_ha = tibble::tribble(
+    ~from, ~to,
+    1, 5,
+    1, 6,
+    1, 7,
+    5, 2,
+    5, 3,
+    5, 4,
+    6, 8,
+    6, 9,
+    6, 10,
+    7, 11,
+    7, 12,
+    7, 13
+)
+
+edges_ha = within(edges_ha, {
+    arrowhead = "none"
+    color = "#004B8D"
+})
+
+create_graph(attr_theme = "tb") |>
+    add_nodes_from_table(
+        table = nodes_ha,
+        label_col = label
+    ) |>
+    add_edges_from_table(
+        table = edges_ha,
+        from_col = from,
+        to_col = to,
+        from_to_map = id_external
+    ) |>
+    export_graph(
+        file_name = "img/hier_agrup_2.png",
+        file_type = "PNG",
+        width = 1200)
