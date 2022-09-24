@@ -249,7 +249,7 @@
 \date{}
 
 \begin{document}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, breakable, borderline west={3pt}{0pt}{shadecolor}, enhanced, interior hidden, frame hidden, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, interior hidden, enhanced, breakable, sharp corners, frame hidden, boxrule=0pt]}{\end{tcolorbox}}\fi
 
 \thispagestyle{empty}
 \begin{center}
@@ -500,12 +500,16 @@ tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a
 estrutura descrita na figura~\ref{fig-h}, por exemplo. Podemos realizar
 a previsão para o horizonte de tempo \(h\) do agregado do Pib
 brasileiro, representado no topo da hierarquia por \emph{Total}
-\eqref{eq:1}, e então distribuir os valores previstos proporcionalmente
-entre os estados.
+(equação~\ref{eq-1}), e então distribuir os valores previstos
+proporcionalmente entre os estados (equação~\ref{eq-2}).
 
-\begin{equation}
-\hat{Y}_{Total, T+h | T} = E[Y_{Total, T+h} | \Omega_T] \label{eq:1}
-\end{equation}
+\begin{equation}\protect\hypertarget{eq-1}{}{
+\hat{Y}_{Total, T+h | T} = E[Y_{Total, T+h} | \Omega_T]
+}\label{eq-1}\end{equation}
+
+\begin{equation}\protect\hypertarget{eq-2}{}{
+\hat{Y}_{Vitória, T+h | T} = p_{Vitória}\hat{Y}_{Total, T+h | T}
+}\label{eq-2}\end{equation}
 
 Então, se o Pib do Espírito Santo é 2,9\% do nacional,
 
