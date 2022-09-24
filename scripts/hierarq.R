@@ -5,16 +5,16 @@
 nodes_h = tibble::tribble(
     ~id, ~tipo, ~label,
     1, "total", "Total",
-    2, "estado", "Espírito Santo",
-    3, "município", "Vitória",
-    4, "município", "Vila Velha",
-    5, "município", "...",
-    6, "estado", "Rio de Janeiro",
-    7, "município", "Rio de Janeiro",
-    8, "município", "Duque de Caxias",
-    9, "município", "...",
-    10, "estado", "...",
-    11, "município", "..."
+    2, "estado", "Espírito Santo (A)",
+    3, "município", "Vitória (AA)",
+    4, "município", "Vila Velha (AB)",
+    5, "município", "... (AC)",
+    6, "estado", "Rio de Janeiro (B)",
+    7, "município", "Rio de Janeiro (BA)",
+    8, "município", "Duque de Caxias (BB)",
+    9, "município", "... (BC)",
+    10, "estado", "... (C)",
+    11, "município", "... (CA)"
 )
 
 nodes_h = within(nodes_h, {
@@ -67,12 +67,12 @@ create_graph(attr_theme = "tb") |>
 nodes_a = tibble::tribble(
     ~id, ~tipo, ~label,
     1, "total", "Total",
-    2, "setor", "Lavoura",
-    3, "setor", "Rebanho",
-    4, "setor", "Ind. Transf.",
-    5, "setor", "Ind. Extrativa",
-    6, "setor", "Bens de K",
-    7, "setor", "..."
+    2, "setor", "Lavoura (A)",
+    3, "setor", "Rebanho (B)",
+    4, "setor", "Ind. Transf. (C)",
+    5, "setor", "Ind. Extrativa (D)",
+    6, "setor", "Bens de K (E)",
+    7, "setor", "... (F)"
 )
 
 nodes_a = within(nodes_a, {
