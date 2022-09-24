@@ -9,8 +9,9 @@ cite-method: natbib
 fontsize: 12pt
 geometry: margin=1in
 number-sections: true
-crossref: 
+crossref:
   fig-prefix: "figura"
+  eq-prefix: "equação"
 ---
 
 ```{r config}
@@ -247,11 +248,17 @@ Combinando as duas, temos a estrutura de séries hierárquicas agrupadas. Ao con
 
 ## ABORDAGEM TOP-DOWN X BOTTOM-UP {-}
 
-Talvez as formas mais intuitivas de se pensar em previsões para esses tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a estrutura descrita na @fig-h, por exemplo. Podemos realizar a previsão para o horizonte de tempo $h$ do agregado do Pib brasileiro, representado no topo da hierarquia por *Total* \eqref{eq:1}, e então distribuir os valores previstos proporcionalmente entre os estados.
+Talvez as formas mais intuitivas de se pensar em previsões para esses tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a estrutura descrita na @fig-h, por exemplo. Podemos realizar a previsão para o horizonte de tempo $h$ do agregado do Pib brasileiro, representado no topo da hierarquia por *Total* (@eq-1), e então distribuir os valores previstos proporcionalmente entre os estados (@eq-2).
 
-\begin{equation}
-\hat{Y}_{Total, T+h | T} = E[Y_{Total, T+h} | \Omega_T] \label{eq:1}
-\end{equation}
+$$
+\hat{Y}_{Total, T+h | T} = E[Y_{Total, T+h} | \Omega_T]
+$$ {#eq-1}
+
+Dessa forma, a previsão para os níveis inferiores da hierarquia são determinadas pela proporção $p_i$ do nível agregado. Por exemplo, as previsões para o estado do Espírito Santo no 
+
+$$
+\hat{Y}_{ES, T+h | T} = p_{ES}\hat{Y}_{Total, T+h | T}
+$$ {#eq-2}
 
 
 Então, se o Pib do Espírito Santo é 2,9% do nacional, 
