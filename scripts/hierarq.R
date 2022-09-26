@@ -67,12 +67,12 @@ create_graph(attr_theme = "tb") |>
 nodes_a = tibble::tribble(
     ~id, ~tipo, ~label,
     1, "total", "Total",
-    2, "setor", "Lavoura (A)",
-    3, "setor", "Rebanho (B)",
-    4, "setor", "Ind. Transf. (C)",
-    5, "setor", "Ind. Extrativa (D)",
-    6, "setor", "Bens de K (E)",
-    7, "setor", "... (F)"
+    2, "setor", "Lavoura",
+    3, "setor", "Rebanho",
+    4, "setor", "Ind. Transf.",
+    5, "setor", "Ind. Extrativa",
+    6, "setor", "Bens de K",
+    7, "setor", "..."
 )
 
 nodes_a = within(nodes_a, {
@@ -121,22 +121,22 @@ create_graph(attr_theme = "tb") |>
 nodes_ha = tibble::tribble(
     ~id, ~tipo, ~label,
     1, "total", "Total",
-    2, "setor", "Agro",
-    3, "setor", "Ind",
-    4, "setor", "...",
-    5, "estado", "ES",
-    6, "estado", "RJ",
-    7, "estado", "...",
-    8, "estado", "ES",
-    9, "estado", "RJ",
-    10, "estado", "...",
-    11, "estado", "...",
-    12, "municipio", "Vitória",
-    13, "municipio", "Vila Velha",
-    14, "municipio", "...",
-    15, "municipio", "Rio de Janeiro",
-    16, "municipio", "Duque de Caxias",
-    17, "municipio", "..."
+    2, "setor", "Agro (X)",
+    3, "setor", "Ind (Y)",
+    4, "setor", "... (Z)",
+    5, "estado", "ES (AX)",
+    6, "estado", "RJ (BX)",
+    7, "estado", "... (CX)",
+    8, "estado", "ES (AY)",
+    9, "estado", "RJ (BY)",
+    10, "estado", "... (CY)",
+    11, "estado", "... (CZ)",
+    12, "municipio", "Vitória (AAY)",
+    13, "municipio", "Vila Velha (ABY)",
+    14, "municipio", "... (ACY)",
+    15, "municipio", "Rio de Janeiro (BAY)",
+    16, "municipio", "Duque de Caxias (BBY)",
+    17, "municipio", "... (BCY)"
 )
 
 nodes_ha = within(nodes_ha, {
@@ -148,7 +148,7 @@ nodes_ha = within(nodes_ha, {
     fillcolor = ifelse(tipo == "municipio", "white", fillcolor)
     fontcolor = ifelse(tipo == "municipio", "#004B8D", "white")
     color = ifelse(tipo == "municipio", "#004B8D", fillcolor)
-    width = 1
+    width = ifelse(tipo == "municipio", 1.5, 1)
 })
 
 edges_ha = tibble::tribble(
@@ -196,18 +196,18 @@ create_graph(attr_theme = "tb") |>
 nodes_ha = tibble::tribble(
     ~id, ~tipo, ~label,
     1, "total", "Total",
-    2, "setor", "Agro",
-    3, "setor", "Ind",
-    4, "setor", "...",
-    5, "estado", "ES",
-    6, "estado", "RJ",
-    7, "estado", "...",
-    8, "setor", "Agro",
-    9, "setor", "Ind",
-    10, "setor", "...",
-    11, "setor", "Agro",
-    12, "setor", "Ind",
-    13, "setor", "...",
+    2, "setor", "Agro (AX)",
+    3, "setor", "Ind (AY)",
+    4, "setor", "... (AZ)",
+    5, "estado", "ES (A)",
+    6, "estado", "RJ (B)",
+    7, "estado", "... (C)",
+    8, "setor", "Agro (BX)",
+    9, "setor", "Ind (BY)",
+    10, "setor", "... (BZ)",
+    11, "setor", "Agro (CX)",
+    12, "setor", "Ind (CY)",
+    13, "setor", "... (CZ)",
 )
 
 nodes_ha = within(nodes_ha, {
