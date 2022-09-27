@@ -255,7 +255,7 @@
 \date{}
 
 \begin{document}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, breakable, enhanced, borderline west={3pt}{0pt}{shadecolor}, frame hidden, interior hidden, boxrule=0pt]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, frame hidden, boxrule=0pt, enhanced, borderline west={3pt}{0pt}{shadecolor}, breakable, interior hidden]}{\end{tcolorbox}}\fi
 
 \thispagestyle{empty}
 \begin{center}
@@ -408,9 +408,7 @@ Tradução do resumo.
 \begin{center}
 \MakeUppercase{\textbf{LISTA DE FIGURAS}}
 \end{center}
-\begin{center}
 \listoffigures
-\end{center}
 
 \newpage
 \begin{center}
@@ -466,7 +464,7 @@ y_{A,t} &= y_{AA,t} + y_{AB,t} + y_{AC,t} \label{eq:haES}
 Alternativamente, podemos descrever a estrutura completa de forma
 matricial:
 
-\[
+\begin{equation}\protect\hypertarget{eq-matriz_hierarquia}{}{
 \begin{bmatrix}
     y_{t} \\
     y_{A, t} \\
@@ -503,7 +501,7 @@ matricial:
     y_{BC, t} \\
     y_{CA, t}
 \end{bmatrix}
-\]
+}\label{eq-matriz_hierarquia}\end{equation}
 
 Por outro lado, o Pib pode ser também desagregado de forma cruzada de
 acordo com a atividade econômica --- lavoura, rebanho, indústria de
@@ -562,7 +560,7 @@ que define as equações para todo nível de agregação, e pela matriz
 \mathbfit{y}_t=\mathbfit{Sb}_t
 \]
 
-\[
+\begin{equation}\protect\hypertarget{eq-matriz_ha}{}{
 \begin{bmatrix}
     y_{t} \\
     y_{A, t} \\
@@ -611,7 +609,7 @@ que define as equações para todo nível de agregação, e pela matriz
     y_{CY, t} \\
     y_{CZ, t}
 \end{bmatrix}
-\]
+}\label{eq-matriz_ha}\end{equation}
 
 \hypertarget{abordagens-top-down-e-bottom-up}{%
 \subsection*{ABORDAGENS TOP-DOWN E
@@ -630,15 +628,163 @@ proporcionalmente entre os estados e municípios.
 \hat{y}_{T+h | T} = E[y_{T+h} | \Omega_T]
 }\label{eq-topdown_1}\end{equation}
 
-Dessa forma, a previsão para os níveis inferiores da hierarquia são
-determinadas por uma proporção \(p_i\) do nível agregado. Por exemplo,
-as previsões para Vitória são dadas pela equação \ref{eq-topdown_2}.
+Essa é a abordagem top-down. Nela, a previsão para os níveis mais
+desagregados da hierarquia são determinadas por uma proporção \(p_i\) do
+nível agregado. Por exemplo, as previsões para Vitória são dadas pela
+equação \ref{eq-topdown_2}.
 
 \begin{equation}\protect\hypertarget{eq-topdown_2}{}{
-\hat{y}_{AA, T+h | T} = p_{1}\hat{y}_{T+h | T}
+\tilde{y}_{AA, T+h | T} = p_{1}\hat{y}_{T+h | T}
 }\label{eq-topdown_2}\end{equation}
 
-Generalizando, temos a equação a seguir,
+Para isso, temos de definir uma matriz com todos esses pesos, que,
+seguindo a formulação de \citet{hyndman2021}, vamos chamar de
+\(\mathbfit{G}\):
+
+\begin{equation}\protect\hypertarget{eq-matriz_g}{}{
+\mathbfit{G}
+=
+\begin{bmatrix}
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}
+}\label{eq-matriz_g}\end{equation}
+
+\(\mathbfit{G}\) é uma matriz \(m \times n\) que multiplica a matriz
+\(\hat{\mathbfit{y}}_{T+h|T}\) que, por sua vez, é composta pelas
+previsões base --- as previsões para todos os níveis de agregação. A
+equação para a abordagem \emph{top-down} será, então:
+
+\begin{equation}\protect\hypertarget{eq-topdown_3}{}{
+\mathbfit{\tilde{y}}_{T+h | T} = \mathbfit{SG\hat{y}}_{T+h | T}
+}\label{eq-topdown_3}\end{equation}
+
+Na notação matricial para a estrutura da figura~\ref{fig-h}, temos:
+
+\begin{equation}\protect\hypertarget{eq-matriz_topdown1}{}{
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{BC, t} \\
+    \tilde{y}_{CA, t}
+\end{bmatrix}
+=
+\mathbfit{S}
+\begin{bmatrix}
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_8 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_9 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_{10} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_{11} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}
+\begin{bmatrix}
+    \hat{y}_{T+h|T} \\
+    \hat{y}_{A, T+h|T} \\
+    \hat{y}_{B, T+h|T} \\
+    \hat{y}_{C, T+h|T} \\
+    \hat{y}_{AA, T+h|T} \\
+    \hat{y}_{AB, T+h|T} \\
+    \hat{y}_{AC, T+h|T} \\
+    \hat{y}_{BA, T+h|T} \\
+    \hat{y}_{BB, T+h|T} \\
+    \hat{y}_{BC, T+h|T} \\
+    \hat{y}_{CA, T+h|T}
+\end{bmatrix}
+}\label{eq-matriz_topdown1}\end{equation}
+
+\begin{equation}\protect\hypertarget{eq-matriz_topdown2}{}{
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{BC, t} \\
+    \tilde{y}_{CA, t}
+\end{bmatrix}
+=
+\mathbfit{S}
+\begin{bmatrix}
+    p_1\hat{y}_{T+h|T} \\
+    p_2\hat{y}_{T+h|T} \\
+    p_3\hat{y}_{T+h|T} \\
+    p_4\hat{y}_{T+h|T} \\
+    p_5\hat{y}_{T+h|T} \\
+    p_6\hat{y}_{T+h|T} \\
+    p_7\hat{y}_{T+h|T} \\
+    p_8\hat{y}_{T+h|T} \\
+    p_9\hat{y}_{T+h|T} \\
+    p_{10}\hat{y}_{T+h|T} \\
+    p_{11}\hat{y}_{T+h|T}
+\end{bmatrix}
+}\label{eq-matriz_topdown2}\end{equation}
+
+A matriz \(\mathbfit{S}\) aqui será, temos:
+
+\begin{equation}\protect\hypertarget{eq-matriz_topdown3}{}{
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{BC, t} \\
+    \tilde{y}_{CA, t}
+\end{bmatrix}
+=
+\begin{bmatrix}
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 \\
+    0 & 0 & 0 & 0 & 1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\end{bmatrix}
+\begin{bmatrix}
+    p_1\hat{y}_{T+h|T} \\
+    p_2\hat{y}_{T+h|T} \\
+    p_3\hat{y}_{T+h|T} \\
+    p_4\hat{y}_{T+h|T} \\
+    p_5\hat{y}_{T+h|T} \\
+    p_6\hat{y}_{T+h|T} \\
+    p_7\hat{y}_{T+h|T} \\
+    p_8\hat{y}_{T+h|T} \\
+    p_9\hat{y}_{T+h|T} \\
+    p_{10}\hat{y}_{T+h|T} \\
+    p_{11}\hat{y}_{T+h|T}
+\end{bmatrix}
+}\label{eq-matriz_topdown3}\end{equation}
+
+\newpage
 
 \hypertarget{revisuxe3o-da-literatura}{%
 \section{REVISÃO DA LITERATURA}\label{revisuxe3o-da-literatura}}
