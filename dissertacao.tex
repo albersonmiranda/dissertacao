@@ -255,7 +255,7 @@
 \date{}
 
 \begin{document}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, frame hidden, boxrule=0pt, enhanced, borderline west={3pt}{0pt}{shadecolor}, breakable, interior hidden]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, interior hidden, sharp corners, frame hidden, borderline west={3pt}{0pt}{shadecolor}, boxrule=0pt, enhanced]}{\end{tcolorbox}}\fi
 
 \thispagestyle{empty}
 \begin{center}
@@ -645,18 +645,20 @@ seguindo a formulação de \citet{hyndman2021}, vamos chamar de
 \mathbfit{G}
 =
 \begin{bmatrix}
-    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
 \end{bmatrix}
 }\label{eq-matriz_g}\end{equation}
 
 \(\mathbfit{G}\) é uma matriz \(m \times n\) que multiplica a matriz
 \(\hat{\mathbfit{y}}_{T+h|T}\) que, por sua vez, é composta pelas
-previsões base --- as previsões para todos os níveis de agregação. A
-equação para a abordagem \emph{top-down} será, então:
+previsões base --- as previsões individuais para todos os níveis de
+agregação. A equação para a abordagem \emph{top-down} será, então:
 
 \begin{equation}\protect\hypertarget{eq-topdown_3}{}{
 \mathbfit{\tilde{y}}_{T+h | T} = \mathbfit{SG\hat{y}}_{T+h | T}
@@ -687,11 +689,7 @@ Na notação matricial para a estrutura da figura~\ref{fig-h}, temos:
     p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_8 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_9 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_{10} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_{11} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+    p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
 \end{bmatrix}
 \begin{bmatrix}
     \hat{y}_{T+h|T} \\
@@ -707,6 +705,9 @@ Na notação matricial para a estrutura da figura~\ref{fig-h}, temos:
     \hat{y}_{CA, T+h|T}
 \end{bmatrix}
 }\label{eq-matriz_topdown1}\end{equation}
+
+O que nos dá uma proporção do total para cada elemento no nível mais
+desagregado.
 
 \begin{equation}\protect\hypertarget{eq-matriz_topdown2}{}{
 \begin{bmatrix}
@@ -731,15 +732,13 @@ Na notação matricial para a estrutura da figura~\ref{fig-h}, temos:
     p_4\hat{y}_{T+h|T} \\
     p_5\hat{y}_{T+h|T} \\
     p_6\hat{y}_{T+h|T} \\
-    p_7\hat{y}_{T+h|T} \\
-    p_8\hat{y}_{T+h|T} \\
-    p_9\hat{y}_{T+h|T} \\
-    p_{10}\hat{y}_{T+h|T} \\
-    p_{11}\hat{y}_{T+h|T}
+    p_7\hat{y}_{T+h|T}
 \end{bmatrix}
 }\label{eq-matriz_topdown2}\end{equation}
 
-A matriz \(\mathbfit{S}\) aqui será, temos:
+Substituindo a matriz \(\mathbfit{S}\), temos as equações que definem
+cada previsão da estrutura em função de proporções da previsão do
+agregado.
 
 \begin{equation}\protect\hypertarget{eq-matriz_topdown3}{}{
 \begin{bmatrix}
@@ -757,17 +756,17 @@ A matriz \(\mathbfit{S}\) aqui será, temos:
 \end{bmatrix}
 =
 \begin{bmatrix}
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 \\
-    0 & 0 & 0 & 0 & 1 & 1 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
-    0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 1 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1
 \end{bmatrix}
 \begin{bmatrix}
     p_1\hat{y}_{T+h|T} \\
@@ -776,13 +775,75 @@ A matriz \(\mathbfit{S}\) aqui será, temos:
     p_4\hat{y}_{T+h|T} \\
     p_5\hat{y}_{T+h|T} \\
     p_6\hat{y}_{T+h|T} \\
-    p_7\hat{y}_{T+h|T} \\
-    p_8\hat{y}_{T+h|T} \\
-    p_9\hat{y}_{T+h|T} \\
-    p_{10}\hat{y}_{T+h|T} \\
-    p_{11}\hat{y}_{T+h|T}
+    p_7\hat{y}_{T+h|T}
 \end{bmatrix}
 }\label{eq-matriz_topdown3}\end{equation}
+
+Já a abordagem bottom-up parte do raciocínio inverso e define as
+previsões de cada elemento da estrutura a partir das previsões dos
+elementos mais desagregados. Para tanto, basta modificar a matriz
+\(\mathbfit{G}\).
+
+\begin{equation}\protect\hypertarget{eq-matriz_gbu}{}{
+\mathbfit{G}
+=
+\begin{bmatrix}
+    0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+}\label{eq-matriz_gbu}\end{equation}
+
+O que resulta nas equações desejadas. Portanto, \(\mathbfit{G}\) define
+a abordagem --- se top-down ou bottom-up ---, e \(\mathbfit{S}\) define
+a maneira da qual as previsões são somadas para formar as equações de
+previsão para cada elemento da estrutura.
+
+\begin{equation}\protect\hypertarget{eq-matriz_bottomup}{}{
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{BC, t} \\
+    \tilde{y}_{CA, t}
+\end{bmatrix}
+=
+\begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 1 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+    \hat{y}_{AA, T+h|T} \\
+    \hat{y}_{AB, T+h|T} \\
+    \hat{y}_{AC, T+h|T} \\
+    \hat{y}_{BA, T+h|T} \\
+    \hat{y}_{BB, T+h|T} \\
+    \hat{y}_{BC, T+h|T} \\
+    \hat{y}_{CA, T+h|T}
+\end{bmatrix}
+}\label{eq-matriz_bottomup}\end{equation}
+
+\hypertarget{coeruxeancia}{%
+\section{COERÊNCIA}\label{coeruxeancia}}
 
 \newpage
 

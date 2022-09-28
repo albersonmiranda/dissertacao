@@ -370,15 +370,17 @@ $$
 \mathbfit{G}
 =
 \begin{bmatrix}
-    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
 \end{bmatrix}
 $$ {#eq-matriz_g}
 
-$\mathbfit{G}$ é uma matriz $m \times n$ que multiplica a matriz $\hat{\mathbfit{y}}_{T+h|T}$ que, por sua vez, é composta pelas previsões base --- as previsões para todos os níveis de agregação. A equação para a abordagem *top-down* será, então:
+$\mathbfit{G}$ é uma matriz $m \times n$ que multiplica a matriz $\hat{\mathbfit{y}}_{T+h|T}$ que, por sua vez, é composta pelas previsões base --- as previsões individuais para todos os níveis de agregação. A equação para a abordagem *top-down* será, então:
 
 $$
 \mathbfit{\tilde{y}}_{T+h | T} = \mathbfit{SG\hat{y}}_{T+h | T}
@@ -409,11 +411,7 @@ $$
     p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_8 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_9 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_{10} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_{11} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+    p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
 \end{bmatrix}
 \begin{bmatrix}
     \hat{y}_{T+h|T} \\
@@ -430,6 +428,7 @@ $$
 \end{bmatrix}
 $$ {#eq-matriz_topdown1}
 
+O que nos dá uma proporção do total para cada elemento no nível mais desagregado.
 $$
 \begin{bmatrix}
     \tilde{y}_{t} \\
@@ -453,15 +452,11 @@ $$
     p_4\hat{y}_{T+h|T} \\
     p_5\hat{y}_{T+h|T} \\
     p_6\hat{y}_{T+h|T} \\
-    p_7\hat{y}_{T+h|T} \\
-    p_8\hat{y}_{T+h|T} \\
-    p_9\hat{y}_{T+h|T} \\
-    p_{10}\hat{y}_{T+h|T} \\
-    p_{11}\hat{y}_{T+h|T}
+    p_7\hat{y}_{T+h|T}
 \end{bmatrix}
 $$ {#eq-matriz_topdown2}
 
-A matriz $\mathbfit{S}$ aqui será, temos:
+Substituindo a matriz $\mathbfit{S}$, temos as equações que definem cada previsão da estrutura em função de proporções da previsão do agregado.
 
 $$
 \begin{bmatrix}
@@ -479,17 +474,17 @@ $$
 \end{bmatrix}
 =
 \begin{bmatrix}
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 \\
-    0 & 0 & 0 & 0 & 1 & 1 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
-    0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 1 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1
 \end{bmatrix}
 \begin{bmatrix}
     p_1\hat{y}_{T+h|T} \\
@@ -498,13 +493,70 @@ $$
     p_4\hat{y}_{T+h|T} \\
     p_5\hat{y}_{T+h|T} \\
     p_6\hat{y}_{T+h|T} \\
-    p_7\hat{y}_{T+h|T} \\
-    p_8\hat{y}_{T+h|T} \\
-    p_9\hat{y}_{T+h|T} \\
-    p_{10}\hat{y}_{T+h|T} \\
-    p_{11}\hat{y}_{T+h|T}
+    p_7\hat{y}_{T+h|T}
 \end{bmatrix}
 $$ {#eq-matriz_topdown3}
+
+Já a abordagem bottom-up parte do raciocínio inverso e define as previsões de cada elemento da estrutura a partir das previsões dos elementos mais desagregados. Para tanto, basta modificar a matriz $\mathbfit{G}$.
+
+$$
+\mathbfit{G}
+=
+\begin{bmatrix}
+    0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+$$ {#eq-matriz_gbu}
+
+O que resulta nas equações desejadas. Portanto, $\mathbfit{G}$ define a abordagem --- se top-down ou bottom-up ---, e $\mathbfit{S}$ define a maneira da qual as previsões são somadas para formar as equações de previsão para cada elemento da estrutura.
+
+$$
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{BC, t} \\
+    \tilde{y}_{CA, t}
+\end{bmatrix}
+=
+\begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 1 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+    \hat{y}_{AA, T+h|T} \\
+    \hat{y}_{AB, T+h|T} \\
+    \hat{y}_{AC, T+h|T} \\
+    \hat{y}_{BA, T+h|T} \\
+    \hat{y}_{BB, T+h|T} \\
+    \hat{y}_{BC, T+h|T} \\
+    \hat{y}_{CA, T+h|T}
+\end{bmatrix}
+$$ {#eq-matriz_bottomup}
+
+# COERÊNCIA
+
+
 
 \newpage
 # REVISÃO DA LITERATURA
