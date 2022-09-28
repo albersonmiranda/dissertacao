@@ -228,7 +228,7 @@ Tradução do resumo.
 
 Neste trabalho, 
 
-## SÉRIES HIERÁRQUICAS X SÉRIES AGRUPADAS {-}
+## SÉRIES HIERÁRQUICAS E SÉRIES AGRUPADAS {-}
 
 Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagregadas naturalmente em uma estrutura aninhada [@hyndman2021]. Para ilustrar, tome a série do Pib brasileiro. Ela pode ser desagregada por estado que, por sua vez, pode ser desagregada por município.
 
@@ -554,9 +554,15 @@ $$
 \end{bmatrix}
 $$ {#eq-matriz_bottomup}
 
-# COERÊNCIA
+## COERÊNCIA E RECONCILIAÇÃO {-}
 
+Seja somando as previsões do nível mais desagregado para formar os níveis superiores da hierarquia (*bottom-up*) ou distribuindo proporcionalmente as previsões do nível mais agregado (*top-down*), o vetor $\mathbfit{\tilde{y}}_t$ representa as previsões *coerentes*. Isso significa que as previsões "batem", ou seja, são totalizadas corretamente --- as previsões de cada elemento agregado corresponde ao somatório das previsões dos níveis inferiores da hierarquia. Isso é garantido pela multiplicação das matrizes $\mathbfit{SG}$.
 
+Não fosse essa pré multiplicação, nada garantiria a coerência das previsões. Tomando a esturtura da @fig-h como exemplo, seria um acaso improvável que as previsões do agregado para o estado do Espírito Santo sejam exatamente a soma das previsões individuais de seus municípios. Isso porque cada série pode seguir um processo diferente (e.g., arima) com erros e variâncias distintas.
+
+Os métodos de gerar previsões coerentes a partir de previsões base são chamados de métodos de *reconciliação* e, como vimos, são definidos na matriz $\mathbfit{G}$. Os métodos de reconciliação tradicionais apresentados, *top-down* e *bottom-up*, utilizam informação limitada. No método *top-down*, utiliza-se apenas informações do nível mais agregado --- por isso, apenas a primeira coluna em (@eq-matriz_g) é diferente de zero. Já na abordagem *bottom-up*, utiliza-se apenas as informações dos níveis mais desagregados, o que resulta na submatriz identidade $m \times m$ em (@eq-matriz_gbu), enquanto as colunas que representam os níveis mais agregados são nulas.
+
+Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham a menor diferença o possível em relação às previsões base. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
 
 \newpage
 # REVISÃO DA LITERATURA

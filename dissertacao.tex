@@ -255,7 +255,7 @@
 \date{}
 
 \begin{document}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, interior hidden, sharp corners, frame hidden, borderline west={3pt}{0pt}{shadecolor}, boxrule=0pt, enhanced]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, enhanced, frame hidden, interior hidden, breakable, sharp corners, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
 
 \thispagestyle{empty}
 \begin{center}
@@ -428,10 +428,10 @@ Tradução do resumo.
 
 Neste trabalho,
 
-\hypertarget{suxe9ries-hieruxe1rquicas-x-suxe9ries-agrupadas}{%
-\subsection*{SÉRIES HIERÁRQUICAS X SÉRIES
-AGRUPADAS}\label{suxe9ries-hieruxe1rquicas-x-suxe9ries-agrupadas}}
-\addcontentsline{toc}{subsection}{SÉRIES HIERÁRQUICAS X SÉRIES
+\hypertarget{suxe9ries-hieruxe1rquicas-e-suxe9ries-agrupadas}{%
+\subsection*{SÉRIES HIERÁRQUICAS E SÉRIES
+AGRUPADAS}\label{suxe9ries-hieruxe1rquicas-e-suxe9ries-agrupadas}}
+\addcontentsline{toc}{subsection}{SÉRIES HIERÁRQUICAS E SÉRIES
 AGRUPADAS}
 
 Séries temporais hierárquicas são aquelas que podem ser agregadas ou
@@ -842,8 +842,45 @@ previsão para cada elemento da estrutura.
 \end{bmatrix}
 }\label{eq-matriz_bottomup}\end{equation}
 
-\hypertarget{coeruxeancia}{%
-\section{COERÊNCIA}\label{coeruxeancia}}
+\hypertarget{coeruxeancia-e-reconciliauxe7uxe3o}{%
+\subsection*{COERÊNCIA E
+RECONCILIAÇÃO}\label{coeruxeancia-e-reconciliauxe7uxe3o}}
+\addcontentsline{toc}{subsection}{COERÊNCIA E RECONCILIAÇÃO}
+
+Seja somando as previsões do nível mais desagregado para formar os
+níveis superiores da hierarquia (\emph{bottom-up}) ou distribuindo
+proporcionalmente as previsões do nível mais agregado (\emph{top-down}),
+o vetor \(\mathbfit{\tilde{y}}_t\) representa as previsões
+\emph{coerentes}. Isso significa que as previsões ``batem'', ou seja,
+são totalizadas corretamente --- as previsões de cada elemento agregado
+corresponde ao somatório das previsões dos níveis inferiores da
+hierarquia. Isso é garantido pela multiplicação das matrizes
+\(\mathbfit{SG}\).
+
+Não fosse essa pré multiplicação, nada garantiria a coerência das
+previsões. Tomando a esturtura da figura~\ref{fig-h} como exemplo, seria
+um acaso improvável que as previsões do agregado para o estado do
+Espírito Santo sejam exatamente a soma das previsões individuais de seus
+municípios. Isso porque cada série pode seguir um processo diferente
+(e.g., arima) com erros e variâncias distintas.
+
+Os métodos de gerar previsões coerentes a partir de previsões base são
+chamados de métodos de \emph{reconciliação} e, como vimos, são definidos
+na matriz \(\mathbfit{G}\). Os métodos de reconciliação tradicionais
+apresentados, \emph{top-down} e \emph{bottom-up}, utilizam informação
+limitada. No método \emph{top-down}, utiliza-se apenas informações do
+nível mais agregado --- por isso, apenas a primeira coluna em
+(\ref{eq-matriz_g}) é diferente de zero. Já na abordagem
+\emph{bottom-up}, utiliza-se apenas as informações dos níveis mais
+desagregados, o que resulta na submatriz identidade \(m \times m\) em
+(\ref{eq-matriz_gbu}), enquanto as colunas que representam os níveis
+mais agregados são nulas.
+
+Alternativamente, podemos pensar numa matriz \(\mathbfit{G}\) qualquer
+que utilize toda a informação disponível e tenha algumas propriedades
+que garantam que as previsões coerentes tenham a menor diferença o
+possível em relação às previsões base. Esse é o problema de pesquisa
+trabalhado na \emph{reconciliação ótima}.
 
 \newpage
 
