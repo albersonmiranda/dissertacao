@@ -45,29 +45,40 @@ knitr::write_bib(file = "config/packages.bib")
 source("scripts/hierarq.R")
 ```
 
-<!-- capa -->
+<!-- folha de rosto -->
 
+\newpage
 \thispagestyle{empty}
-\begin{center}
-{\Large \MakeUppercase{\universidade\\ \campus\\ \curso}}
-\end{center}
-\vspace{1cm}
+
 \begin{center}
 {\Large \MakeUppercase{\nome\>\sobrenome}}
-\end{center}
-\vspace{5cm}
-\begin{center}
+
+\vspace{6cm}
+
 \Large \MakeUppercase{\textbf{\titulo}}
+
+\normalsize
+
+\vspace{3cm}
 \end{center}
-\vspace{5cm}
+
+\hspace{7cm}{\begin{minipage}{8.5cm}{
+Projeto de dissertação apresentado ao \curso\>da \universidade\\
+
+Orientador: \parbox[t]{6.0cm}{\orientador}}
+\end{minipage}}
+
+\vspace{3cm}
 
 \begin{center}
-\uppercase{\cidade}\\ \ano
+\cidade\\
+\ano
 \end{center}
 
 <!-- elementos textuais -->
 
 \newpage
+\setcounter{page}{1}
 # INTRODUÇÃO {-}
 
 Neste trabalho, 
