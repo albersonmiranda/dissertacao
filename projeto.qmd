@@ -4,7 +4,7 @@ format:
     pdf:
         include-in-header: config/preamble.tex
         keep-tex: false
-        output-file: render/dissertacao.pdf
+        output-file: render/projeto.pdf
 biblio-style: apalike
 cite-method: natbib
 fontsize: 12pt
@@ -64,163 +64,6 @@ source("scripts/hierarq.R")
 \begin{center}
 \uppercase{\cidade}\\ \ano
 \end{center}
-
-<!-- folha de rosto -->
-
-\newpage
-\thispagestyle{empty}
-\setcounter{page}{1}
-
-\begin{center}
-{\Large \MakeUppercase{\nome\>\sobrenome}}
-
-\vspace{6cm}
-
-\Large \MakeUppercase{\textbf{\titulo}}
-
-\normalsize
-
-\vspace{3cm}
-\end{center}
-
-\hspace{7cm}{\begin{minipage}{8.5cm}{
-\tipo\>apresentada ao \curso\>da \universidade, como requisito para a obtenção do título de \grau.\\
-
-Orientador: \parbox[t]{6.0cm}{\orientador}}
-\end{minipage}}
-
-\vspace{3cm}
-
-\begin{center}
-\cidade\\
-\ano
-\end{center}
-
-<!-- folha de aprovação -->
-
-\newpage
-\thispagestyle{empty}
-
-\begin{center}
-{\large \MakeUppercase{\nome\>\sobrenome}}
-
-\vspace{1cm}
-
-\Large \MakeUppercase{\textbf{\titulo}}
-
-\normalsize
-
-\vspace{1cm}
-\end{center}
-
-\hspace{7.5cm}{\begin{minipage}{8.5cm}{
-\tipo\>apresentada ao \curso\>da \universidade\>como requisito para a obtenção do título de \grau.\\}
-\end{minipage}}
-
-\vspace{1cm}
-
-\hspace{9cm} \uppercase{\textbf{Banca Examinadora}}
-
-\vspace{1cm}
-\begin{center}
-
-\hspace{7cm}{\underline{\hspace{7cm}} \\}
-\hspace{7cm}{\orientador \\}
-\hspace{7cm}{\universidade}
-
-\hspace{7cm}{\underline{\hspace{7cm}} \\}
-\hspace{7cm}{\bancap \\}
-\hspace{7cm}{\universidade}
-
-\hspace{7cm}{\underline{\hspace{7cm}} \\}
-\hspace{7cm}{\bancas \\}
-\hspace{7cm}{\universidade}
-
-
-\cidade, \dia\>de \mes\>de \ano.
-\end{center}
-
-<!-- resumo -->
-
-\newpage
-\thispagestyle{empty}
-\begin{singlespace}
-\noindent \MakeUppercase{\sobrenome}, \nome. \textbf{\titulo}. \ano. xx folhas. \tipo\>(\curso) -- \universidade, \cidade, \ano.
-
-\vspace{1pc}
-\begin{center}
-\textbf{RESUMO}
-\end{center}
-\vspace{1pc}
-
-\noindent
-No máximo 500 palavaras em espaço simples e sem parágrafos. Deve apresentar de forma concisa os objetivos, metodologia e os resultado alcançados, utilizar o verbo na voz ativa. Espaçamento simples, sem recuo de parágrafos.
-
-\vspace{2pc}
-\noindent
-{\textbf{Palavras-chave}:}  Palavra 1. Palavra 2. Palavra 3. Palavra 4. Palavra 5.
-
-\end{singlespace}
-
-<!-- abstract -->
-
-\newpage
-\thispagestyle{empty}
-
-\begin{singlespace}
-\noindent \MakeUppercase{\sobrenome}, \nome. \textbf{\tituloingles}. \ano. xx folhas. \tipoingles\>(\cursoingles) -- \universidade, \cidade, \ano.
-
-\vspace{1pc}
-\begin{center}
-\textbf{ABSTRACT}
-\end{center}
-\vspace{1pc}
-
-\noindent 
-Tradução do resumo.
-
-\vspace{2pc}
-\noindent
-{\textbf{Keywords}:}  Tradução das palavras chave.
-\end{singlespace}
-
-<!-- sumário -->
-
-\newpage
-\thispagestyle{empty}
-\begin{flushleft}
-\begingroup
-\let\clearpage\relax
-
-\newpage
-\begin{center}
-\MakeUppercase{\textbf{Sumário}}
-\end{center}
-\begin{center}
-\tableofcontents
-\end{center}
-\end{flushleft}
-
-<!-- lista de figuras -->
-
-\newpage
-\thispagestyle{empty}
-\begin{center}
-\MakeUppercase{\textbf{LISTA DE FIGURAS}}
-\end{center}
-\listoffigures
-
-<!-- lista de tabelas -->
-
-\newpage
-\begin{center}
-\MakeUppercase{\textbf{LISTA DE TABELAS}}
-\end{center}
-\begin{center}
-\listoftables
-\end{center}
-\thispagestyle{empty}
-\endgroup
 
 <!-- elementos textuais -->
 
@@ -561,7 +404,7 @@ Seja somando as previsões do nível mais desagregado para formar os níveis sup
 
 Não fosse essa pré multiplicação, nada garantiria a coerência das previsões. Tomando a esturtura da @fig-h como exemplo, seria um acaso improvável que as previsões do agregado para o estado do Espírito Santo sejam exatamente a soma das previsões individuais de seus municípios. Isso porque cada série pode seguir um processo diferente (e.g., arima) com erros e variâncias distintas.
 
-Os métodos de gerar previsões coerentes a partir de previsões base são chamados de métodos de *reconciliação* e, como vimos, são definidos na matriz $\mathbfit{G}$. Os métodos de reconciliação tradicionais apresentados, *top-down* e *bottom-up*, utilizam informação limitada. No método *top-down*, utiliza-se apenas informações do nível mais agregado --- por isso, apenas a primeira coluna em (@eq-matriz_g) é diferente de zero. Já na abordagem *bottom-up*, utiliza-se apenas as informações dos níveis mais desagregados, o que resulta na submatriz identidade $m \times m$ em (@eq-matriz_gbu), enquanto as colunas que representam os níveis mais agregados são nulas.
+Os métodos de gerar previsões coerentes a partir de previsões base são chamados de métodos de *reconciliação* e, como vimos, são definidos na matriz $\mathbfit{G}$. Os métodos de reconciliação tradicionais apresentados, *top-down* e *bottom-up*, utilizam informação limitada. No método *top-down*, utiliza-se apenas informações do nível mais agregado --- por isso, apenas a primeira coluna em (@eq-matriz_g) é diferente de zero. Já na abordagem *bottom-up*, utiliza-se apenas as informações dos níveis mais desagregados, o que resulta na submatriz identidade $m \times m$ em (@eq-matriz_gbu), enquanto as colunas que representam os níveis mais agregados são nulas.s
 
 Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham a menor diferença o possível em relação às previsões base. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
 
