@@ -63,7 +63,7 @@ source("scripts/hierarq.R")
 \end{center}
 
 \hspace{7cm}{\begin{minipage}{8.5cm}{
-Projeto de dissertação apresentado ao \curso\>da \universidade\\
+Projeto de dissertação apresentado ao \curso\>da \universidade.\\
 
 Orientador: \parbox[t]{6.0cm}{\orientador}}
 \end{minipage}}
@@ -75,15 +75,37 @@ Orientador: \parbox[t]{6.0cm}{\orientador}}
 \ano
 \end{center}
 
+<!-- resumo -->
+
+\newpage
+\thispagestyle{empty}
+\begin{singlespace}
+\noindent \MakeUppercase{\sobrenome}, \nome. \textbf{\titulo}. \ano. \pageref{LastPage} folhas. Projeto de \MakeLowercase{\tipo}\>(\curso) -- \universidade, \cidade, \ano.
+
+\vspace{1pc}
+\begin{center}
+\textbf{RESUMO}
+\end{center}
+\vspace{1pc}
+
+\noindent
+No máximo 500 palavaras em espaço simples e sem parágrafos. Deve apresentar de forma concisa os objetivos, metodologia e os resultado alcançados, utilizar o verbo na voz ativa. Espaçamento simples, sem recuo de parágrafos.
+
+\vspace{2pc}
+\noindent
+{\textbf{Palavras-chave}:}  Palavra 1. Palavra 2. Palavra 3. Palavra 4. Palavra 5.
+
+\end{singlespace}
+
 <!-- elementos textuais -->
 
 \newpage
 \setcounter{page}{1}
-# INTRODUÇÃO {-}
+# INTRODUÇÃO
 
 Neste trabalho, 
 
-## SÉRIES HIERÁRQUICAS E SÉRIES AGRUPADAS {-}
+## SÉRIES HIERÁRQUICAS E SÉRIES AGRUPADAS
 
 Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagregadas naturalmente em uma estrutura aninhada [@hyndman2021]. Para ilustrar, tome a série do Pib brasileiro. Ela pode ser desagregada por estado que, por sua vez, pode ser desagregada por município.
 
@@ -205,7 +227,7 @@ $$
 \end{bmatrix}
 $$ {#eq-matriz_ha}
 
-## ABORDAGENS TOP-DOWN E BOTTOM-UP {-}
+## ABORDAGENS TOP-DOWN E BOTTOM-UP
 
 Talvez as formas mais intuitivas de se pensar em previsões para esses tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a estrutura descrita na @fig-h, por exemplo. Podemos realizar a previsão para o horizonte de tempo $h$ do agregado do Pib brasileiro, representado no topo da hierarquia por *Total* (@eq-topdown_1), e então distribuir os valores previstos proporcionalmente entre os estados e municípios.
 
@@ -409,7 +431,7 @@ $$
 \end{bmatrix}
 $$ {#eq-matriz_bottomup}
 
-## COERÊNCIA E RECONCILIAÇÃO {-}
+## COERÊNCIA E RECONCILIAÇÃO
 
 Seja somando as previsões do nível mais desagregado para formar os níveis superiores da hierarquia (*bottom-up*) ou distribuindo proporcionalmente as previsões do nível mais agregado (*top-down*), o vetor $\mathbfit{\tilde{y}}_t$ representa as previsões *coerentes*. Isso significa que as previsões "batem", ou seja, são totalizadas corretamente --- as previsões de cada elemento agregado corresponde ao somatório das previsões dos níveis inferiores da hierarquia. Isso é garantido pela multiplicação das matrizes $\mathbfit{SG}$.
 
@@ -420,7 +442,18 @@ Os métodos de gerar previsões coerentes a partir de previsões base são chama
 Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham a menor diferença o possível em relação às previsões base. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
 
 \newpage
+# OBJETIVOS
+
+Meu objetivo geral para a dissertação é expandir a literatura de reconciliação ótima utilizando regressão quantílica 
+
+\newpage
 # REVISÃO DA LITERATURA
+
+\newpage
+# METODOLOGIA
+
+\newpage
+# CRONOGRAMA
 
 \newpage
 # REFERÊNCIAS {-}

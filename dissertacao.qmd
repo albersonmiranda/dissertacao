@@ -145,7 +145,7 @@ Orientador: \parbox[t]{6.0cm}{\orientador}}
 \newpage
 \thispagestyle{empty}
 \begin{singlespace}
-\noindent \MakeUppercase{\sobrenome}, \nome. \textbf{\titulo}. \ano. xx folhas. \tipo\>(\curso) -- \universidade, \cidade, \ano.
+\noindent \MakeUppercase{\sobrenome}, \nome. \textbf{\titulo}. \ano. \pageref{LastPage} folhas. \tipo\>(\curso) -- \universidade, \cidade, \ano.
 
 \vspace{1pc}
 \begin{center}
@@ -168,7 +168,7 @@ No máximo 500 palavaras em espaço simples e sem parágrafos. Deve apresentar d
 \thispagestyle{empty}
 
 \begin{singlespace}
-\noindent \MakeUppercase{\sobrenome}, \nome. \textbf{\tituloingles}. \ano. xx folhas. \tipoingles\>(\cursoingles) -- \universidade, \cidade, \ano.
+\noindent \MakeUppercase{\sobrenome}, \nome. \textbf{\tituloingles}. \ano. \pageref{LastPage} folhas. \tipoingles\>(\cursoingles) -- \universidade, \cidade, \ano.
 
 \vspace{1pc}
 \begin{center}
