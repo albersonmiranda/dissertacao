@@ -103,7 +103,7 @@ No máximo 500 palavaras em espaço simples e sem parágrafos. Deve apresentar d
 \setcounter{page}{1}
 # INTRODUÇÃO
 
-Neste trabalho, 
+Em minha pesquisa no mestrado, pretendo trabalhar no problema da reconciliação ótima de séries temporais hierárquicas e agrupadas no contexto probabilístico.
 
 ## SÉRIES HIERÁRQUICAS E SÉRIES AGRUPADAS
 
@@ -444,7 +444,14 @@ Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize
 \newpage
 # OBJETIVOS
 
-Meu objetivo geral para a dissertação é expandir a literatura de reconciliação ótima utilizando regressão quantílica 
+Meu objetivo geral para a dissertação é estudar o problema da reconciliação ótima de previsões pontuais a partir de regressões quantílicas.
+
+Como objetivos específicos, tenho:
+
+1. Estudar métodos para estimação da matriz $\mathbfit{G}$ para qualquer quantil desejado, e não apenas a média;
+2. Identificar possíveis vantagens e limitações da abordagem quantílica na reconciliação de previsões pontuais a partir de aplicação do método estudado na previsão de saldos de crédito do Banco do Estado do Espírito Santo SA.
+
+Não está no escopo do estudo os métodos de se obter previsões probabilísticas, ou seja, a estimação da matriz $\hat{y}$ para além de previsões pontuais.
 
 \newpage
 # REVISÃO DA LITERATURA
