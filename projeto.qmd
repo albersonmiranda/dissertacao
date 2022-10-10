@@ -174,7 +174,7 @@ Na notação matricial, a estrutura da @fig-ha2 é representada como abaixo. For
 
 $$
 \mathbfit{y}_t=\mathbfit{Sb}_t
-$$
+$$ {#eq-geral}
 
 $$
 \begin{bmatrix}
