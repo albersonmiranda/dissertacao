@@ -456,6 +456,10 @@ Não está no escopo do estudo os métodos de se obter previsões probabilístic
 \newpage
 # REVISÃO DA LITERATURA
 
+Previsões de séries temporais hierárquicas não é um assunto novo. Desde a década de 70, ao menos, já há pesquis publicada. Entretanto, é apenas em com 
+
+Gamakumara reinterpreta a lilteratura de coerência e reconciliação de previsões pontuais (média) a partir de uma abordagem geométrica, trazendo provas alternativas para conclusões anteriores ao mesmo tempo em que fornece novos teoremas. Além disso, Gamakumara então estende essa interpretação geométrica para o contexto probabilístico, fornecendo métodos paramétricos e não paramétricos (via bootstrapping) para reconciliação de previsões probabilísticas, ou seja, para reconciliar previsões \haty_t obtidas a partir de toda a distribuição, e não apenas a média.
+
 \newpage
 # METODOLOGIA
 
