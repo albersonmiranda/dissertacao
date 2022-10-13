@@ -23,10 +23,11 @@
 \usepackage{indentfirst, float, graphicx, psfrag, fancyhdr}
 \usepackage{times, amsmath, amsfonts, amssymb, amsthm}
 \usepackage{xcolor, url, placeins, sectsty, enumitem}
-\usepackage{polyglossia, natbib, dcolumn, lastpage}
+\usepackage{polyglossia, dcolumn, lastpage}
 \usepackage[T1]{fontenc}
 \usepackage[skip = 2pt, size = normalsize]{caption}
 \usepackage[labelfont = bf]{caption}
+\usepackage[backend=biber, style=abnt, ittitles, justify, indent, ]{biblatex}
 
 % fontes
 \setmainfont{Times New Roman}
@@ -83,7 +84,8 @@
 \pagestyle{fancy}
 
 % bibliografia
-\renewcommand{\bibsection}{}
+\addbibresource{config/bib.bib}
+\addbibresource{config/packages.bib}
 
 % matrizes
 \setcounter{MaxMatrixCols}{20}
