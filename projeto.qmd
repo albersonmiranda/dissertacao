@@ -27,18 +27,23 @@ knitr::opts_chunk$set(
 set.seed(1)
 
 # pacotes
-library(DiagrammeR)
-library(kableExtra)
-library(ggplot2)
-
-# tema ggplot
-tema = theme_classic() +
-    theme(
-        text = element_text(family = "serif")
-    )
+pacman::p_load(
+    kableExtra
+)
 
 # gerar bibliografia de pacotes
-knitr::write_bib(file = "config/packages.bib")
+knitr::write_bib(
+    x = c(
+        .packages(),
+        "tsibble",
+        "fable",
+        "fabletools",
+        "feasts",
+        "quantreg",
+        "bees"
+    ),
+    file = "config/packages.bib"
+)
 
 # scripts
 source("scripts/hierarq.R")
@@ -101,7 +106,7 @@ No máximo 500 palavaras em espaço simples e sem parágrafos. Deve apresentar d
 \setcounter{page}{1}
 # INTRODUÇÃO
 
-Em minha pesquisa no mestrado, pretendo trabalhar no problema da reconciliação ótima de séries temporais hierárquicas e agrupadas no contexto probabilístico.
+Minha pesquisa visa abordar o problema da reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas através de regressão quantílica. Após o desenvolvimento teórico, espero evidenciar *que vantagens e limitações essa abordagem proporciona*, aplicando o método no dados de crédito do Banco do Estado do Espirito Santo SA.
 
 ## CONTEXTUALIZAÇÃO DA PESQUISA
 
@@ -139,7 +144,11 @@ Os métodos de gerar previsões coerentes a partir de previsões base são chama
 
 Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham a menor diferença o possível em relação às previsões base. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
 
-# OBJETIVOS
+## JUSTIFICATIVA
+
+O estado da arte em reconciliação ótima de previsões pontuais se encontra no método de MinT. Esse método, assim como toda estimação de média de parâmetros, está sujeita à interferência de *outliers* extremos que, no caso de previsão de séries hierárquicas, se apresentam na forma de elementos da hierarquia muito maiores que os demais. Isso pode significar em menor peso atribuído à elementos menores da hierarquia e, talvez, a estimação pela mediana possua alguma vantagem em determinadas situações. Além disso, pode ser do interesse do pesquisador a estimação em eventos extremos, o que exigiria usar quantis muito altos ou muito baixos. Nesse sentido, a estimação por regressão quantílica pode ser uma adição à literatura do tema.
+
+## OBJETIVOS
 
 Meu objetivo geral para a dissertação é estudar o problema da reconciliação ótima de previsões pontuais a partir de regressões quantílicas.
 
@@ -166,7 +175,35 @@ A estimação por esse método resulta numa reconciliação ótima que depende a
 
 # METODOLOGIA
 
-Para atingir os objetivos, será realizada pesquisa bibliográfica 
+Para atingir os objetivos, a primeira etapa da pesquisa consistirá na pesquisa bibliográfica relacionada a reconciliação ótima de previsões de séries temporais hierárquicas e agrupadas e a regressão quantílica.
+
+Utilizando a base de dados do Google Acadêmico, pesquisei pelas palavras-chave " hierarquical forecast reconciliation", encontrando 27.600 resultados. Utilizando um programa para ordenar os resultados pelo número de citações^[https://github.com/WittmannF/sort-google-scholar], o trabalho mais citado é @hyndman2021.
+
+```{r citacoes}
+#| tbl-cap: Trabalhados mais citados com os termos "hierarquical forecast reconciliation"
+
+readxl::read_excel("data-raw/academico.xlsx") |>
+    subset(select = c(-Publisher, -Venue, -Título)) |>
+    kbl(booktabs = TRUE, escape = TRUE) |>
+    kable_styling(latex_options = "striped", font_size = 10)
+```
+
+Utilizando essa obra como texto base, obtive os textos referenciados no capítulo 11 "*Forecasting Hierarquical and Grouped Time-Series*", subcapítulo 3 "*Forecast Reconciliation*", além de @hyndman2016, onde o método por MPQ foi desenvolvido porém não está citado nas referências do capítulo.
+
+```{r citacoes fpp3}
+#| tbl-cap: Artigos de referência em Hyndman e Athanasopoulos (2021)
+
+readxl::read_excel("data-raw/academico.xlsx", sheet = "fpp3") |>
+    subset(select = c(-Título)) |>
+    kbl(booktabs = TRUE, escape = TRUE) |>
+    kable_styling(latex_options = "striped", font_size = 10)
+```
+
+Nessa etapa, foram primeiramente selecionados os artigos de referência no desenvolvimento dos métodos de estimação para reconciliação ótima
+
+A coleta dos dados para aplicação do método será realizada diretamente do sistema de planejamento orçamentário do Banestes SA. A importação, limpeza e tratamento dos dados será realizado utilizando o *software* R [@R-base] e o pacote {bees} [@R-bees], que é um privado que desenvolvi para esses fins.
+
+Para a comparação com os métodos MQO, MQP e MinT, os dados serão organizados na estrutura hierárquica utilizando o pacote {tsibble} [@R-tsibble], as previsões base realizadas com o pacote {fable} [@R-fable] e as reconciliações via MQO, MQP e MinT para comparação dos resultados serão realizadas com o pacote {fabletools} [@R-fabletools]. Já a reconciliação via regressão quantílica será realizada com o pacote {quantreg} [@R-quantreg].
 
 # CRONOGRAMA
 

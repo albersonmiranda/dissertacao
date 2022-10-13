@@ -1,5 +1,7 @@
 # DIAGRAMAS #
 
+# pacotes
+library(DiagrammeR)
 
 # séries hierárquicas
 nodes_h = tibble::tribble(
@@ -258,3 +260,6 @@ create_graph(attr_theme = "tb") |>
         file_name = "img/hier_agrup_2.png",
         file_type = "PNG",
         width = 1200)
+
+# unload packages
+detach("package:DiagrammeR")

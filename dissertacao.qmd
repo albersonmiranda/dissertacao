@@ -5,8 +5,7 @@ format:
         include-in-header: config/preamble.tex
         keep-tex: false
         output-file: render/dissertacao.pdf
-biblio-style: apalike
-cite-method: natbib
+cite-method: biblatex
 fontsize: 12pt
 geometry: margin=1in
 number-sections: true
@@ -28,9 +27,9 @@ knitr::opts_chunk$set(
 set.seed(1)
 
 # pacotes
-library(DiagrammeR)
-library(kableExtra)
-library(ggplot2)
+pacman::p_load(
+    kableExtra
+)
 
 # tema ggplot
 tema = theme_classic() +
@@ -192,7 +191,6 @@ Tradução do resumo.
 \begingroup
 \let\clearpage\relax
 
-\newpage
 \begin{center}
 \MakeUppercase{\textbf{Sumário}}
 \end{center}
@@ -570,5 +568,3 @@ Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize
 
 \newpage
 # REFERÊNCIAS {-}
-
-\bibliography{config/bib.bib, config/packages.bib}
