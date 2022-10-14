@@ -93,11 +93,11 @@ Orientador: \parbox[t]{6.0cm}{\orientador}}
 \vspace{1pc}
 
 \noindent
-No máximo 500 palavaras em espaço simples e sem parágrafos. Deve apresentar de forma concisa os objetivos, metodologia e os resultado alcançados, utilizar o verbo na voz ativa. Espaçamento simples, sem recuo de parágrafos.
+Minha pesquisa visa aplicar o método de estimação de regressão quantílica no problema da reconciliação ótima de previsões de séries temporais hierárquicas ou agrupadas. Além disso, pretendo evidenciar as vantagens e problemas do método o comparando com as abordagens via MQO, MQP e MinT, adotando tanto a mediana quanto quantis extremos. O experimento será realizado nas séries temporais de saldo de crédito do Banco do Estado do Espírito Santo SA, organizadas hierarquicamente por superintendências regionais e agências, e agrupadas por modalidades de crédito selecionadas.
 
 \vspace{2pc}
 \noindent
-{\textbf{Palavras-chave}:}  Palavra 1. Palavra 2. Palavra 3. Palavra 4. Palavra 5.
+{\textbf{Palavras-chave}:}  Séries temporais hierárquicas. Previsão. Reconciliação. Regressão quantílica.
 
 \end{singlespace}
 
@@ -106,7 +106,7 @@ No máximo 500 palavaras em espaço simples e sem parágrafos. Deve apresentar d
 \setcounter{page}{1}
 # INTRODUÇÃO
 
-Minha pesquisa visa abordar o problema da reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas através de regressão quantílica. Após o desenvolvimento teórico, espero evidenciar *que vantagens e limitações essa abordagem proporciona*, aplicando o método no dados de crédito do Banco do Estado do Espirito Santo SA.
+Minha pesquisa visa abordar o problema da reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas através de regressão quantílica. Após o desenvolvimento teórico, espero evidenciar *que vantagens e limitações a abordagem de reconciliação ótima por regressão quantílica proporciona*, aplicando o método no dados de crédito do Banco do Estado do Espirito Santo SA.
 
 ## CONTEXTUALIZAÇÃO DA PESQUISA
 
@@ -148,7 +148,7 @@ Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize
 
 O estado da arte em reconciliação ótima de previsões pontuais se encontra no método de MinT. Esse método, assim como toda estimação de média de parâmetros, está sujeita à interferência de *outliers* extremos que, no caso de previsão de séries hierárquicas, se apresentam na forma de elementos da hierarquia muito maiores que os demais. Isso pode significar em menor peso atribuído à elementos menores da hierarquia e, talvez, a estimação pela mediana possua alguma vantagem em determinadas situações. Além disso, pode ser do interesse do pesquisador a estimação em eventos extremos, o que exigiria usar quantis muito altos ou muito baixos. Nesse sentido, a estimação por regressão quantílica pode ser uma adição à literatura do tema.
 
-## OBJETIVOS
+# OBJETIVOS
 
 Meu objetivo geral para a dissertação é estudar o problema da reconciliação ótima de previsões pontuais a partir de regressões quantílicas.
 
@@ -175,14 +175,14 @@ A estimação por esse método resulta numa reconciliação ótima que depende a
 
 # METODOLOGIA
 
-Para atingir os objetivos, a primeira etapa da pesquisa consistirá na pesquisa bibliográfica relacionada a reconciliação ótima de previsões de séries temporais hierárquicas e agrupadas e a regressão quantílica.
+Para atingir os objetivos, a primeira etapa da pesquisa consistirá na pesquisa bibliográfica relacionada à reconciliação ótima de previsões de séries temporais hierárquicas e agrupadas e à regressão quantílica.
 
-Utilizando a base de dados do Google Acadêmico, pesquisei pelas palavras-chave " hierarquical forecast reconciliation", encontrando 27.600 resultados. Utilizando um programa para ordenar os resultados pelo número de citações^[https://github.com/WittmannF/sort-google-scholar], o trabalho mais citado é @hyndman2021.
+Utilizando a base de dados do Google Acadêmico, pesquisei pelas palavras-chave "*hierarchical forecast reconciliation*", encontrando 27.600 resultados. Utilizando um script para ordenar os resultados pelo número de citações^[https://github.com/WittmannF/sort-google-scholar], verifiquei que o trabalho mais citado é @hyndman2021.
 
 ```{r citacoes}
 #| tbl-cap: Trabalhados mais citados com os termos "hierarquical forecast reconciliation"
 
-readxl::read_excel("data-raw/academico.xlsx") |>
+readxl::read_excel("docs/academico.xlsx") |>
     subset(select = c(-Publisher, -Venue, -Título)) |>
     kbl(booktabs = TRUE, escape = TRUE) |>
     kable_styling(latex_options = "striped", font_size = 10)
@@ -193,18 +193,47 @@ Utilizando essa obra como texto base, obtive os textos referenciados no capítul
 ```{r citacoes fpp3}
 #| tbl-cap: Artigos de referência em Hyndman e Athanasopoulos (2021)
 
-readxl::read_excel("data-raw/academico.xlsx", sheet = "fpp3") |>
+readxl::read_excel("docs/academico.xlsx", sheet = "fpp3") |>
     subset(select = c(-Título)) |>
     kbl(booktabs = TRUE, escape = TRUE) |>
     kable_styling(latex_options = "striped", font_size = 10)
 ```
 
-Nessa etapa, foram primeiramente selecionados os artigos de referência no desenvolvimento dos métodos de estimação para reconciliação ótima
+Adicionando o termo "*quantile*" à pesquisa, nenhum trabalho é encontrado com essas palavras no título. Modificando os termos para encontrar palavras semelhantes, a busca por "*allintitle: hierarchical OR hierarchically probabilistic OR quantile reconciliation OR reconciled*" retornou 5 títulos, dentre os quais dois são artigos de acesso livre e, portanto, foram adicionadas à pesquisa bibliográfica a ser realizada. \nocite{han2021, roach2019}
 
-A coleta dos dados para aplicação do método será realizada diretamente do sistema de planejamento orçamentário do Banestes SA. A importação, limpeza e tratamento dos dados será realizado utilizando o *software* R [@R-base] e o pacote {bees} [@R-bees], que é um privado que desenvolvi para esses fins.
+```{r citacoes probablisticas}
+#| tbl-cap: Trabalhados encontrados na busca estendida
 
-Para a comparação com os métodos MQO, MQP e MinT, os dados serão organizados na estrutura hierárquica utilizando o pacote {tsibble} [@R-tsibble], as previsões base realizadas com o pacote {fable} [@R-fable] e as reconciliações via MQO, MQP e MinT para comparação dos resultados serão realizadas com o pacote {fabletools} [@R-fabletools]. Já a reconciliação via regressão quantílica será realizada com o pacote {quantreg} [@R-quantreg].
+readxl::read_excel("docs/academico.xlsx", sheet = "probabilistica") |>
+    subset(select = c(-Título)) |>
+    kbl(booktabs = TRUE, escape = TRUE) |>
+    kable_styling(latex_options = "striped", font_size = 10)
+```
 
-# CRONOGRAMA
+A segunda etapa do trabalho consistirá na aplicação e avaliação dos métodos estimados nas séries de saldo de empréstimos e financiamentos do Banco do Estado do Espírito Santo SA. A coleta dos dados para aplicação do método será realizada diretamente do sistema de planejamento orçamentário do Banestes. A importação, limpeza e tratamento dos dados será realizado utilizando o *software* R [@R-base] e o pacote {bees} [@R-bees], que é um pacote privado que desenvolvi para esses fins. A disponibilização em repositório aberto, tanto da base de dados quanto do pacote para importação e tratamento deles, para fins de reprodutibilidade será proposta à instituição.
+
+Para a comparação com os métodos MQO, MQP e MinT, os dados serão organizados na estrutura hierárquica agrupada utilizando o pacote {tsibble} [@R-tsibble], as previsões base realizadas com o pacote {fable} [@R-fable] e as reconciliações via MQO, MQP e MinT para comparação dos resultados serão realizadas com o pacote {fabletools} [@R-fabletools]. Já a reconciliação via regressão quantílica será realizada com o pacote {quantreg} [@R-quantreg]. Inicialmente, a métrica para avaliação será a raíz do erro quadrático médio, *RMSE* na sigla em inglês, para os erros de previsão das séries reconciliadas.
+
+A estrutura hierárquica terá 3 níveis --- total, superintendências regionais (norte, sul, centro e empresarial) e agências ---, e a estrutura agrupada será formada por modalidades de crédito selecionadas, sendo algumas mais ruidosas que outras^[Por exemplo, espera-se que a série de crédito imobiliário seja menos ruidosa que a série de crédito pessoal.] de forma a evidenciar vantagens e desvantagens em cada caso.
+
+# PLANO DE TRABALHO
+
+Para a introdução, o planejado é detalhar os conceitos de séries temporais hierárquicas e agrupadas, coerência e reconciliação ótima notação matricial. Além disso, introduzir o conceito envolvendo a matriz $\mathbfit{G}$ e as abordagens de reconciliação clássicas (*bottom-up* e *top-down*) também na notação matricial. Paralelamente, já iniciarei a escolha das séries a serem trabalhadas e a formalização do uso e publicação da base de dados.
+
+No primeiro capítulo, devo detalhar as abordagens de reconciliação ótima para previsões pontuais nos três métodos MQO, MQP e MinT, demonstrando a estimação, hipóteses, vantagens e limitações.
+
+No capítulo 2, vou trazer os conceitos da regressão quantílica e aplicá-los ao problema da reconciliação ótima, que é o objetivo principal do trabalho. Trabalharei tanto com a mediana quanto com quantis extremos.
+
+No capítulo 3, aplicarei os métodos aos dados de crédito do Banestes, irei comparar a performance com os demais métodos e vou analisar onde ele se mostrou mais ou menos vantajoso.
+
+```{r cronograma}
+#| tbl-cap: Cronograma das atividades
+
+readxl::read_excel("docs/academico.xlsx", sheet = "cronograma") |>
+    (\(x) replace(x, is.na(x), ""))() |>
+    kbl(booktabs = TRUE, escape = TRUE) |>
+    kable_styling(latex_options = "striped", font_size = 10)|>
+    column_spec(1, width = "15em")
+```
 
 # REFERÊNCIAS {-}
