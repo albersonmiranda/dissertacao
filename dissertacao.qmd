@@ -28,7 +28,8 @@ set.seed(1)
 
 # pacotes
 pacman::p_load(
-    kableExtra
+    kableExtra,
+    ggplot2
 )
 
 # tema ggplot

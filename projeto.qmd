@@ -49,42 +49,32 @@ knitr::write_bib(
 source("scripts/hierarq.R")
 ```
 
-<!-- folha de rosto -->
+<!-- capa -->
 
-\newpage
 \thispagestyle{empty}
-
+\begin{center}
+{\Large \MakeUppercase{\universidade\\ \campus\\ \curso}}
+\end{center}
+\vspace{1cm}
 \begin{center}
 {\Large \MakeUppercase{\nome\>\sobrenome}}
-
-\vspace{6cm}
-
-\Large \MakeUppercase{\textbf{\titulo}}
-
-\normalsize
-
-\vspace{3cm}
 \end{center}
-
-\hspace{7cm}{\begin{minipage}{8.5cm}{
-Projeto de dissertação apresentado ao \curso\>da \universidade.\\
-
-Orientador: \parbox[t]{6.0cm}{\orientador}}
-\end{minipage}}
-
-\vspace{3cm}
+\vspace{4cm}
+\begin{center}
+\Large \MakeUppercase{\textbf{\titulo}}
+\end{center}
+\vspace{7cm}
 
 \begin{center}
-\cidade\\
-\ano
+\uppercase{\cidade}\\ \ano
 \end{center}
 
 <!-- resumo -->
 
 \newpage
 \thispagestyle{empty}
+\setcounter{page}{1}
 \begin{singlespace}
-\noindent \MakeUppercase{\sobrenome}, \nome. \textbf{\titulo}. \ano. \pageref{LastPage} folhas. Projeto de \MakeLowercase{\tipo}\>(\curso) -- \universidade, \cidade, \ano.
 
 \vspace{1pc}
 \begin{center}
@@ -103,10 +93,9 @@ Minha pesquisa visa aplicar o método de estimação por regressão quantílica 
 
 <!-- elementos textuais -->
 
-\setcounter{page}{1}
 # INTRODUÇÃO
 
-Minha pesquisa visa abordar o problema da reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas através de regressão quantílica. Após o desenvolvimento teórico, espero evidenciar *que vantagens e limitações a abordagem de reconciliação ótima por regressão quantílica proporciona*, aplicando o método no dados de crédito do Banco do Estado do Espirito Santo SA.
+O objetivo do meu trabalho é abordar o problema da reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas através de regressão quantílica. Após o desenvolvimento teórico, espero evidenciar *que vantagens e limitações a abordagem de reconciliação ótima por regressão quantílica proporciona*, aplicando o método no dados de crédito do Banco do Estado do Espirito Santo SA.
 
 ## CONTEXTUALIZAÇÃO DA PESQUISA
 
@@ -210,7 +199,7 @@ readxl::read_excel("docs/academico.xlsx", sheet = "probabilistica") |>
     kable_styling(latex_options = "striped", font_size = 10)
 ```
 
-A segunda etapa do trabalho consistirá na aplicação e avaliação dos métodos estimados nas séries de saldo de empréstimos e financiamentos do Banco do Estado do Espírito Santo SA. A coleta dos dados para aplicação do método será realizada diretamente do sistema de planejamento orçamentário do Banestes. A importação, limpeza e tratamento dos dados será realizado utilizando o *software* R [@R-base] e o pacote {bees} [@R-bees], que é um pacote privado que desenvolvi para esses fins. A disponibilização em repositório aberto, tanto da base de dados quanto do pacote para importação e tratamento deles, para fins de reprodutibilidade será proposta à instituição.
+A segunda etapa do trabalho consistirá na aplicação e avaliação dos métodos estimados nas séries de saldo de empréstimos e financiamentos do Banco do Estado do Espírito Santo SA. A coleta dos dados para aplicação do método será realizada diretamente do sistema de planejamento orçamentário do Banestes. A importação, limpeza e tratamento dos dados será realizado utilizando o *software* R [@R-base] e o pacote {bees} [@R-bees], que é um pacote privado que desenvolvi para esses fins. A disponibilização em repositório aberto^[https://github.com/albersonmiranda/dissertacao], tanto da base de dados quanto do pacote para importação e tratamento deles, para fins de reprodutibilidade será proposta à instituição.
 
 Para a comparação com os métodos MQO, MQP e MinT, os dados serão organizados na estrutura hierárquica agrupada utilizando o pacote {tsibble} [@R-tsibble], as previsões base realizadas com o pacote {fable} [@R-fable] e as reconciliações via MQO, MQP e MinT para comparação dos resultados serão realizadas com o pacote {fabletools} [@R-fabletools]. Já a reconciliação via regressão quantílica será realizada com o pacote {quantreg} [@R-quantreg]. Inicialmente, a métrica para avaliação será a raíz do erro quadrático médio, *RMSE* na sigla em inglês, para os erros de previsão das séries reconciliadas.
 
