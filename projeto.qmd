@@ -93,7 +93,7 @@ Orientador: \parbox[t]{6.0cm}{\orientador}}
 \vspace{1pc}
 
 \noindent
-Minha pesquisa visa aplicar o método de estimação de regressão quantílica no problema da reconciliação ótima de previsões de séries temporais hierárquicas ou agrupadas. Além disso, pretendo evidenciar as vantagens e problemas do método o comparando com as abordagens via MQO, MQP e MinT, adotando tanto a mediana quanto quantis extremos. O experimento será realizado nas séries temporais de saldo de crédito do Banco do Estado do Espírito Santo SA, organizadas hierarquicamente por superintendências regionais e agências, e agrupadas por modalidades de crédito selecionadas.
+Minha pesquisa visa aplicar o método de estimação por regressão quantílica no problema da reconciliação ótima de previsões de séries temporais hierárquicas ou agrupadas. Além disso, pretendo evidenciar as vantagens e problemas do método o comparando com as abordagens por MQO, MQP e MinT, adotando tanto a mediana quanto quantis extremos. O experimento será realizado nas séries temporais de saldo de crédito do Banco do Estado do Espírito Santo SA, organizadas hierarquicamente por superintendências regionais e agências, e agrupadas por modalidades de crédito selecionadas.
 
 \vspace{2pc}
 \noindent
@@ -134,7 +134,7 @@ $$
 \mathbfit{y}_t=\mathbfit{Sb}_t
 $$ {#eq-geral}
 
-Talvez as formas mais intuitivas de se pensar em previsões para esses tipos de estrutura sejam as abordagens *top-down* e *bottom-up*. Na abordagem *top-down*, a previsão para os níveis mais desagregados da hierarquia são determinadas por uma proporção $p_i$ do nível agregado. Para isso, temos de definir uma matriz com todos esses pesos, que, seguindo a formulação de @hyndman2021, chamo de $\mathbfit{G}$. Já a abordagem *bottom-up* parte do raciocínio inverso e define as previsões de cada elemento da estrutura a partir das previsões dos elementos mais desagregados. Para tanto, basta modificar a matriz $\mathbfit{G}$. Então, $\mathbfit{G}$ define a abordagem --- se top-down ou bottom-up ---, e $\mathbfit{S}$ define a maneira da qual as previsões são somadas para formar as equações de previsão para cada elemento da estrutura.
+Talvez as formas mais intuitivas de se pensar em previsões para esses tipos de estrutura sejam as abordagens *top-down* e *bottom-up*. Na abordagem *top-down*, a previsão para os níveis mais desagregados da hierarquia são determinadas por uma proporção $p_i$ do nível agregado. Para isso, temos de definir uma matriz com todos esses pesos, que, seguindo a formulação de @hyndman2021, chamo de $\mathbfit{G}$. Já a abordagem *bottom-up* parte do raciocínio inverso e define as previsões de cada elemento da estrutura a partir das previsões dos elementos mais desagregados $\mathbfit{\hat{y}}_t$. Para tanto, basta modificar a matriz $\mathbfit{G}$. Então, $\mathbfit{G}$ define a abordagem --- se top-down ou bottom-up ---, e $\mathbfit{S}$ define a maneira da qual as previsões são somadas para formar as equações de previsão para cada elemento da estrutura.
 
 Seja somando as previsões do nível mais desagregado para formar os níveis superiores da hierarquia (*bottom-up*) ou distribuindo proporcionalmente as previsões do nível mais agregado (*top-down*), o vetor $\mathbfit{\tilde{y}}_t$ representa as previsões *coerentes*. Isso significa que as previsões "batem", ou seja, são totalizadas corretamente --- as previsões de cada elemento agregado corresponde ao somatório das previsões dos níveis inferiores da hierarquia. Isso é garantido pela multiplicação das matrizes $\mathbfit{SG}$.
 
@@ -165,9 +165,9 @@ Previsões pontuais de séries temporais hierárquicas não é um assunto novo. 
 
 Entretanto, para ser capaz de estimar o modelo por MQG, é necessária a matriz de variância-covariância dos erros. @hyndman2011 usam a matriz de erros de coerência, ou seja, a diferença entre as previsões reconciliadas e as previsões base, que tem posto incompleto e não identificada e, portanto, não pode ser estimada. Os autores contornam esse problema adotando no lugar da matriz de variância-covariância dos erros uma matriz diagonal constante, ou seja, assumem variância constante dos erros de reconciliação, e estimam a matriz $\mathbfit{G}$ por MQO.
 
-A estimação por esse método resulta numa reconciliação ótima que depende apenas da matriz $\mathbfit{G}$, ou seja, da estrutura hierárquica, e independe da variância e covariância das previsões base $\mathbfit{\hat{y}_{T+h}}$ --- o que não é uma conclusão satisfatória.
+A estimação por esse método resulta numa reconciliação ótima que depende apenas da matriz $\mathbfit{S}$, ou seja, da estrutura hierárquica, e independe da variância e covariância das previsões base $\mathbfit{\hat{y}_{T+h}}$ --- o que não é uma conclusão satisfatória.
 
-@hyndman2016 tentam aperfeiçoar o método usando as variâncias das previsões base estimadas (dentro da amostra) como estimativa para a matriz de variância-covariância dos erros de conciliação, de forma a as utilizar como pesos e realizar a reconciliação ótima por MQP. Assim, previsões base mais acuradas têm peso maior do que as mais ruidosas. Entretanto, não fornecem justificativa teórica para usar a diagonal da matriz de variância-covariância de $\mathbfit{\hat{e}_{t}}$.
+@hyndman2016 tentam aperfeiçoar o método usando as variâncias das previsões base estimadas (dentro da amostra) como estimativa para a matriz de variância-covariância dos erros de reconciliação, de forma a as utilizar como pesos e realizar a reconciliação ótima por MQP. Assim, previsões base mais acuradas têm peso maior do que as mais ruidosas. Entretanto, não fornecem justificativa teórica para usar a diagonal da matriz de variância-covariância de $\mathbfit{\hat{e}_{t}}$.
 
 @wickramasuriya2019 argumentam que o que de fato interessa é que as previsões reconciliadas tenham o menor erro. Então, corrigem a abordagem de reconciliação ótima para o objetivo de minimização dos erros das previsões reconciliadas $\mathbfit{\tilde{y}_{t+h}}$, ao invés dos erros das previsões base $\mathbfit{\hat{y}_{t+h}}$. Dado que isso implica na minimização da variância de $\mathbfit{\tilde{e}_{t+h}}$, ou seja, na minimização do somatório da diagonal, o traço, da matriz de variância-covariância de $\mathbfit{\tilde{e}_{t+h}}$, eles chamaram esse método de MinT (*Minimum Trace*). Paralelamente, usam desigualdade triangular para demonstrar que as previsões reconciliadas obtidas por esse método são ao menos tão boas quanto as previsões base.
 
@@ -177,10 +177,10 @@ A estimação por esse método resulta numa reconciliação ótima que depende a
 
 Para atingir os objetivos, a primeira etapa da pesquisa consistirá na pesquisa bibliográfica relacionada à reconciliação ótima de previsões de séries temporais hierárquicas e agrupadas e à regressão quantílica.
 
-Utilizando a base de dados do Google Acadêmico, pesquisei pelas palavras-chave "*hierarchical forecast reconciliation*", encontrando 27.600 resultados. Utilizando um script para ordenar os resultados pelo número de citações^[https://github.com/WittmannF/sort-google-scholar], verifiquei que o trabalho mais citado é @hyndman2021.
+Utilizando a base de dados do Google Acadêmico, pesquisei pelas palavras-chave "*hierarchical forecast reconciliation*" para qualquer lugar no corpo do texto, encontrando 27.600 resultados. Utilizando um script para ordenar os resultados pelo número de citações^[https://github.com/WittmannF/sort-google-scholar], verifiquei que o trabalho mais citado é @hyndman2021.
 
 ```{r citacoes}
-#| tbl-cap: Trabalhados mais citados com os termos "hierarquical forecast reconciliation"
+#| tbl-cap: Trabalhos mais citados com os termos "hierarquical forecast reconciliation"
 
 readxl::read_excel("docs/academico.xlsx") |>
     subset(select = c(-Publisher, -Venue, -Título)) |>
@@ -199,7 +199,7 @@ readxl::read_excel("docs/academico.xlsx", sheet = "fpp3") |>
     kable_styling(latex_options = "striped", font_size = 10)
 ```
 
-Adicionando o termo "*quantile*" à pesquisa, nenhum trabalho é encontrado com essas palavras no título. Modificando os termos para encontrar palavras semelhantes, a busca por "*allintitle: hierarchical OR hierarchically probabilistic OR quantile reconciliation OR reconciled*" retornou 5 títulos, dentre os quais dois são artigos de acesso livre e, portanto, foram adicionadas à pesquisa bibliográfica a ser realizada. \nocite{han2021, roach2019}
+Adicionando o termo "*quantile*" e refinando a pesquisa para encontrar as palavras chave no título dos trabalhos, nenhum resultado foi encontrado. Modificando os termos para encontrar palavras semelhantes, a busca por "*allintitle: hierarchical OR hierarchically probabilistic OR quantile reconciliation OR reconciled*" retornou 5 títulos, dentre os quais dois são artigos de acesso livre e, portanto, foram adicionadas à pesquisa bibliográfica a ser realizada. \nocite{han2021, roach2019}
 
 ```{r citacoes probablisticas}
 #| tbl-cap: Trabalhados encontrados na busca estendida
@@ -218,13 +218,13 @@ A estrutura hierárquica terá 3 níveis --- total, superintendências regionais
 
 # PLANO DE TRABALHO
 
-Para a introdução, o planejado é detalhar os conceitos de séries temporais hierárquicas e agrupadas, coerência e reconciliação ótima notação matricial. Além disso, introduzir o conceito envolvendo a matriz $\mathbfit{G}$ e as abordagens de reconciliação clássicas (*bottom-up* e *top-down*) também na notação matricial. Paralelamente, já iniciarei a escolha das séries a serem trabalhadas e a formalização do uso e publicação da base de dados.
+Para a introdução, o planejado é detalhar os conceitos de séries temporais hierárquicas e agrupadas, coerência e reconciliação ótima na notação matricial. Além disso, devo introduzir o conceito envolvendo a matriz $\mathbfit{G}$ e as abordagens de reconciliação clássicas (*bottom-up* e *top-down*), também na notação matricial. Paralelamente, já iniciarei a escolha das séries a serem trabalhadas e a formalização do uso e publicação da base de dados.
 
 No primeiro capítulo, devo detalhar as abordagens de reconciliação ótima para previsões pontuais nos três métodos MQO, MQP e MinT, demonstrando a estimação, hipóteses, vantagens e limitações.
 
-No capítulo 2, vou trazer os conceitos da regressão quantílica e aplicá-los ao problema da reconciliação ótima, que é o objetivo principal do trabalho. Trabalharei tanto com a mediana quanto com quantis extremos.
+No segundo capítulo, vou trazer os conceitos da regressão quantílica e aplicá-los ao problema da reconciliação ótima, que é o objetivo principal do trabalho. Trabalharei tanto com a mediana quanto com quantis extremos.
 
-No capítulo 3, aplicarei os métodos aos dados de crédito do Banestes, irei comparar a performance com os demais métodos e vou analisar onde ele se mostrou mais ou menos vantajoso.
+No capítulo 3, aplicarei os métodos estudados aos dados de crédito do Banestes, comparando as performances entre eles enquanto analiso onde a reconciliação quantílica se mostra mais ou menos vantajosa.
 
 ```{r cronograma}
 #| tbl-cap: Cronograma das atividades
