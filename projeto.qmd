@@ -10,7 +10,8 @@ fontsize: 12pt
 geometry: margin=1in
 number-sections: true
 crossref:
-  fig-prefix: "figura"
+  fig-prefix: "Figura"
+  tab-prefix: "Tabela"
   eq-prefix: ""
 ---
 
