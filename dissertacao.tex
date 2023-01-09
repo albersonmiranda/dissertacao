@@ -1,0 +1,1220 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  12pt,
+  oneside,
+  a4paper,
+  chapter=TITLE,
+  section=TITLE,
+  subsubsection=TITLE,
+  brazil]{abntex2}
+
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\setcounter{secnumdepth}{5}
+% Make \paragraph and \subparagraph free-standing
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+% opções para o classoption
+%
+%	12pt,				% tamanho da fonte
+%	openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+%	twoside,			% para impressão em recto e verso. Oposto a oneside
+%	a4paper,			% tamanho do papel. 
+%	% -- opções da classe abntex2 --
+%	%chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+%	%section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+%	%subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+%	%subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+%	% -- opções do pacote babel --
+%	english,			% idioma adicional para hifenização
+%	french,				% idioma adicional para hifenização
+%	spanish,			% idioma adicional para hifenização
+%	brazil				% o último idioma é o principal do documento
+
+% ---
+% Pacotes básicos 
+% ---
+\usepackage{lmodern}			% Usa a fonte Latin Modern			
+\usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
+\usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+\usepackage{microtype} 			% para melhorias de justificação
+\usepackage{config/ppgecotex}	% customização para PPGEco/UFES
+% ---
+
+% ---
+% Pacotes adicionais
+% ---
+\usepackage{lipsum}																% para geração de dummy text
+\usepackage{bbm, times, quoting, setspace, lscape}
+\usepackage{psfrag, fancyhdr}
+\usepackage{amsmath, amsfonts, amssymb, amsthm}									% escrita matemática
+\usepackage{xcolor, url, placeins, enumitem}
+\usepackage{dcolumn, lastpage}
+\usepackage[skip = 2pt, size = normalsize, labelfont = bf]{caption}
+% ---
+
+% ---
+% Pacotes de citações
+% ---
+\usepackage[backend=biber, style=abnt, ittitles, justify, indent, backref=true]{biblatex}
+
+% fontes
+\setmainfont{Times New Roman}
+\setmonofont[Scale=0.9, Scale=MatchLowercase]{Consolas}
+
+% --- 
+% CONFIGURAÇÕES DE PACOTES
+% --- 
+
+% ---
+% Configurações de aparência do PDF final
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={abnt}{latex}{abntex}{abntex2}{trabalho acadêmico}, 
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=blue,          	% color of internal links
+    	citecolor=blue,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=blue,
+		bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% ---
+% Posiciona figuras e tabelas no topo da página quando adicionadas sozinhas
+% em um página em branco. Ver https://github.com/abntex/abntex2/issues/170
+\makeatletter
+\setlength{\@fptop}{5pt} % Set distance from top of page to first float
+\makeatother
+% ---
+
+% ---
+% Possibilita criação de Quadros e Lista de quadros.
+% Ver https://github.com/abntex/abntex2/issues/176
+%
+\newcommand{\quadroname}{Quadro}
+\newcommand{\listofquadrosname}{Lista de Quadros}
+
+\newfloat[chapter]{quadro}{loq}{\quadroname}
+\newlistof{listofquadros}{loq}{\listofquadrosname}
+\newlistentry{quadro}{loq}{0}
+
+% configurações para atender às regras da ABNT
+\setfloatadjustment{quadro}{\centering}
+\counterwithout{quadro}{chapter}
+\renewcommand{\cftquadroname}{\quadroname\space} 
+\renewcommand*{\cftquadroaftersnum}{\hfill--\hfill}
+
+\setfloatlocations{quadro}{hbtp} % Ver https://github.com/abntex/abntex2/issues/176
+% ---
+
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% Seleciona o idioma do documento (conforme pacotes do babel)
+%\selectlanguage{english}
+\selectlanguage{brazil}
+\captionsetup[figure]{name=Figura}
+\captionsetup[table]{name=Tabela}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% matrizes
+\setcounter{MaxMatrixCols}{20}
+
+% bibliografia
+\addbibresource{config/bib.bib}
+\addbibresource{config/packages.bib}
+
+% fazer sumário começar do 1 ao invés do zero
+\renewcommand{\thesection}{\arabic{section}}
+
+% posição das figuras
+\setfloatlocations{figure}{hbtp}
+\setfloatlocations{table}{hbtp}
+\titulo{MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA DE SÉRIES TEMPORAIS HIERÁRQUICAS}
+\local{VITÓRIA}
+\orientador{Prof. Dr. Guilherme A. A. Pereira}
+\instituicao{%
+    UNIVERSIDADE FEDERAL DO ESPÍRITO SANTO
+    \par
+    CENTRO DE CIÊNCIAS JURÍDICAS E ECONÔMICAS
+    \par
+    PROGRAMA DE PÓS-GRADUAÇÃO EM ECONOMIA}
+\tipotrabalho{Dissertação (Mestrado)}
+\preambulo{Dissertação apresentada ao Programa de Pós-Graduação em Economia da Universidade Federal do Espírito Santo, como requisito para a obtenção do título de Mestre em Economia.}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\makeatletter
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{LISTA DE FIGURAS}
+\else
+  \newcommand\listfigurename{LISTA DE FIGURAS}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{LISTA DE TABELAS}
+\else
+  \newcommand\listtablename{LISTA DE TABELAS}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\makeatletter
+\@ifpackageloaded{tcolorbox}{}{\usepackage[many]{tcolorbox}}
+\makeatother
+\makeatletter
+\@ifundefined{shadecolor}{\definecolor{shadecolor}{rgb}{.97, .97, .97}}
+\makeatother
+\makeatletter
+\makeatother
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage[]{biblatex}
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdfauthor={ALBERSON DA SILVA MIRANDA},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\author{ALBERSON DA SILVA MIRANDA}
+\date{2022}
+
+\begin{document}
+% elementos pré-textuais 
+
+% título do sumário
+\ifdefined\contentsname
+  \renewcommand*\contentsname{SUMÁRIO}
+\else
+  \newcommand\contentsname{SUMÁRIO}
+\fi
+
+% capa 
+\imprimircapa
+
+% folha de rosto 
+% o * indica que haverá a ficha bibliográfica 
+\imprimirfolhaderosto*
+
+% ficha catalográfica 
+%\begin{fichacatalografica}
+%    \includepdf{ficha_ufes.pdf}
+%\end{fichacatalografica}
+
+
+% substituir pela ficha em pdf fornecida pela UFES após defesa 
+\begin{fichacatalografica}
+	\sffamily
+	\vspace*{\fill}					% Posição vertical
+	\begin{center}					% Minipage Centralizado
+	\fbox{\begin{minipage}[c][8cm]{15cm}		% Largura
+	\small
+	\imprimirautor
+	
+	\hspace{0.5cm} \imprimirtitulo  / \imprimirautor. --
+	\imprimirlocal, \imprimirdata-
+	
+	\hspace{0.5cm} \thelastpage p. : il. (algumas color.) ; 30 cm.\\
+	
+	\hspace{0.5cm} \imprimirorientadorRotulo~\imprimirorientador\\
+	
+	\hspace{0.5cm}
+	\parbox[t]{\textwidth}{\imprimirtipotrabalho~--~\imprimirinstituicao,
+	\imprimirdata.}\\
+	
+	\hspace{0.5cm}
+		1. Palavra-chave1.
+		2. Palavra-chave2.
+		2. Palavra-chave3.
+		I. Orientador.
+		II. Universidade xxx.
+		III. Faculdade de xxx.
+		IV. Título 			
+	\end{minipage}}
+	\end{center}
+\end{fichacatalografica}
+
+% folha de aprovação 
+%
+%\begin{folhadeaprovacao}
+%    \includepdf{folhadeaprovacao_final.pdf}
+%\end{folhadeaprovacao}
+
+
+% substituir pela folha assinada pela banca após defesa 
+\begin{folhadeaprovacao}
+
+  \begin{center}
+    {\ABNTEXchapterfont\large\imprimirautor}
+
+    \vspace*{\fill}\vspace*{\fill}
+    \begin{center}
+      \ABNTEXchapterfont\bfseries\Large\imprimirtitulo
+    \end{center}
+    \vspace*{\fill}
+    
+    \hspace{.45\textwidth}
+    \begin{minipage}{.5\textwidth}
+        \imprimirpreambulo
+        \vspace*{1cm}
+        Aprovada em xx de xx de 20xx.\\[2cm]
+        \textbf{COMISSÃO EXAMINADORA} \\
+        \assinatura{\textbf{\imprimirorientador} \\ Universidade Federal do Espírito Santo \\ Orientador} 
+        \assinatura{\textbf{Professor} \\ Instituição}
+        \assinatura{\textbf{Professor} \\ Instituição}
+        %\assinatura{\textbf{Professor} \\ Convidado 3}
+        %\assinatura{\textbf{Professor} \\ Convidado 4}
+    \end{minipage}%
+   \end{center}
+  
+\end{folhadeaprovacao}
+
+% dedicatória 
+\begin{dedicatoria}
+   \vspace*{\fill}
+   \centering
+   \noindent
+   \textit{ Este trabalho é dedicado às crianças adultas que,\\
+   quando pequenas, sonharam em se tornar cientistas.} \vspace*{\fill}
+\end{dedicatoria}
+
+% agradecimentos 
+\begin{agradecimentos}
+Os agradecimentos principais são direcionados à Gerald Weber, Miguel Frasson,
+Leslie H. Watter, Bruno Parente Lima, Flávio de Vasconcellos Corrêa, Otavio Real
+Salvador, Renato Machnievscz\footnote{Os nomes dos integrantes do primeiro
+projeto abn\TeX\ foram extraídos de
+\url{http://codigolivre.org.br/projects/abntex/}} e todos aqueles que
+contribuíram para que a produção de trabalhos acadêmicos conforme
+as normas ABNT com \LaTeX\ fosse possível.
+
+Agradecimentos especiais são direcionados ao Centro de Pesquisa em Arquitetura
+da Informação\footnote{\url{http://www.cpai.unb.br/}} da Universidade de
+Brasília (CPAI), ao grupo de usuários
+\emph{latex-br}\footnote{\url{http://groups.google.com/group/latex-br}} e aos
+novos voluntários do grupo
+\emph{\abnTeX}\footnote{\url{http://groups.google.com/group/abntex2} e
+\url{http://www.abntex.net.br/}}~que contribuíram e que ainda
+contribuirão para a evolução do \abnTeX.
+
+\end{agradecimentos}
+
+% epígrafe 
+\begin{epigrafe}
+    \vspace*{\fill}
+	\begin{flushright}
+		\textit{``Não vos amoldeis às estruturas deste mundo, \\
+		mas transformai-vos pela renovação da mente, \\
+		a fim de distinguir qual é a vontade de Deus: \\
+		o que é bom, o que Lhe é agradável, o que é perfeito.\\
+		(Bíblia Sagrada, Romanos 12, 2)}
+	\end{flushright}
+\end{epigrafe}
+
+% resumo 
+
+\setlength{\absparsep}{18pt}
+\begin{resumo}
+ O resumo deve ressaltar o
+ objetivo, o método, os resultados e as conclusões do documento. A ordem e a extensão
+ destes itens dependem do tipo de resumo (informativo ou indicativo) e do
+ tratamento que cada item recebe no documento original. O resumo deve ser
+ precedido da referência do documento, com exceção do resumo inserido no
+ próprio documento. (\ldots) As palavras-chave devem figurar logo abaixo do
+ resumo, antecedidas da expressão Palavras-chave:, separadas entre si por
+ ponto e finalizadas também por ponto.
+
+ \textbf{Palavras-chave}: latex. abntex. editoração de texto.
+\end{resumo}
+
+% abstract 
+\begin{resumo}[Abstract]
+ \begin{otherlanguage*}{english}
+   This is the english abstract.
+
+   \vspace{\onelineskip}
+ 
+   \noindent 
+   \textbf{Keywords}: latex. abntex. text editoration.
+ \end{otherlanguage*}
+\end{resumo}
+
+% lista de ilustrações 
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*
+\cleardoublepage
+
+% lista de quadros 
+\pdfbookmark[0]{\listofquadrosname}{loq}
+\listofquadros*
+\cleardoublepage
+
+% lista de tabelas 
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\cleardoublepage
+
+% lista de abreviaturas 
+\begin{siglas}
+  \item[ABNT] Associação Brasileira de Normas Técnicas
+  \item[abnTeX] ABsurdas Normas para TeX
+\end{siglas}
+
+% lista de símbolos 
+\begin{simbolos}
+  \item[$ \Gamma $] Letra grega Gama
+  \item[$ \Lambda $] Lambda
+  \item[$ \zeta $] Letra grega minúscula zeta
+  \item[$ \in $] Pertence
+\end{simbolos}
+
+% sumário 
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+
+% elementos textuais 
+\textual
+
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[interior hidden, borderline west={3pt}{0pt}{shadecolor}, enhanced, frame hidden, boxrule=0pt, breakable, sharp corners]}{\end{tcolorbox}}\fi
+
+\hypertarget{introduuxe7uxe3o}{%
+\section{INTRODUÇÃO}\label{introduuxe7uxe3o}}
+
+Neste trabalho,
+
+\hypertarget{contextualizauxe7uxe3o-da-pesquisa}{%
+\subsection{CONTEXTUALIZAÇÃO DA
+PESQUISA}\label{contextualizauxe7uxe3o-da-pesquisa}}
+
+Neste item, forneço uma breve introdução de conceitos necessários para a
+discussão do tema da reconciliação ótima.
+
+\hypertarget{suxe9ries-hieruxe1rquicas-e-suxe9ries-agrupadas}{%
+\subsubsection{SÉRIES HIERÁRQUICAS E SÉRIES
+AGRUPADAS}\label{suxe9ries-hieruxe1rquicas-e-suxe9ries-agrupadas}}
+
+Séries temporais hierárquicas são aquelas que podem ser agregadas ou
+desagregadas naturalmente em uma estrutura aninhada
+\autocite{hyndman2021}. Para ilustrar, tome a série do PIB brasileiro.
+Ela pode ser desagregada por estado que, por sua vez, pode ser
+desagregada por município.
+
+\begin{figure}
+
+{\centering \includegraphics{img/hierarq.png}
+
+}
+
+\caption{\label{fig-h}Séries Hierárquicas}
+
+\end{figure}
+
+Essa estrutura pode ser representada por equações para qualquer nível de
+agregação.
+
+\begin{align}
+y_t &= y_{A,t} + y_{B,t} + y_{C,t} \label{eq:ha} \\
+y_t &= y_{AA,t} + y_{AB,t} + y_{AC,t} + y_{BA,t} + y_{BC,t} + y_{CA,t}\label{eq:ha_mun} \\
+y_{A,t} &= y_{AA,t} + y_{AB,t} + y_{AC,t} \label{eq:haES}
+\end{align}
+
+Assim, o agregado nacional pode ser representado apenas pelos agregados
+dos estados, através de \eqref{eq:ha}, ou como o agregado dos municípios
+\eqref{eq:ha_mun}. Já o agregado para o estado do Espírito Santo é
+representado por \eqref{eq:haES}.
+
+Alternativamente, podemos descrever a estrutura completa de forma
+matricial:
+
+\begin{equation}\protect\hypertarget{eq-matriz_hierarquia}{}{
+\begin{bmatrix}
+    y_{t} \\
+    y_{A, t} \\
+    y_{B, t} \\
+    y_{C, t} \\
+    y_{AA, t} \\
+    y_{AB, t} \\
+    y_{AC, t} \\
+    y_{BA, t} \\
+    y_{BB, t} \\
+    y_{BC, t} \\
+    y_{CA, t}
+\end{bmatrix}
+=
+\begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 1 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\end{bmatrix}
+\begin{bmatrix}
+    y_{AA, t} \\
+    y_{AB, t} \\
+    y_{AC, t} \\
+    y_{BA, t} \\
+    y_{BB, t} \\
+    y_{BC, t} \\
+    y_{CA, t}
+\end{bmatrix}
+}\label{eq-matriz_hierarquia}\end{equation}
+
+Por outro lado, o PIB pode ser também desagregado de forma cruzada de
+acordo com a atividade econômica --- lavoura, rebanho, indústria de
+transformação, extrativa, bens de capital, bens intermediários, comércio
+de vestuário, automotivos, serviços etc. Essa estrutura não pode ser
+desagregada naturalmente de uma única forma, como é a hierarquia de
+estados e municípios. Não pode ser aninhada por um atributo como a
+própria geografia. A esse tipo de estrutura dá-se o nome de séries
+agrupadas.
+
+\begin{figure}
+
+{\centering \includegraphics{img/agrupadas.png}
+
+}
+
+\caption{\label{fig-a}Séries Agrupadas}
+
+\end{figure}
+
+Combinando as duas, temos a estrutura de séries hierárquicas agrupadas.
+Ao contrário da estrutura hierárquica, que só pode ser agregada de uma
+forma --- como com os municípios abaixo dos estados ---, a adição da
+estrutura agrupada pode ocorrer tanto acima (Figura~\ref{fig-ha1})
+quanto abaixo (Figura~\ref{fig-ha2}) da hierárquica.
+
+\begin{figure}
+
+{\centering \includegraphics{img/hier_agrup.png}
+
+}
+
+\caption{\label{fig-ha1}Séries Hierárquicas Agrupadas (a)}
+
+\end{figure}
+
+\begin{figure}
+
+{\centering \includegraphics{img/hier_agrup_2.png}
+
+}
+
+\caption{\label{fig-ha2}Séries Hierárquicas Agrupadas (b)}
+
+\end{figure}
+
+Na notação matricial, a estrutura da Figura~\ref{fig-ha2} é representada
+como abaixo. Formalmente, o primeiro membro da igualdade é composto pelo
+vetor \(\mathbfit{y}_t\) \(n\)-dimensional com todas as observações no
+tempo \(t\) para todos os níveis da hierarquia. O segundo membro é
+composto pela matriz de soma \(\mathbfit{S}\) de dimensão \(n \times m\)
+que define as equações para todo nível de agregação, e pela matriz
+\(\mathbfit{b}_t\) composta pelas séries no nível mais desagregado.
+
+\[
+\mathbfit{y}_t=\mathbfit{Sb}_t
+\]
+
+\begin{equation}\protect\hypertarget{eq-matriz_ha}{}{
+\begin{bmatrix}
+    y_{t} \\
+    y_{A, t} \\
+    y_{B, t} \\
+    y_{C, t} \\
+    y_{X, t} \\
+    y_{Y, t} \\
+    y_{Z, t} \\
+    y_{AX, t} \\
+    y_{AY, t} \\
+    y_{AZ, t} \\
+    y_{BX, t} \\
+    y_{BY, t} \\
+    y_{BZ, t} \\
+    y_{CX, t} \\
+    y_{CY, t} \\
+    y_{CZ, t}
+\end{bmatrix}
+=
+\begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 1 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 \\
+    1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+    y_{AX, t} \\
+    y_{AY, t} \\
+    y_{AZ, t} \\
+    y_{BX, t} \\
+    y_{BY, t} \\
+    y_{BZ, t} \\
+    y_{CX, t} \\
+    y_{CY, t} \\
+    y_{CZ, t}
+\end{bmatrix}
+}\label{eq-matriz_ha}\end{equation}
+
+\hypertarget{abordagens-top-down-e-bottom-up}{%
+\subsubsection{ABORDAGENS TOP-DOWN E
+BOTTOM-UP}\label{abordagens-top-down-e-bottom-up}}
+
+Talvez as formas mais intuitivas de se pensar em previsões para esses
+tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a
+estrutura descrita na Figura~\ref{fig-h}, por exemplo. Podemos realizar
+a previsão para o horizonte de tempo \(h\) do agregado do PIB
+brasileiro, representado no topo da hierarquia por \emph{Total}
+(\ref{eq-topdown_1}), e então distribuir os valores previstos
+proporcionalmente entre os estados e municípios.
+
+\begin{equation}\protect\hypertarget{eq-topdown_1}{}{
+\hat{y}_{T+h | T} = E[y_{T+h} | \Omega_T]
+}\label{eq-topdown_1}\end{equation}
+
+Essa é a abordagem top-down. Nela, a previsão para os níveis mais
+desagregados da hierarquia são determinadas por uma proporção \(p_i\) do
+nível agregado. Por exemplo, as previsões para Vitória são dadas pela
+equação \ref{eq-topdown_2}.
+
+\begin{equation}\protect\hypertarget{eq-topdown_2}{}{
+\tilde{y}_{AA, T+h | T} = p_{1}\hat{y}_{T+h | T}
+}\label{eq-topdown_2}\end{equation}
+
+Para isso, temos de definir uma matriz com todos esses pesos, que,
+seguindo a formulação de \textcite{hyndman2021}, vamos chamar de
+\(\mathbfit{G}\):
+
+\begin{equation}\protect\hypertarget{eq-matriz_g}{}{
+\mathbfit{G}
+=
+\begin{bmatrix}
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}
+}\label{eq-matriz_g}\end{equation}
+
+\(\mathbfit{G}\) é uma matriz \(m \times n\) que multiplica a matriz
+\(\hat{\mathbfit{y}}_{T+h|T}\) que, por sua vez, é composta pelas
+previsões base --- as previsões individuais para todos os níveis de
+agregação. A equação para a abordagem \emph{top-down} será, então:
+
+\begin{equation}\protect\hypertarget{eq-topdown_3}{}{
+\mathbfit{\tilde{y}}_{T+h | T} = \mathbfit{SG\hat{y}}_{T+h | T}
+}\label{eq-topdown_3}\end{equation}
+
+Na notação matricial para a estrutura da Figura~\ref{fig-h}, temos:
+
+\begin{equation}\protect\hypertarget{eq-matriz_topdown1}{}{
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{BC, t} \\
+    \tilde{y}_{CA, t}
+\end{bmatrix}
+=
+\mathbfit{S}
+\begin{bmatrix}
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}
+\begin{bmatrix}
+    \hat{y}_{T+h|T} \\
+    \hat{y}_{A, T+h|T} \\
+    \hat{y}_{B, T+h|T} \\
+    \hat{y}_{C, T+h|T} \\
+    \hat{y}_{AA, T+h|T} \\
+    \hat{y}_{AB, T+h|T} \\
+    \hat{y}_{AC, T+h|T} \\
+    \hat{y}_{BA, T+h|T} \\
+    \hat{y}_{BB, T+h|T} \\
+    \hat{y}_{BC, T+h|T} \\
+    \hat{y}_{CA, T+h|T}
+\end{bmatrix}
+}\label{eq-matriz_topdown1}\end{equation}
+
+O que nos dá uma proporção do total para cada elemento no nível mais
+desagregado.
+
+\begin{equation}\protect\hypertarget{eq-matriz_topdown2}{}{
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{BC, t} \\
+    \tilde{y}_{CA, t}
+\end{bmatrix}
+=
+\mathbfit{S}
+\begin{bmatrix}
+    p_1\hat{y}_{T+h|T} \\
+    p_2\hat{y}_{T+h|T} \\
+    p_3\hat{y}_{T+h|T} \\
+    p_4\hat{y}_{T+h|T} \\
+    p_5\hat{y}_{T+h|T} \\
+    p_6\hat{y}_{T+h|T} \\
+    p_7\hat{y}_{T+h|T}
+\end{bmatrix}
+}\label{eq-matriz_topdown2}\end{equation}
+
+Substituindo a matriz \(\mathbfit{S}\), temos as equações que definem
+cada previsão da estrutura em função de proporções da previsão do
+agregado.
+
+\begin{equation}\protect\hypertarget{eq-matriz_topdown3}{}{
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{BC, t} \\
+    \tilde{y}_{CA, t}
+\end{bmatrix}
+=
+\begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 1 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+    p_1\hat{y}_{T+h|T} \\
+    p_2\hat{y}_{T+h|T} \\
+    p_3\hat{y}_{T+h|T} \\
+    p_4\hat{y}_{T+h|T} \\
+    p_5\hat{y}_{T+h|T} \\
+    p_6\hat{y}_{T+h|T} \\
+    p_7\hat{y}_{T+h|T}
+\end{bmatrix}
+}\label{eq-matriz_topdown3}\end{equation}
+
+Já a abordagem bottom-up parte do raciocínio inverso e define as
+previsões de cada elemento da estrutura a partir das previsões dos
+elementos mais desagregados. Para tanto, basta modificar a matriz
+\(\mathbfit{G}\).
+
+\begin{equation}\protect\hypertarget{eq-matriz_gbu}{}{
+\mathbfit{G}
+=
+\begin{bmatrix}
+    0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+}\label{eq-matriz_gbu}\end{equation}
+
+O que resulta nas equações desejadas. Portanto, \(\mathbfit{G}\) define
+a abordagem --- se \emph{top-down} ou \emph{bottom-up} ---, e
+\(\mathbfit{S}\) define a maneira da qual as previsões são somadas para
+formar as equações de previsão para cada elemento da estrutura.
+
+\begin{equation}\protect\hypertarget{eq-matriz_bottomup}{}{
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{BC, t} \\
+    \tilde{y}_{CA, t}
+\end{bmatrix}
+=
+\begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 1 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+    \hat{y}_{AA, T+h|T} \\
+    \hat{y}_{AB, T+h|T} \\
+    \hat{y}_{AC, T+h|T} \\
+    \hat{y}_{BA, T+h|T} \\
+    \hat{y}_{BB, T+h|T} \\
+    \hat{y}_{BC, T+h|T} \\
+    \hat{y}_{CA, T+h|T}
+\end{bmatrix}
+}\label{eq-matriz_bottomup}\end{equation}
+
+\hypertarget{coeruxeancia-e-reconciliauxe7uxe3o}{%
+\subsubsection{COERÊNCIA E
+RECONCILIAÇÃO}\label{coeruxeancia-e-reconciliauxe7uxe3o}}
+
+\index{coerência} \index{reconciliação} Seja somando as previsões do
+nível mais desagregado para formar os níveis superiores da hierarquia
+(\emph{bottom-up}) ou distribuindo proporcionalmente as previsões do
+nível mais agregado (\emph{top-down}), o vetor
+\(\mathbfit{\tilde{y}}_t\) representa as previsões \emph{coerentes}.
+Isso significa que as previsões ``batem'', ou seja, são totalizadas
+corretamente --- as previsões de cada elemento agregado corresponde ao
+somatório das previsões dos níveis inferiores da hierarquia. Isso é
+garantido pela multiplicação das matrizes \(\mathbfit{SG}\).
+
+Não fosse essa pré multiplicação, nada garantiria a coerência das
+previsões. Tomando a estrutura da Figura~\ref{fig-h} como exemplo, seria
+um acaso improvável que as previsões do agregado para o estado do
+Espírito Santo sejam exatamente a soma das previsões individuais de seus
+municípios. Isso porque cada série pode seguir um processo diferente
+(e.g., arima) com erros e variâncias distintas.
+
+Os métodos de gerar previsões coerentes a partir de previsões base são
+chamados de métodos de \emph{reconciliação}. Os métodos de reconciliação
+tradicionais apresentados, \emph{top-down} e \emph{bottom-up}, utilizam
+informação limitada. No método \emph{top-down}, utiliza-se apenas
+informações do nível mais agregado --- por isso, apenas a primeira
+coluna em (\ref{eq-matriz_g}) é diferente de zero. Já na abordagem
+\emph{bottom-up}, utiliza-se apenas as informações dos níveis mais
+desagregados, o que resulta na submatriz identidade \(m \times m\) em
+(\ref{eq-matriz_gbu}), enquanto as colunas que representam os níveis
+mais agregados são nulas.
+
+Alternativamente, podemos pensar numa matriz \(\mathbfit{G}\) qualquer
+que utilize toda a informação disponível e tenha algumas propriedades
+que garantam que as previsões coerentes tenham o menor erro o possível.
+Esse é o problema de pesquisa trabalhado na \emph{reconciliação ótima}.
+
+\hypertarget{motivauxe7uxe3o}{%
+\subsection{MOTIVAÇÃO}\label{motivauxe7uxe3o}}
+
+O estado da arte em reconciliação ótima de previsões pontuais se
+encontra no método de \emph{Minimun Trace} (MinT). Esse método, assim
+como toda estimação de média de parâmetros, está sujeita à interferência
+de \emph{outliers} extremos que, no caso de previsão de séries
+hierárquicas, se apresentam na forma de elementos da hierarquia muito
+maiores que os demais. Isso pode significar em menor peso atribuído à
+elementos menores da hierarquia e, talvez, a estimação pela mediana
+possua alguma vantagem em determinadas situações. Além disso, pode ser
+do interesse do pesquisador a estimação em eventos extremos, o que
+exigiria usar quantis muito altos ou muito baixos. Nesse sentido, a
+estimação por regressão quantílica pode ser uma adição à literatura do
+tema.
+
+\hypertarget{objetivos}{%
+\subsection{OBJETIVOS}\label{objetivos}}
+
+O objetivo geral da dissertação é estudar o problema da reconciliação
+ótima de previsões pontuais a partir de regressões quantílicas.
+
+Como objetivos específicos, tenho:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Estudar métodos para estimação da matriz \(\mathbfit{G}\) para
+  qualquer quantil desejado, e não apenas a média;
+\item
+  Identificar possíveis vantagens e limitações da abordagem quantílica
+  na reconciliação de previsões pontuais a partir de aplicação do método
+  estudado na previsão de saldos de crédito do Banestes.
+\end{enumerate}
+
+Não está no escopo do estudo os métodos de se obter previsões
+probabilísticas, ou seja, a estimação da matriz \(\hat{y}_{T+h}\) para
+além de previsões pontuais.
+
+\hypertarget{revisuxe3o-da-literatura}{%
+\subsection{REVISÃO DA LITERATURA}\label{revisuxe3o-da-literatura}}
+
+\hypertarget{metodologia}{%
+\subsubsection{METODOLOGIA}\label{metodologia}}
+
+A primeira etapa da pesquisa consistirá na pesquisa bibliográfica
+relacionada à reconciliação ótima de previsões de séries temporais
+hierárquicas e agrupadas e à regressão quantílica.
+
+Realizei uma pesquisa bibliométrica na base de dados do Google
+Acadêmico, pesquisando pelas palavras-chave ``\emph{hierarchical
+forecast reconciliation}'' para qualquer lugar no corpo do texto,
+encontrando 27.600 resultados. Utilizando um script para ordenar os
+resultados pelo número de citações\footnote{https://github.com/WittmannF/sort-google-scholar},
+verifiquei que o trabalho mais citado é \textcite{hyndman2021}.
+
+\begin{table}
+\caption{Trabalhos mais citados com os termos ``hierarquical forecast
+reconciliation''}\tabularnewline
+
+\centering\begingroup\fontsize{10}{12}\selectfont
+
+\begin{tabular}[t]{lrr}
+\toprule
+Autor & Citações & Ano\\
+\midrule
+\cellcolor{gray!6}{Hyndman, G Athanasopoulos} & \cellcolor{gray!6}{5222} & \cellcolor{gray!6}{2018}\\
+Dellarocas, X Zhang & 2082 & 2007\\
+\cellcolor{gray!6}{Hyndman, A Lee, E Wang, S Wickramasuriya} & \cellcolor{gray!6}{1023} & \cellcolor{gray!6}{2013}\\
+Badre, M D'esposito & 974 & 2009\\
+\cellcolor{gray!6}{Hong, S Fan} & \cellcolor{gray!6}{912} & \cellcolor{gray!6}{2016}\\
+\addlinespace
+Tashman & 798 & 2000\\
+\bottomrule
+\end{tabular}
+\endgroup{}
+\end{table}
+
+Utilizando essa obra como texto base, obtive os textos referenciados no
+capítulo 11 ``\emph{Forecasting Hierarquical and Grouped Time-Series}'',
+subcapítulo 3 ``\emph{Forecast Reconciliation}'', além de
+\textcite{hyndman2016}, onde o método por MPQ foi desenvolvido porém não
+está citado nas referências do capítulo.
+
+\begin{quadro}
+\caption{Artigos de referência em Hyndman e Athanasopoulos (2021)}\tabularnewline
+
+\centering\begingroup\fontsize{10}{12}\selectfont
+
+\begin{tabular}[t]{lr}
+\toprule
+Autor & Ano\\
+\midrule
+\cellcolor{gray!6}{Hyndman, R. J., Ahmed, R. A., Athanasopoulos, G., Shang, H. L.} & \cellcolor{gray!6}{2011}\\
+Panagiotelis, A., Athanasopoulos, G., Gamakumara, P., Hyndman, R. J. & 2021\\
+\cellcolor{gray!6}{Wickramasuriya, S. L., Athanasopoulos, G., Hyndman, R. J.} & \cellcolor{gray!6}{2019}\\
+Rob J. Hyndman and Alan J. Lee and Earo Wang & 2016\\
+\bottomrule
+\end{tabular}
+\endgroup{}
+\end{quadro}
+
+Adicionando o termo ``\emph{quantile}'' e refinando a pesquisa para
+encontrar as palavras chave no título dos trabalhos, nenhum resultado
+foi encontrado. Modificando os termos para encontrar palavras
+semelhantes, a busca por ``\emph{allintitle: hierarchical OR
+hierarchically probabilistic OR quantile reconciliation OR reconciled}''
+retornou 5 títulos, dentre os quais dois são artigos de acesso livre e,
+portanto, foram adicionadas à pesquisa bibliográfica a ser realizada.
+\nocite{han2021, roach2019}
+
+\begin{quadro}
+\caption{Trabalhados encontrados na busca estendida}\tabularnewline
+
+\centering\begingroup\fontsize{10}{12}\selectfont
+
+\begin{tabular}[t]{lr}
+\toprule
+Autor & Ano\\
+\midrule
+\cellcolor{gray!6}{Han, X., Dasgupta, S., Ghosh, J.} & \cellcolor{gray!6}{2021}\\
+Roach, C. & 2019\\
+\bottomrule
+\end{tabular}
+\endgroup{}
+\end{quadro}
+
+\hypertarget{suxedntese-da-literatura}{%
+\subsubsection{SÍNTESE DA LITERATURA}\label{suxedntese-da-literatura}}
+
+Previsões pontuais de séries temporais hierárquicas não é um assunto
+novo. Ao menos desde a década de 70, pesquisas foram publicadas acerca
+de abordagens \emph{bottom-up} e \emph{top-down}, suas vantagens e
+desvantagens, e tentativas de se definir qual é o melhor
+método\footnote{Uma revisão dessa literatura pode ser encontrada em
+  \textcite{athanasopoulos2009}.}. Entretanto, é apenas em
+\textcite{hyndman2011} que é formalizada uma abordagem prática que
+utiliza toda a informação disponível, (i.e.~as previsões de todos
+elementos de todos os níveis da hierarquia) a partir da estimação da
+matriz \(\mathbfit{G}\) via regressão linear por mínimos quadrados
+generalizados (MQG).
+
+Entretanto, para ser capaz de estimar o modelo por MQG, é necessária a
+matriz de variância-covariância dos erros. \textcite{hyndman2011} usam a
+matriz de erros de coerência, ou seja, a diferença entre as previsões
+reconciliadas e as previsões base, que tem posto incompleto e não
+identificada e, portanto, não pode ser estimada. Os autores contornam
+esse problema adotando no lugar da matriz de variância-covariância dos
+erros uma matriz diagonal constante, ou seja, assumem variância
+constante dos erros de reconciliação, e estimam a matriz
+\(\mathbfit{G}\) por mínimos quadrados ordinários (MQO).
+
+A estimação por esse método resulta numa reconciliação ótima que depende
+apenas da matriz \(\mathbfit{S}\), ou seja, da estrutura hierárquica, e
+independe da variância e covariância das previsões base
+\(\mathbfit{\hat{y}_{T+h}}\) --- o que não é uma conclusão satisfatória.
+
+\textcite{hyndman2016} tentam aperfeiçoar o método usando as variâncias
+das previsões base estimadas (dentro da amostra) como estimativa para a
+matriz de variância-covariância dos erros de reconciliação, de forma a
+as utilizar como pesos e realizar a reconciliação ótima por mínimos
+quadrados ponderados (MQP). Assim, previsões base mais acuradas têm peso
+maior do que as mais ruidosas. Entretanto, não fornecem justificativa
+teórica para usar a diagonal da matriz de variância-covariância de
+\(\mathbfit{\hat{e}_{t}}\).
+
+\textcite{wickramasuriya2019} argumentam que o que de fato interessa é
+que as previsões reconciliadas tenham o menor erro. Então, corrigem a
+abordagem de reconciliação ótima para o objetivo de minimização dos
+erros das previsões reconciliadas \(\mathbfit{\tilde{y}_{t+h}}\), ao
+invés dos erros das previsões base \(\mathbfit{\hat{y}_{t+h}}\). Dado
+que isso implica na minimização da variância de
+\(\mathbfit{\tilde{e}_{t+h}}\), ou seja, na minimização do somatório da
+diagonal, o traço, da matriz de variância-covariância de
+\(\mathbfit{\tilde{e}_{t+h}}\), eles chamaram esse método de Menor Traço
+(MinT, na sigla em inglês). Paralelamente, usam desigualdade triangular
+para demonstrar que as previsões reconciliadas obtidas por esse método
+são ao menos tão boas quanto as previsões base.
+
+\textcite{panagiotelis2021} reinterpreta a literatura de coerência e
+reconciliação de previsões pontuais a partir de uma abordagem
+geométrica, trazendo provas alternativas para conclusões anteriores ao
+mesmo tempo em que fornece novos teoremas. Além disso,
+\textcite{panagiotelis2021} estende essa interpretação geométrica para o
+contexto probabilístico, fornecendo métodos paramétricos e não
+paramétricos (via \emph{bootstrapping}) para reconciliação de previsões
+probabilísticas, ou seja, para reconciliar previsões \(\hat{y}_t\)
+obtidas a partir de toda a distribuição, e não apenas a média.
+
+\hypertarget{muxe9todos-estatuxedsticos-de-reconciliauxe7uxe3o-uxf3tima}{%
+\section{MÉTODOS ESTATÍSTICOS DE RECONCILIAÇÃO
+ÓTIMA}\label{muxe9todos-estatuxedsticos-de-reconciliauxe7uxe3o-uxf3tima}}
+
+Oi.
+
+
+\printbibliography
+
+
+% elementos pós-textuais 
+\postextual
+
+% apêndice 
+\begin{apendicesenv}
+\partapendices
+
+\chapter{PRIMEIRO APÊNDICE}
+
+\lipsum[50]
+
+\chapter{SEGUNDO APÊNDICE}
+
+\lipsum[50]
+
+\end{apendicesenv}
+
+% anexos 
+\begin{anexosenv}
+\partanexos
+
+\chapter{PRIMEIRO ANEXO}
+
+\lipsum[30]
+
+\chapter{SEGUNDO ANEXO}
+
+\lipsum[30]
+
+\end{anexosenv}
+
+% índice remissivo 
+\phantompart
+\printindex
+
+\end{document}

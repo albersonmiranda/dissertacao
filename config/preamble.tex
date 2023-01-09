@@ -1,95 +1,146 @@
-% variáveis
-\newcommand{\nome}{Alberson da Silva}
-\newcommand{\sobrenome}{Miranda}
-\newcommand{\tipo}{Dissertação}
-\newcommand{\tipoingles}{Thesis}
-\newcommand{\titulo}{Reconciliação Ótima Probabilística em Séries Temporais Hierárquicas}
-\newcommand{\tituloingles}{Probabilistic Optimal Conciliation of Hierarquic Time Series}
-\newcommand{\universidade}{Universidade Federal do Espírito Santo}
-\newcommand{\campus}{Centro de Ciências Jurídicas e Econômicas}
-\newcommand{\curso}{Programa de Pós-Graduação em Economia}
-\newcommand{\cursoingles}{MSc. in Economics}
-\newcommand{\orientador}{Prof. Dr. Guilherme A. A. Pereira}
-\newcommand{\cidade}{Vitória}
-\newcommand{\dia}{xx}
-\newcommand{\mes}{setembro}
-\newcommand{\ano}{2022}
-\newcommand{\grau}{Mestre em Economia}
-\newcommand{\bancap}{Prof. Dr. Componente Banca}
-\newcommand{\bancas}{Prof. Dr. Componente Banca}
+% opções para o classoption
+%
+%	12pt,				% tamanho da fonte
+%	openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+%	twoside,			% para impressão em recto e verso. Oposto a oneside
+%	a4paper,			% tamanho do papel. 
+%	% -- opções da classe abntex2 --
+%	%chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+%	%section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+%	%subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+%	%subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+%	% -- opções do pacote babel --
+%	english,			% idioma adicional para hifenização
+%	french,				% idioma adicional para hifenização
+%	spanish,			% idioma adicional para hifenização
+%	brazil				% o último idioma é o principal do documento
 
-% pacotes
+% ---
+% Pacotes básicos 
+% ---
+\usepackage{lmodern}			% Usa a fonte Latin Modern			
+\usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
+\usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+\usepackage{microtype} 			% para melhorias de justificação
+\usepackage{config/ppgecotex}	% customização para PPGEco/UFES
+% ---
+
+% ---
+% Pacotes adicionais
+% ---
+\usepackage{lipsum}																% para geração de dummy text
 \usepackage{bbm, times, quoting, setspace, lscape}
-\usepackage{indentfirst, float, graphicx, psfrag, fancyhdr}
-\usepackage{times, amsmath, amsfonts, amssymb, amsthm}
-\usepackage{xcolor, url, placeins, sectsty, enumitem}
-\usepackage{polyglossia, dcolumn, lastpage}
-\usepackage[T1]{fontenc}
-\usepackage[skip = 2pt, size = normalsize]{caption}
-\usepackage[labelfont = bf]{caption}
-\usepackage[backend=biber, style=abnt, ittitles, justify, indent, ]{biblatex}
+\usepackage{psfrag, fancyhdr}
+\usepackage{amsmath, amsfonts, amssymb, amsthm}									% escrita matemática
+\usepackage{xcolor, url, placeins, enumitem}
+\usepackage{dcolumn, lastpage}
+\usepackage[skip = 2pt, size = normalsize, labelfont = bf]{caption}
+% ---
+
+% ---
+% Pacotes de citações
+% ---
+\usepackage[backend=biber, style=abnt, ittitles, justify, indent, backref=true]{biblatex}
 
 % fontes
 \setmainfont{Times New Roman}
 \setmonofont[Scale=0.9, Scale=MatchLowercase]{Consolas}
-\sectionfont{\fontsize{12}{15}\selectfont}
-\subsectionfont{\fontsize{12}{15}\selectfont}
-\setlength\parindent{1.5cm}
-%\renewenvironment{Shaded}
-%    {\begin{snugshade}
-%    \begin{singlespace}
-%    \linespread{0.5}
-%    }
-%    {\end{singlespace}
-%    \end{snugshade}
-%}
 
-% linguagem
-\setdefaultlanguage{portuguese}
-\deftocheading{toc}{}%
-\deftocheading{lot}{}%
-\deftocheading{lof}{}%
+% --- 
+% CONFIGURAÇÕES DE PACOTES
+% --- 
 
-% cabeçalho e rodapé
-\lhead{}
-\chead{}
-\rhead{\thepage}
-\lfoot{}
-\cfoot{}
-\rfoot{}
-\renewcommand{\headrulewidth}{0pt}
+% ---
+% Configurações de aparência do PDF final
 
-% espaçamento
-\onehalfspacing
-\linespread{1.5}
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
 
-% ambiente citação
-\newenvironment{citacao}
-    {\begin{quoting}[rightmargin=0cm,leftmargin=4cm]
-    \begin{singlespace}
-    \footnotesize
-    }
-    {\end{singlespace}
-    \end{quoting}
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={abnt}{latex}{abntex}{abntex2}{trabalho acadêmico}, 
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=blue,          	% color of internal links
+    	citecolor=blue,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=blue,
+		bookmarksdepth=4
 }
+\makeatother
+% --- 
 
-% legenda
-\captionsetup[figure]{font=scriptsize}
-\captionsetup{labelsep = endash, format = hang, width = \textwidth}
+% ---
+% Posiciona figuras e tabelas no topo da página quando adicionadas sozinhas
+% em um página em branco. Ver https://github.com/abntex/abntex2/issues/170
+\makeatletter
+\setlength{\@fptop}{5pt} % Set distance from top of page to first float
+\makeatother
+% ---
 
-% posição das figuras
-\floatplacement{figure}{H}
-\floatplacement{table}{H}
+% ---
+% Possibilita criação de Quadros e Lista de quadros.
+% Ver https://github.com/abntex/abntex2/issues/176
+%
+\newcommand{\quadroname}{Quadro}
+\newcommand{\listofquadrosname}{Lista de Quadros}
 
-% estilo
-\pagestyle{fancy}
+\newfloat[chapter]{quadro}{loq}{\quadroname}
+\newlistof{listofquadros}{loq}{\listofquadrosname}
+\newlistentry{quadro}{loq}{0}
+
+% configurações para atender às regras da ABNT
+\setfloatadjustment{quadro}{\centering}
+\counterwithout{quadro}{chapter}
+\renewcommand{\cftquadroname}{\quadroname\space} 
+\renewcommand*{\cftquadroaftersnum}{\hfill--\hfill}
+
+\setfloatlocations{quadro}{hbtp} % Ver https://github.com/abntex/abntex2/issues/176
+% ---
+
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% Seleciona o idioma do documento (conforme pacotes do babel)
+%\selectlanguage{english}
+\selectlanguage{brazil}
+\captionsetup[figure]{name=Figura}
+\captionsetup[table]{name=Tabela}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% matrizes
+\setcounter{MaxMatrixCols}{20}
 
 % bibliografia
 \addbibresource{config/bib.bib}
 \addbibresource{config/packages.bib}
 
-% matrizes
-\setcounter{MaxMatrixCols}{20}
+% fazer sumário começar do 1 ao invés do zero
+\renewcommand{\thesection}{\arabic{section}}
 
-% equações
-\renewcommand{\theequation}{\arabic{equation}}
+% posição das figuras
+\setfloatlocations{figure}{hbtp}
+\setfloatlocations{table}{hbtp}
