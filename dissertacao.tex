@@ -9,7 +9,6 @@
   a4paper,
   chapter=TITLE,
   section=TITLE,
-  subsubsection=TITLE,
   brazil]{abntex2}
 
 \usepackage{amsmath,amssymb}
@@ -225,7 +224,7 @@
 % posição das figuras
 \setfloatlocations{figure}{hbtp}
 \setfloatlocations{table}{hbtp}
-\titulo{MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA DE SÉRIES TEMPORAIS HIERÁRQUICAS}
+\titulo{MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA DE SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS}
 \local{VITÓRIA}
 \orientador{Prof. Dr. Guilherme A. A. Pereira}
 \instituicao{%
@@ -410,74 +409,50 @@
   
 \end{folhadeaprovacao}
 
-% dedicatória 
-\begin{dedicatoria}
-   \vspace*{\fill}
-   \centering
-   \noindent
-   \textit{ Este trabalho é dedicado às crianças adultas que,\\
-   quando pequenas, sonharam em se tornar cientistas.} \vspace*{\fill}
-\end{dedicatoria}
+%% dedicatória 
+%\begin{dedicatoria}
+%   \vspace*{\fill}
+%   \centering
+%   \noindent
+%   \textit{Exemplo de dedicatória,\\\lipsum[10].} \vspace*{\fill}
+%\end{dedicatoria}
 
-% agradecimentos 
-\begin{agradecimentos}
-Os agradecimentos principais são direcionados à Gerald Weber, Miguel Frasson,
-Leslie H. Watter, Bruno Parente Lima, Flávio de Vasconcellos Corrêa, Otavio Real
-Salvador, Renato Machnievscz\footnote{Os nomes dos integrantes do primeiro
-projeto abn\TeX\ foram extraídos de
-\url{http://codigolivre.org.br/projects/abntex/}} e todos aqueles que
-contribuíram para que a produção de trabalhos acadêmicos conforme
-as normas ABNT com \LaTeX\ fosse possível.
-
-Agradecimentos especiais são direcionados ao Centro de Pesquisa em Arquitetura
-da Informação\footnote{\url{http://www.cpai.unb.br/}} da Universidade de
-Brasília (CPAI), ao grupo de usuários
-\emph{latex-br}\footnote{\url{http://groups.google.com/group/latex-br}} e aos
-novos voluntários do grupo
-\emph{\abnTeX}\footnote{\url{http://groups.google.com/group/abntex2} e
-\url{http://www.abntex.net.br/}}~que contribuíram e que ainda
-contribuirão para a evolução do \abnTeX.
-
-\end{agradecimentos}
+%% agradecimentos 
+%\begin{agradecimentos}
+%\lipsum[30]
+%
+%\lipsum[30]
+%
+%\end{agradecimentos}
 
 % epígrafe 
-\begin{epigrafe}
-    \vspace*{\fill}
-	\begin{flushright}
-		\textit{``Não vos amoldeis às estruturas deste mundo, \\
-		mas transformai-vos pela renovação da mente, \\
-		a fim de distinguir qual é a vontade de Deus: \\
-		o que é bom, o que Lhe é agradável, o que é perfeito.\\
-		(Bíblia Sagrada, Romanos 12, 2)}
-	\end{flushright}
-\end{epigrafe}
+%\begin{epigrafe}
+%    \vspace*{\fill}
+%	\begin{flushright}
+%		\textit{``Modelo de epígrafe, \\
+%		modelo de epígrafe.''}
+%	\end{flushright}
+%\end{epigrafe}
 
 % resumo 
 
 \setlength{\absparsep}{18pt}
 \begin{resumo}
- O resumo deve ressaltar o
- objetivo, o método, os resultados e as conclusões do documento. A ordem e a extensão
- destes itens dependem do tipo de resumo (informativo ou indicativo) e do
- tratamento que cada item recebe no documento original. O resumo deve ser
- precedido da referência do documento, com exceção do resumo inserido no
- próprio documento. (\ldots) As palavras-chave devem figurar logo abaixo do
- resumo, antecedidas da expressão Palavras-chave:, separadas entre si por
- ponto e finalizadas também por ponto.
+  \lipsum[30]
 
- \textbf{Palavras-chave}: latex. abntex. editoração de texto.
+  \textbf{Palavras-chave}: palavra-chave1. palavra-chave2. palavra-chave3.
 \end{resumo}
 
 % abstract 
 \begin{resumo}[Abstract]
- \begin{otherlanguage*}{english}
-   This is the english abstract.
+  \begin{otherlanguage*}{english}
+    \lipsum[30]
 
-   \vspace{\onelineskip}
+    \vspace{\onelineskip}
  
-   \noindent 
-   \textbf{Keywords}: latex. abntex. text editoration.
- \end{otherlanguage*}
+    \noindent 
+    \textbf{Keywords}: keyword1. keyword2. keyword3.
+  \end{otherlanguage*}
 \end{resumo}
 
 % lista de ilustrações 
@@ -497,16 +472,25 @@ contribuirão para a evolução do \abnTeX.
 
 % lista de abreviaturas 
 \begin{siglas}
-  \item[ABNT] Associação Brasileira de Normas Técnicas
-  \item[abnTeX] ABsurdas Normas para TeX
+  \item[MinT] \textit{Minimum Trace}
+  \item[MCRL] Modelo Clássico de Regressão Linear
+  \item[MQO] Mínimos Quadrados Ordinários
+  \item[MQP] Mínimos Quadrados Ponderados
 \end{siglas}
 
 % lista de símbolos 
 \begin{simbolos}
-  \item[$ \Gamma $] Letra grega Gama
-  \item[$ \Lambda $] Lambda
-  \item[$ \zeta $] Letra grega minúscula zeta
-  \item[$ \in $] Pertence
+  \item[$ t $] Tempo dentro-da-amostra
+  \item[$ T $] Último tempo dentro-da-amostra
+  \item[$ h $] Horizonte de previsão, tempo fora-da-amostra
+  \item[$ \Omega $] Conjunto de dados dentro-da-amostra
+  \item[$ y $] Série temporal dentro-da-amostra
+  \item[$ \hat{y} $] Série temporal estimada
+  \item[$ \tilde{y} $] Série temporal reconciliada
+  \item[$ \mathbfit{S} $] Matriz de soma
+  \item[$ \mathbfit{G} $] Matriz de reconciliação
+  \item[$\{...\}$] Conjunto
+  \item[$|\{...\}|$] Número de elementos em um conjunto
 \end{simbolos}
 
 % sumário 
@@ -517,23 +501,16 @@ contribuirão para a evolução do \abnTeX.
 % elementos textuais 
 \textual
 
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[interior hidden, borderline west={3pt}{0pt}{shadecolor}, enhanced, frame hidden, boxrule=0pt, breakable, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, boxrule=0pt, frame hidden, enhanced, interior hidden, breakable, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
 
 \hypertarget{introduuxe7uxe3o}{%
 \section{INTRODUÇÃO}\label{introduuxe7uxe3o}}
 
 Neste trabalho,
 
-\hypertarget{contextualizauxe7uxe3o-da-pesquisa}{%
-\subsection{CONTEXTUALIZAÇÃO DA
-PESQUISA}\label{contextualizauxe7uxe3o-da-pesquisa}}
-
-Neste item, forneço uma breve introdução de conceitos necessários para a
-discussão do tema da reconciliação ótima.
-
 \hypertarget{suxe9ries-hieruxe1rquicas-e-suxe9ries-agrupadas}{%
-\subsubsection{SÉRIES HIERÁRQUICAS E SÉRIES
-AGRUPADAS}\label{suxe9ries-hieruxe1rquicas-e-suxe9ries-agrupadas}}
+\subsection{Séries hierárquicas e séries
+agrupadas}\label{suxe9ries-hieruxe1rquicas-e-suxe9ries-agrupadas}}
 
 Séries temporais hierárquicas são aquelas que podem ser agregadas ou
 desagregadas naturalmente em uma estrutura aninhada
@@ -656,9 +633,10 @@ Na notação matricial, a estrutura da Figura~\ref{fig-ha2} é representada
 como abaixo. Formalmente, o primeiro membro da igualdade é composto pelo
 vetor \(\mathbfit{y}_t\) \(n\)-dimensional com todas as observações no
 tempo \(t\) para todos os níveis da hierarquia. O segundo membro é
-composto pela matriz de soma \(\mathbfit{S}\) de dimensão \(n \times m\)
-que define as equações para todo nível de agregação, e pela matriz
-\(\mathbfit{b}_t\) composta pelas séries no nível mais desagregado.
+composto pela matriz de soma \(\mathbfit{S}\)
+\index{matriz $\mathbfit{S}$}de dimensão \(n \times m\) que define as
+equações para todo nível de agregação, e pela matriz \(\mathbfit{b}_t\)
+composta pelas séries no nível mais desagregado.
 
 \[
 \mathbfit{y}_t=\mathbfit{Sb}_t
@@ -716,8 +694,8 @@ que define as equações para todo nível de agregação, e pela matriz
 }\label{eq-matriz_ha}\end{equation}
 
 \hypertarget{abordagens-top-down-e-bottom-up}{%
-\subsubsection{ABORDAGENS TOP-DOWN E
-BOTTOM-UP}\label{abordagens-top-down-e-bottom-up}}
+\subsection{Abordagens top-down e
+bottom-up}\label{abordagens-top-down-e-bottom-up}}
 
 Talvez as formas mais intuitivas de se pensar em previsões para esses
 tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a
@@ -905,6 +883,8 @@ O que resulta nas equações desejadas. Portanto, \(\mathbfit{G}\) define
 a abordagem --- se \emph{top-down} ou \emph{bottom-up} ---, e
 \(\mathbfit{S}\) define a maneira da qual as previsões são somadas para
 formar as equações de previsão para cada elemento da estrutura.
+Portanto, chamo \(\mathbfit{G}\) de matriz de reconciliação.
+\index{matriz de reconciliação}
 
 \begin{equation}\protect\hypertarget{eq-matriz_bottomup}{}{
 \begin{bmatrix}
@@ -946,25 +926,25 @@ formar as equações de previsão para cada elemento da estrutura.
 }\label{eq-matriz_bottomup}\end{equation}
 
 \hypertarget{coeruxeancia-e-reconciliauxe7uxe3o}{%
-\subsubsection{COERÊNCIA E
-RECONCILIAÇÃO}\label{coeruxeancia-e-reconciliauxe7uxe3o}}
+\subsection{Coerência e
+reconciliação}\label{coeruxeancia-e-reconciliauxe7uxe3o}}
 
 \index{coerência} \index{reconciliação} Seja somando as previsões do
 nível mais desagregado para formar os níveis superiores da hierarquia
 (\emph{bottom-up}) ou distribuindo proporcionalmente as previsões do
 nível mais agregado (\emph{top-down}), o vetor
 \(\mathbfit{\tilde{y}}_t\) representa as previsões \emph{coerentes}.
-Isso significa que as previsões ``batem'', ou seja, são totalizadas
-corretamente --- as previsões de cada elemento agregado corresponde ao
-somatório das previsões dos níveis inferiores da hierarquia. Isso é
-garantido pela multiplicação das matrizes \(\mathbfit{SG}\).
+Isso significa que as previsões são totalizadas corretamente --- as
+previsões de cada elemento agregado corresponde ao somatório das
+previsões dos níveis inferiores da hierarquia. Isso é garantido pela
+multiplicação das matrizes \(\mathbfit{SG}\).
 
 Não fosse essa pré multiplicação, nada garantiria a coerência das
 previsões. Tomando a estrutura da Figura~\ref{fig-h} como exemplo, seria
 um acaso improvável que as previsões do agregado para o estado do
 Espírito Santo sejam exatamente a soma das previsões individuais de seus
-municípios. Isso porque cada série pode seguir um processo diferente
-(e.g., arima) com erros e variâncias distintas.
+municípios. Isso porque não há qualquer razão para que cada série siga o
+mesmo processo (e.g., arima) com coeficientes idênticos.
 
 Os métodos de gerar previsões coerentes a partir de previsões base são
 chamados de métodos de \emph{reconciliação}. Os métodos de reconciliação
@@ -983,26 +963,28 @@ que garantam que as previsões coerentes tenham o menor erro o possível.
 Esse é o problema de pesquisa trabalhado na \emph{reconciliação ótima}.
 
 \hypertarget{motivauxe7uxe3o}{%
-\subsection{MOTIVAÇÃO}\label{motivauxe7uxe3o}}
+\subsection{Motivação}\label{motivauxe7uxe3o}}
 
-O estado da arte em reconciliação ótima de previsões pontuais se
-encontra no método de \emph{Minimun Trace} (MinT). Esse método, assim
-como toda estimação de média de parâmetros, está sujeita à interferência
-de \emph{outliers} extremos que, no caso de previsão de séries
-hierárquicas, se apresentam na forma de elementos da hierarquia muito
-maiores que os demais. Isso pode significar em menor peso atribuído à
-elementos menores da hierarquia e, talvez, a estimação pela mediana
-possua alguma vantagem em determinadas situações. Além disso, pode ser
-do interesse do pesquisador a estimação em eventos extremos, o que
-exigiria usar quantis muito altos ou muito baixos. Nesse sentido, a
-estimação por regressão quantílica pode ser uma adição à literatura do
-tema.
+Atualmente, os métodos analíticos, especificamente o MinT, são os mais
+populares na literatura da reconciliação ótima. Entretanto, tais métodos
+são sujeitos a uma série de restrições, como as do MCLR, e têm sua
+capacidade preditiva reduzida quando suas hipóteses são violadas.
+
+Em previsões de séries temporais, o objetivo na maioria dos casos é
+prever valores futuros com a maior acurácia possível. Em vista disso,
+métodos de \emph{machine learning} são mais gerais, no sentido de
+permitir parâmetros não lineares e poderem aproximar virtualmente
+qualquer função. Além disso, são focados na capacidade preditiva, muitas
+vezes em detrimento da explicativa. Espera-se, portanto, que esses
+métodos alcancem melhor performance no problema da reconciliação ótima,
+devendo receber mais atenção
 
 \hypertarget{objetivos}{%
-\subsection{OBJETIVOS}\label{objetivos}}
+\subsection{Objetivos}\label{objetivos}}
 
 O objetivo geral da dissertação é estudar o problema da reconciliação
-ótima de previsões pontuais a partir de regressões quantílicas.
+ótima de previsões pontuais a partir de métodos de \emph{machine
+learning}.
 
 Como objetivos específicos, tenho:
 
@@ -1010,33 +992,29 @@ Como objetivos específicos, tenho:
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Estudar métodos para estimação da matriz \(\mathbfit{G}\) para
-  qualquer quantil desejado, e não apenas a média;
+  Estudar métodos para estimação da matriz de reconciliação aplicando
+  algoritmos e fluxos de trabalho de \emph{machine learning}, como
+  \emph{tuning} e \emph{resampling};
 \item
-  Identificar possíveis vantagens e limitações da abordagem quantílica
-  na reconciliação de previsões pontuais a partir de aplicação do método
-  estudado na previsão de saldos de crédito do Banestes.
+  Identificar possíveis vantagens e limitações da abordagem por
+  \emph{machine learning} na reconciliação de previsões pontuais a
+  partir de aplicação do método estudado na previsão de saldos de
+  crédito do Banestes.
 \end{enumerate}
 
-Não está no escopo do estudo os métodos de se obter previsões
-probabilísticas, ou seja, a estimação da matriz \(\hat{y}_{T+h}\) para
-além de previsões pontuais.
-
 \hypertarget{revisuxe3o-da-literatura}{%
-\subsection{REVISÃO DA LITERATURA}\label{revisuxe3o-da-literatura}}
+\subsection{Revisão da literatura}\label{revisuxe3o-da-literatura}}
 
-\hypertarget{metodologia}{%
-\subsubsection{METODOLOGIA}\label{metodologia}}
+A primeira etapa da revisão de literatura consistiu na pesquisa
+bibliográfica relacionada à reconciliação ótima de previsões de séries
+temporais hierárquicas e agrupadas e sua interseção com o tema
+\emph{machine learning}.
 
-A primeira etapa da pesquisa consistirá na pesquisa bibliográfica
-relacionada à reconciliação ótima de previsões de séries temporais
-hierárquicas e agrupadas e à regressão quantílica.
-
-Realizei uma pesquisa bibliométrica na base de dados do Google
-Acadêmico, pesquisando pelas palavras-chave ``\emph{hierarchical
-forecast reconciliation}'' para qualquer lugar no corpo do texto,
-encontrando 27.600 resultados. Utilizando um script para ordenar os
-resultados pelo número de citações\footnote{https://github.com/WittmannF/sort-google-scholar},
+A pesquisa bibliométrica na base de dados do Google Acadêmico,
+pesquisando pelas palavras-chave ``\emph{hierarchical forecast
+reconciliation}'' para qualquer lugar no corpo do texto, encontrando
+27.600 resultados. Utilizando um script para ordenar os resultados pelo
+número de citações\footnote{https://github.com/WittmannF/sort-google-scholar},
 verifiquei que o trabalho mais citado é \textcite{hyndman2021}.
 
 \begin{table}
@@ -1064,7 +1042,7 @@ Tashman & 798 & 2000\\
 Utilizando essa obra como texto base, obtive os textos referenciados no
 capítulo 11 ``\emph{Forecasting Hierarquical and Grouped Time-Series}'',
 subcapítulo 3 ``\emph{Forecast Reconciliation}'', além de
-\textcite{hyndman2016}, onde o método por MPQ foi desenvolvido porém não
+\textcite{hyndman2016}, onde o método por MQP foi desenvolvido porém não
 está citado nas referências do capítulo.
 
 \begin{quadro}
@@ -1085,33 +1063,34 @@ Rob J. Hyndman and Alan J. Lee and Earo Wang & 2016\\
 \endgroup{}
 \end{quadro}
 
-Adicionando o termo ``\emph{quantile}'' e refinando a pesquisa para
-encontrar as palavras chave no título dos trabalhos, nenhum resultado
-foi encontrado. Modificando os termos para encontrar palavras
-semelhantes, a busca por ``\emph{allintitle: hierarchical OR
-hierarchically probabilistic OR quantile reconciliation OR reconciled}''
-retornou 5 títulos, dentre os quais dois são artigos de acesso livre e,
-portanto, foram adicionadas à pesquisa bibliográfica a ser realizada.
-\nocite{han2021, roach2019}
+Adicionando o termo ``\emph{machine learning}'' e refinando a pesquisa
+para encontrar as palavras chave no título dos trabalhos, 10 resultados
+foram encontrados.
 
 \begin{quadro}
-\caption{Trabalhados encontrados na busca estendida}\tabularnewline
+\caption{Trabalhos encontrados na busca estendida}\tabularnewline
 
 \centering\begingroup\fontsize{10}{12}\selectfont
 
-\begin{tabular}[t]{lr}
+\begin{tabular}[t]{lrr}
 \toprule
-Autor & Ano\\
+Autor & Ano & Citacoes\\
 \midrule
-\cellcolor{gray!6}{Han, X., Dasgupta, S., Ghosh, J.} & \cellcolor{gray!6}{2021}\\
-Roach, C. & 2019\\
+\cellcolor{gray!6}{Li, SMM Rahman, R Vega, B Dong} & \cellcolor{gray!6}{2016} & \cellcolor{gray!6}{114}\\
+Mancuso, V Piccialli, AM Sudoso & 2021 & 17\\
+\cellcolor{gray!6}{Abolghasemi, RJ Hyndman, G Tarr} & \cellcolor{gray!6}{2019} & \cellcolor{gray!6}{13}\\
+Afolabi, SU Guan, KL Man, PWH Wong, X Zhao & 2017 & 20\\
+\cellcolor{gray!6}{Saatloo, A Moradzadeh, H Moayyed} & \cellcolor{gray!6}{2021} & \cellcolor{gray!6}{6}\\
+\addlinespace
+Abolghasemi, G Tarr, C Bergmeir & 2022 & 0\\
+\cellcolor{gray!6}{C Neto, BL Fernando…} & \cellcolor{gray!6}{2022} & \cellcolor{gray!6}{0}\\
+Moon & 2012 & 0\\
+\cellcolor{gray!6}{YAN, C SHENG} & \cellcolor{gray!6}{2018} & \cellcolor{gray!6}{1}\\
+Varone, C Ieracitano, A Özyüksel, T Hussain… & 2022 & 0\\
 \bottomrule
 \end{tabular}
 \endgroup{}
 \end{quadro}
-
-\hypertarget{suxedntese-da-literatura}{%
-\subsubsection{SÍNTESE DA LITERATURA}\label{suxedntese-da-literatura}}
 
 Previsões pontuais de séries temporais hierárquicas não é um assunto
 novo. Ao menos desde a década de 70, pesquisas foram publicadas acerca
@@ -1157,10 +1136,10 @@ invés dos erros das previsões base \(\mathbfit{\hat{y}_{t+h}}\). Dado
 que isso implica na minimização da variância de
 \(\mathbfit{\tilde{e}_{t+h}}\), ou seja, na minimização do somatório da
 diagonal, o traço, da matriz de variância-covariância de
-\(\mathbfit{\tilde{e}_{t+h}}\), eles chamaram esse método de Menor Traço
-(MinT, na sigla em inglês). Paralelamente, usam desigualdade triangular
-para demonstrar que as previsões reconciliadas obtidas por esse método
-são ao menos tão boas quanto as previsões base.
+\(\mathbfit{\tilde{e}_{t+h}}\), eles chamaram esse método de Traço
+Mínimo (MinT, na sigla em inglês). Paralelamente, usam desigualdade
+triangular para demonstrar que as previsões reconciliadas obtidas por
+esse método são ao menos tão boas quanto as previsões base.
 
 \textcite{panagiotelis2021} reinterpreta a literatura de coerência e
 reconciliação de previsões pontuais a partir de uma abordagem
@@ -1172,11 +1151,161 @@ paramétricos (via \emph{bootstrapping}) para reconciliação de previsões
 probabilísticas, ou seja, para reconciliar previsões \(\hat{y}_t\)
 obtidas a partir de toda a distribuição, e não apenas a média.
 
-\hypertarget{muxe9todos-estatuxedsticos-de-reconciliauxe7uxe3o-uxf3tima}{%
-\section{MÉTODOS ESTATÍSTICOS DE RECONCILIAÇÃO
-ÓTIMA}\label{muxe9todos-estatuxedsticos-de-reconciliauxe7uxe3o-uxf3tima}}
+\hypertarget{muxe9todos-de-machine-learning-para-reconciliauxe7uxe3o-uxf3tima}{%
+\section{MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO
+ÓTIMA}\label{muxe9todos-de-machine-learning-para-reconciliauxe7uxe3o-uxf3tima}}
 
-Oi.
+Neste capítulo\ldots{}
+
+\hypertarget{o-processo-de-ajuste-e-sobreajuste}{%
+\subsection{O processo de ajuste e
+sobreajuste}\label{o-processo-de-ajuste-e-sobreajuste}}
+
+Considere uma função de ajuste \(f\), um conjunto de pontos
+\(D = {d_1, ..., d_n}\) com \(d_i = (x_i y_i)´\), variáveis de decisão
+ou parâmetros \(x_i \in \mathbb{R}^m\) e imagem
+\(y_i = f(x_i) \in \mathbb{R}\). Diferentemente da abordagem clássica,
+em que, no caso do modelo clássico de regressão linear, há um modelo
+teórico de coeficientes estimados por mínimos quadrados ordinários (MQO)
+que é garantido pelo teorema de Gauss-Markov ser o melhor estimador
+linear não viesado (BLUE), em \emph{machine learning} o objetivo é
+encontrar, de forma iterativa, um meta-modelo que melhor aproxima a
+função \(f\) usando a informação contida em \(D\), ou seja, queremos
+ajustar uma função de regressão \(\hat{f}_D\) aos nossos dados \(D\) de
+forma que \(\hat{y} = \hat{f}_D(x, \varepsilon)\) tenha o menor erro de
+aproximação \(\varepsilon\).
+
+Para verificar o quão bem o modelo \(\hat{f}_D\) se aproxima da função
+real \(f\), é necessário uma função de perda \(L(y, \hat{f}(x))\) que,
+no caso de regressão, será a perda quadrática \((y - \hat{f}(y))^2\) ou
+a perda absoluta \(|y - \hat{f}(y)|\). Esses valores são agregados pela
+média para formar as funções de custo erro médio quadrático (MSE) e erro
+médio absoluto (MAE).
+
+Dada a função de perda, pode-se definir o risco associado ao modelo de
+função de ajuste
+
+\[R(f, p) = \int_{\mathbb{R}}{}\int_{\mathbb{R}^m}{} L(y, f(x))p(x, y)dxdy\]
+
+em que \(p(x, y)\) é a função densidade de probabilidade conjunta. Como
+não temos a função real mas procuramos uma função estimada que se
+aproxime dela, temos
+
+\[GE(\hat{f}_D, p) = \int_{\mathbb{R}}{}\int_{\mathbb{R}^m}{} L(y, \hat{f}_D(x))p(x, y)dxdy \tag{1}\]
+
+que é o erro de generalização ou risco condicional associado ao
+preditor.
+
+Então, podemos estimar o erro de generalização do modelo. Como não
+conhecemos a distribuição \(P\), a substituímos pela amostra de teste
+\(D^*\) e ficamos com
+
+\[\widehat{GE}(\hat{f}_D, D^*) = \sum_{(xy)´ \in D^*} \frac{L(y, \hat{f}_D(x))}{|D^*|}\]
+
+Se substituirmos a amostra teste pela amostra treino \(D\) usada para
+ajustar o modelo, teremos o chamado erro de resubstituição
+
+\[\widehat{GE}_\text{resub} = \widehat{GE}(\hat{f}_D, D)\]
+
+Naturalmente, nesse caso estaríamos usando os dados de treino tanto para
+treinar o preditor quanto para estimar o erro de generalização, o que
+nos levaria a uma estimativa enviesada do erro de generalização. Caso
+usássemos essa estimativa para seleção de modelos, esse viés favoreceria
+modelos mais adaptados à amostra.
+
+O problema é que nesses modelos, dadas suficientes iterações, o erro de
+resubstituição tende a zero. Isso acontece porque conforme o preditor se
+adapta cada vez mais aos dados de treinamento ele irá memorizar a
+relação entre o conjunto de pontos \(D\) e a imagem \(f(x_i)\), ou seja,
+irá se ajustar perfeitamente ao formato da função a ser modelada. E não
+necessariamente um modelo perfeitamente ajustado se traduz na capacidade
+de predição de dados futuros (fora da amostra).
+
+De forma geral, espera-se que o preditor reduza seu viés durante o
+treino apenas o suficiente para que seja capaz de generalizar sua
+predição para fora da amostra em um nível ótimo de acurácia. A partir
+desse ponto, a redução no viés é penalizada com o aumento da variância,
+ou seja, com a redução de sua capacidade de prever dados futuros. A esse
+processo se dá o nome de \emph{overfitting} ou \textbf{sobreajuste}.
+Isso quer dizer que não podemos considerar a performance do preditor em
+\(D\) se desejamos estimar honestamente a performance real do modelo.
+
+\hypertarget{reamostragem}{%
+\subsection{Reamostragem}\label{reamostragem}}
+
+Uma forma de se corrigir esse problema é dividindo a amostra em um
+conjunto para treino \(D_\text{treino}\) e outro conjunto para teste
+\(D_\text{teste}\) de forma que
+\(D_\text{treino} \cup D_\text{teste} = D\) e
+\(D_\text{treino} \cap D_\text{teste} = \empty\). Assim, pode-se treinar
+o modelo em \(D_\text{treino}\) para se obter
+\(\hat{f}_{D_{\text{treino}}}\) e calcular seu erro de generalização
+usando os dados de \(D_\text{teste}\). Essa abordagem é chamada de
+\emph{hold-out} e ela é de simples implementação e utilização, uma vez
+que as observações do conjunto teste são completamente independentes das
+observações com as quais o modelo foi treinado. A estimativa do erro de
+generalização então se torna
+
+\[\widehat{GE}_\text{hold-out} = \widehat{GE}(\hat{f}_{D_{\text{treino}}}, D_{\text{teste}})\]
+
+Dois problemas permanecem:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  É necessária uma amostra grande, uma vez que deve-se ter dados
+  suficientes tanto na amostra treino para ajustar um modelo adequado,
+  quanto na amostra teste para realizar uma avaliação de performance
+  estatisticamente válida.
+\item
+  Esse método não é suficiente para detectar variância e instabilidades
+  na amostra treino. Modelos mais complexos, especialmente não lineares,
+  podem produzir resultados muito diferentes com mudanças pequenas nos
+  dados de treino.
+\end{enumerate}
+
+É exatamente para lidar com essas situações que foram desenvolvidas as
+técnicas de reamostragem. Todas essas tecnicas geram repetidamente \(i\)
+subconjuntos de treino \(D_{\text{treino}}^{(i)}\) e teste
+\(D_{\text{teste}}^{(i)}\) com o dataset disponível, ajustam um modelo
+com cada conjunto de treino e atestam sua qualidade no conjunto de teste
+correspondente. A estimativa do erro de generalização então se torna
+
+\[\widehat{GE}_\text{samp} = \frac{1}{k}\sum_{i=1}^{k}\widehat{GE}(\hat{f}_{D_{\text{treino}}^{(i)}}, D_{\text{teste}}^{(i)}) \tag{2}\]
+
+O erro de generalização dado na equação (1) depende tanto do tamanho da
+amostra usada para treinar quanto para testar o modelo ajustado.
+Portanto, devemos garantir que o tamanho da amostra usado para verificar
+o erro de generalização de um modelo estimado a partir de \(n\)
+\emph{data points} seja próximo de \emph{n}. Se, por exemplo, o conjunto
+de treino for muito menor que a amostra total o erro será superestimado,
+uma vez que muito menos informação foi usada para calcular o estimador.
+
+Da mesma forma, a qualidade do estimador do erro de generalização obtido
+em (2) a partir de uma estratégia de reamostragem também depende muito
+do tamanho dos conjuntos \(D^{(i)}\) em relação à amostra original, da
+quantidade \(k\) de subconjuntos utilizados e da estrutura de
+dependência entre os subconjuntos \(D^{(i)}\) --- novamente, modelos
+mais complexos são mais sensíveis a alterações no dataset e a variância
+entre os subconjuntos tende a ser maior. O erro do estimador é
+geralmente medido pelo erro médio quadrático (MSE):
+
+\[\text{MSE}(\widehat{GE}_\text{samp}) = \mathbb{E}[(\widehat{GE}_\text{samp} - GE(\hat{f}_D, P))^2]\]
+
+Esse estimador também pode ser representado como a soma do quadrado do
+viés e a variância:
+
+\[\text{MSE}(\widehat{GE}_\text{samp}) = \text{Bias}(\widehat{GE}_\text{samp})^2 + \text{Variância}(\widehat{GE}_\text{samp})\]
+
+Sendo que o viés expressa a diferença média entre um estimador e o valor
+real, enquanto a variância mede a dispersão média do estimador. Essas
+quantidades são definidas da seguinte forma:
+
+\[\text{Bias}(\widehat{GE}_\text{samp}) = \mathbb{E}[\widehat{GE}_\text{samp}] - \mathbb{E}[GE(\hat{f}_D, p)]\]
+
+e
+
+\[\text{Variância}(\widehat{GE}_\text{samp}) = \mathbb{E}[(\widehat{GE}_\text{samp} - \mathbb{E}[\widehat{GE}_\text{samp}])^2]\]
 
 
 \printbibliography
@@ -1185,33 +1314,33 @@ Oi.
 % elementos pós-textuais 
 \postextual
 
-% apêndice 
-\begin{apendicesenv}
-\partapendices
-
-\chapter{PRIMEIRO APÊNDICE}
-
-\lipsum[50]
-
-\chapter{SEGUNDO APÊNDICE}
-
-\lipsum[50]
-
-\end{apendicesenv}
-
-% anexos 
-\begin{anexosenv}
-\partanexos
-
-\chapter{PRIMEIRO ANEXO}
-
-\lipsum[30]
-
-\chapter{SEGUNDO ANEXO}
-
-\lipsum[30]
-
-\end{anexosenv}
+%% apêndice 
+%\begin{apendicesenv}
+%\partapendices
+%
+%\chapter{PRIMEIRO APÊNDICE}
+%
+%\lipsum[50]
+%
+%\chapter{SEGUNDO APÊNDICE}
+%
+%\lipsum[50]
+%
+%\end{apendicesenv}
+%
+%% anexos 
+%\begin{anexosenv}
+%\partanexos
+%
+%\chapter{PRIMEIRO ANEXO}
+%
+%\lipsum[30]
+%
+%\chapter{SEGUNDO ANEXO}
+%
+%\lipsum[30]
+%
+%\end{anexosenv}
 
 % índice remissivo 
 \phantompart
