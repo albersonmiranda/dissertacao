@@ -215,7 +215,7 @@
 \setcounter{MaxMatrixCols}{20}
 
 % bibliografia
-\addbibresource{config/bib.bib}
+\addbibresource{config/Dissertação.bib}
 \addbibresource{config/packages.bib}
 
 % fazer sumário começar do 1 ao invés do zero
@@ -317,7 +317,7 @@
   pdfcreator={LaTeX via pandoc}}
 
 \author{ALBERSON DA SILVA MIRANDA}
-\date{2022}
+\date{2023}
 
 \begin{document}
 % elementos pré-textuais 
@@ -501,7 +501,7 @@
 % elementos textuais 
 \textual
 
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, boxrule=0pt, frame hidden, enhanced, interior hidden, breakable, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, breakable, boxrule=0pt, interior hidden, frame hidden, borderline west={3pt}{0pt}{shadecolor}, sharp corners]}{\end{tcolorbox}}\fi
 
 \hypertarget{introduuxe7uxe3o}{%
 \section{INTRODUÇÃO}\label{introduuxe7uxe3o}}
@@ -514,9 +514,9 @@ agrupadas}\label{suxe9ries-hieruxe1rquicas-e-suxe9ries-agrupadas}}
 
 Séries temporais hierárquicas são aquelas que podem ser agregadas ou
 desagregadas naturalmente em uma estrutura aninhada
-\autocite{hyndman2021}. Para ilustrar, tome a série do PIB brasileiro.
-Ela pode ser desagregada por estado que, por sua vez, pode ser
-desagregada por município.
+\autocite{hyndman_forecasting_2021}. Para ilustrar, tome a série do PIB
+brasileiro. Ela pode ser desagregada por estado que, por sua vez, pode
+ser desagregada por município.
 
 \begin{figure}
 
@@ -633,10 +633,10 @@ Na notação matricial, a estrutura da Figura~\ref{fig-ha2} é representada
 como abaixo. Formalmente, o primeiro membro da igualdade é composto pelo
 vetor \(\mathbfit{y}_t\) \(n\)-dimensional com todas as observações no
 tempo \(t\) para todos os níveis da hierarquia. O segundo membro é
-composto pela matriz de soma \(\mathbfit{S}\)
-\index{matriz $\mathbfit{S}$}de dimensão \(n \times m\) que define as
-equações para todo nível de agregação, e pela matriz \(\mathbfit{b}_t\)
-composta pelas séries no nível mais desagregado.
+composto pela matriz de soma \(\mathbfit{S}\) \index{matriz de soma}de
+dimensão \(n \times m\) que define as equações para todo nível de
+agregação, e pela matriz \(\mathbfit{b}_t\) composta pelas séries no
+nível mais desagregado.
 
 \[
 \mathbfit{y}_t=\mathbfit{Sb}_t
@@ -693,9 +693,9 @@ composta pelas séries no nível mais desagregado.
 \end{bmatrix}
 }\label{eq-matriz_ha}\end{equation}
 
-\hypertarget{abordagens-top-down-e-bottom-up}{%
-\subsection{Abordagens top-down e
-bottom-up}\label{abordagens-top-down-e-bottom-up}}
+\hypertarget{abordagens-top-down-bottom-up-e-middle-out}{%
+\subsection{Abordagens top-down, bottom-up e
+middle-out}\label{abordagens-top-down-bottom-up-e-middle-out}}
 
 Talvez as formas mais intuitivas de se pensar em previsões para esses
 tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a
@@ -925,6 +925,75 @@ Portanto, chamo \(\mathbfit{G}\) de matriz de reconciliação.
 \end{bmatrix}
 }\label{eq-matriz_bottomup}\end{equation}
 
+Quando \(m\) --- a quantidade de elementos do nível mais desagregado ---
+é muito grande, tornando muito custoso obter \(\mathbfit{\hat{y}_t}\), e
+não se deseja uma abordagem estritamente \emph{top-down}, pode-se
+combinar as duas formas. Ainda na estrutura hierárquica descrita na
+Figura~\ref{fig-h}, obter de forma criteriosa modelos Arima, por
+exemplo, para cada um dos municípios é muito custoso em tempo. Por outro
+lado, pode-se realizar a previsão para os Estados e então obter de
+maneira \emph{top-down} as previsões para os municípios, enquanto o
+nível mais agregado é obtido de maneira \emph{bottom-up}.
+
+\begin{equation}\protect\hypertarget{eq-matriz_gmo}{}{
+\mathbfit{G}
+=
+\begin{bmatrix}
+    0 & p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}
+}\label{eq-matriz_gmo}\end{equation}
+
+Esse método é chamado de \emph{middle-out}. Nele, o total é o somatório
+das proporções de um nível intermédiário escolhido, ao invés de
+proporções do total. Isso permite uma abordagem mais econômica, em
+termos de custo computacional e de tempo, ao mesmo tempo em que mantém
+em algum grau as características individuais das hierarquias.
+
+\begin{equation}\protect\hypertarget{eq-matriz_mo}{}{
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{BC, t} \\
+    \tilde{y}_{CA, t}
+\end{bmatrix}
+=
+\begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 1 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+    p_1\hat{y}_{A,T+h|T} \\
+    p_2\hat{y}_{A,T+h|T} \\
+    p_3\hat{y}_{A,T+h|T} \\
+    p_4\hat{y}_{B,T+h|T} \\
+    p_5\hat{y}_{B,T+h|T} \\
+    p_6\hat{y}_{B,T+h|T} \\
+    p_7\hat{y}_{C,T+h|T}
+\end{bmatrix}
+}\label{eq-matriz_mo}\end{equation}
+
 \hypertarget{coeruxeancia-e-reconciliauxe7uxe3o}{%
 \subsection{Coerência e
 reconciliação}\label{coeruxeancia-e-reconciliauxe7uxe3o}}
@@ -1015,7 +1084,8 @@ pesquisando pelas palavras-chave ``\emph{hierarchical forecast
 reconciliation}'' para qualquer lugar no corpo do texto, encontrando
 27.600 resultados. Utilizando um script para ordenar os resultados pelo
 número de citações\footnote{https://github.com/WittmannF/sort-google-scholar},
-verifiquei que o trabalho mais citado é \textcite{hyndman2021}.
+verifiquei que o trabalho mais citado é
+\textcite{hyndman_forecasting_2021}.
 
 \begin{table}
 \caption{Trabalhos mais citados com os termos ``hierarquical forecast
@@ -1042,8 +1112,8 @@ Tashman & 798 & 2000\\
 Utilizando essa obra como texto base, obtive os textos referenciados no
 capítulo 11 ``\emph{Forecasting Hierarquical and Grouped Time-Series}'',
 subcapítulo 3 ``\emph{Forecast Reconciliation}'', além de
-\textcite{hyndman2016}, onde o método por MQP foi desenvolvido porém não
-está citado nas referências do capítulo.
+\textcite{hyndman_fast_2016}, onde o método por MQP foi desenvolvido
+porém não está citado nas referências do capítulo.
 
 \begin{quadro}
 \caption{Artigos de referência em Hyndman e Athanasopoulos (2021)}\tabularnewline
@@ -1097,65 +1167,84 @@ novo. Ao menos desde a década de 70, pesquisas foram publicadas acerca
 de abordagens \emph{bottom-up} e \emph{top-down}, suas vantagens e
 desvantagens, e tentativas de se definir qual é o melhor
 método\footnote{Uma revisão dessa literatura pode ser encontrada em
-  \textcite{athanasopoulos2009}.}. Entretanto, é apenas em
-\textcite{hyndman2011} que é formalizada uma abordagem prática que
-utiliza toda a informação disponível, (i.e.~as previsões de todos
+  \textcite{athanasopoulos_hierarchical_2009}.}. Entretanto, é apenas em
+\textcite{hyndman_optimal_2011} que é formalizada uma abordagem prática
+que utiliza toda a informação disponível, (i.e.~as previsões de todos
 elementos de todos os níveis da hierarquia) a partir da estimação da
 matriz \(\mathbfit{G}\) via regressão linear por mínimos quadrados
 generalizados (MQG).
 
 Entretanto, para ser capaz de estimar o modelo por MQG, é necessária a
-matriz de variância-covariância dos erros. \textcite{hyndman2011} usam a
-matriz de erros de coerência, ou seja, a diferença entre as previsões
-reconciliadas e as previsões base, que tem posto incompleto e não
-identificada e, portanto, não pode ser estimada. Os autores contornam
-esse problema adotando no lugar da matriz de variância-covariância dos
-erros uma matriz diagonal constante, ou seja, assumem variância
-constante dos erros de reconciliação, e estimam a matriz
-\(\mathbfit{G}\) por mínimos quadrados ordinários (MQO).
+matriz de variância-covariância dos erros.
+\textcite{hyndman_optimal_2011} usam a matriz de erros de coerência, ou
+seja, a diferença entre as previsões reconciliadas e as previsões base,
+que tem posto incompleto e não identificada e, portanto, não pode ser
+estimada. Os autores contornam esse problema adotando no lugar da matriz
+de variância-covariância dos erros uma matriz diagonal constante, ou
+seja, assumem variância constante dos erros de reconciliação, e estimam
+a matriz \(\mathbfit{G}\) por mínimos quadrados ordinários (MQO).
 
 A estimação por esse método resulta numa reconciliação ótima que depende
 apenas da matriz \(\mathbfit{S}\), ou seja, da estrutura hierárquica, e
 independe da variância e covariância das previsões base
 \(\mathbfit{\hat{y}_{T+h}}\) --- o que não é uma conclusão satisfatória.
 
-\textcite{hyndman2016} tentam aperfeiçoar o método usando as variâncias
-das previsões base estimadas (dentro da amostra) como estimativa para a
-matriz de variância-covariância dos erros de reconciliação, de forma a
-as utilizar como pesos e realizar a reconciliação ótima por mínimos
-quadrados ponderados (MQP). Assim, previsões base mais acuradas têm peso
-maior do que as mais ruidosas. Entretanto, não fornecem justificativa
-teórica para usar a diagonal da matriz de variância-covariância de
-\(\mathbfit{\hat{e}_{t}}\).
+\textcite{hyndman_fast_2016} tentam aperfeiçoar o método usando as
+variâncias das previsões base estimadas (dentro da amostra) como
+estimativa para a matriz de variância-covariância dos erros de
+reconciliação, de forma a as utilizar como pesos e realizar a
+reconciliação ótima por mínimos quadrados ponderados (MQP). Assim,
+previsões base mais acuradas têm peso maior do que as mais ruidosas.
+Entretanto, não fornecem justificativa teórica para usar a diagonal da
+matriz de variância-covariância de \(\mathbfit{\hat{e}_{t}}\).
 
-\textcite{wickramasuriya2019} argumentam que o que de fato interessa é
-que as previsões reconciliadas tenham o menor erro. Então, corrigem a
-abordagem de reconciliação ótima para o objetivo de minimização dos
-erros das previsões reconciliadas \(\mathbfit{\tilde{y}_{t+h}}\), ao
-invés dos erros das previsões base \(\mathbfit{\hat{y}_{t+h}}\). Dado
-que isso implica na minimização da variância de
-\(\mathbfit{\tilde{e}_{t+h}}\), ou seja, na minimização do somatório da
-diagonal, o traço, da matriz de variância-covariância de
+\textcite{wickramasuriya_optimal_2019} argumentam que o que de fato
+interessa é que as previsões reconciliadas tenham o menor erro. Então,
+corrigem a abordagem de reconciliação ótima para o objetivo de
+minimização dos erros das previsões reconciliadas
+\(\mathbfit{\tilde{y}_{t+h}}\), ao invés dos erros das previsões base
+\(\mathbfit{\hat{y}_{t+h}}\). Dado que isso implica na minimização da
+variância de \(\mathbfit{\tilde{e}_{t+h}}\), ou seja, na minimização do
+somatório da diagonal, o traço, da matriz de variância-covariância de
 \(\mathbfit{\tilde{e}_{t+h}}\), eles chamaram esse método de Traço
 Mínimo (MinT, na sigla em inglês). Paralelamente, usam desigualdade
 triangular para demonstrar que as previsões reconciliadas obtidas por
 esse método são ao menos tão boas quanto as previsões base.
 
-\textcite{panagiotelis2021} reinterpreta a literatura de coerência e
-reconciliação de previsões pontuais a partir de uma abordagem
-geométrica, trazendo provas alternativas para conclusões anteriores ao
-mesmo tempo em que fornece novos teoremas. Além disso,
-\textcite{panagiotelis2021} estende essa interpretação geométrica para o
-contexto probabilístico, fornecendo métodos paramétricos e não
-paramétricos (via \emph{bootstrapping}) para reconciliação de previsões
-probabilísticas, ou seja, para reconciliar previsões \(\hat{y}_t\)
-obtidas a partir de toda a distribuição, e não apenas a média.
+\textcite{panagiotelis_forecast_2021} reinterpreta a literatura de
+coerência e reconciliação de previsões pontuais a partir de uma
+abordagem geométrica, trazendo provas alternativas para conclusões
+anteriores ao mesmo tempo em que fornece novos teoremas. Além disso,
+\textcite{panagiotelis_forecast_2021} estende essa interpretação
+geométrica para o contexto probabilístico, fornecendo métodos
+paramétricos e não paramétricos (via \emph{bootstrapping}) para
+reconciliação de previsões probabilísticas, ou seja, para reconciliar
+previsões \(\hat{y}_t\) obtidas a partir de toda a distribuição, e não
+apenas a média.
+
+\textcite{spiliotis_hierarchical_2021} propõem
+
+\hypertarget{muxe9todos-analuxedticos-para-reconciliauxe7uxe3o-uxf3tima}{%
+\section{MÉTODOS ANALÍTICOS PARA RECONCILIAÇÃO
+ÓTIMA}\label{muxe9todos-analuxedticos-para-reconciliauxe7uxe3o-uxf3tima}}
+
+{[}Escrever \emph{outline} do capítulo{]}
+
+\hypertarget{abordagens-de-nuxedvel-uxfanico}{%
+\subsection{Abordagens de nível
+único}\label{abordagens-de-nuxedvel-uxfanico}}
+
+Uma abordagem de nível único é uma abordagem em que as previsões são
+realizadas para um único nível da hierarquia. A partir dessas previsões,
+os demais níveis são obtidos, ou desagregando (no caso dos níveis
+inferiores), ou agregando (no caso dos níveis superiores) essas
+informações \autocite{hyndman_forecasting_2021}.
 
 \hypertarget{muxe9todos-de-machine-learning-para-reconciliauxe7uxe3o-uxf3tima}{%
 \section{MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO
 ÓTIMA}\label{muxe9todos-de-machine-learning-para-reconciliauxe7uxe3o-uxf3tima}}
 
-Neste capítulo\ldots{}
+{[}Escrever \emph{outline} do capítulo{]}
 
 \hypertarget{o-processo-de-ajuste-e-sobreajuste}{%
 \subsection{O processo de ajuste e
@@ -1225,10 +1314,11 @@ De forma geral, espera-se que o preditor reduza seu viés durante o
 treino apenas o suficiente para que seja capaz de generalizar sua
 predição para fora da amostra em um nível ótimo de acurácia. A partir
 desse ponto, a redução no viés é penalizada com o aumento da variância,
-ou seja, com a redução de sua capacidade de prever dados futuros. A esse
-processo se dá o nome de \emph{overfitting} ou \textbf{sobreajuste}.
-Isso quer dizer que não podemos considerar a performance do preditor em
-\(D\) se desejamos estimar honestamente a performance real do modelo.
+ou seja, com a redução de sua capacidade de prever dados futuros
+\autocite{bischl_resampling_2012}. A esse processo se dá o nome de
+\emph{overfitting} ou \textbf{sobreajuste}. Isso quer dizer que não
+podemos considerar a performance do preditor em \(D\) se desejamos
+estimar honestamente a performance real do modelo.
 
 \hypertarget{reamostragem}{%
 \subsection{Reamostragem}\label{reamostragem}}

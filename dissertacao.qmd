@@ -1,6 +1,6 @@
 ---
 author: ALBERSON DA SILVA MIRANDA
-date: "2022"
+date: "2023"
 format:
     pdf:
         include-in-header: [config/preamble.tex, config/customizacao.tex, config/glossario.tex]
@@ -57,7 +57,7 @@ Neste trabalho,
 
 ## Séries hierárquicas e séries agrupadas
 
-Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagregadas naturalmente em uma estrutura aninhada [@hyndman2021]. Para ilustrar, tome a série do PIB brasileiro. Ela pode ser desagregada por estado que, por sua vez, pode ser desagregada por município.
+Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagregadas naturalmente em uma estrutura aninhada [@hyndman_forecasting_2021]. Para ilustrar, tome a série do PIB brasileiro. Ela pode ser desagregada por estado que, por sua vez, pode ser desagregada por município.
 
 ![Séries Hierárquicas](img/hierarq.png){#fig-h}
 
@@ -122,7 +122,7 @@ Combinando as duas, temos a estrutura de séries hierárquicas agrupadas. Ao con
 
 ![Séries Hierárquicas Agrupadas (b)](img/hier_agrup_2.png){#fig-ha2}
 
-Na notação matricial, a estrutura da @fig-ha2 é representada como abaixo. Formalmente, o primeiro membro da igualdade é composto pelo vetor $\mathbfit{y}_t$ $n$-dimensional com todas as observações no tempo $t$ para todos os níveis da hierarquia. O segundo membro é composto pela matriz de soma $\mathbfit{S}$ \index{matriz $\mathbfit{S}$}de dimensão $n \times m$ que define as equações para todo nível de agregação, e pela matriz $\mathbfit{b}_t$ composta pelas séries no nível mais desagregado.
+Na notação matricial, a estrutura da @fig-ha2 é representada como abaixo. Formalmente, o primeiro membro da igualdade é composto pelo vetor $\mathbfit{y}_t$ $n$-dimensional com todas as observações no tempo $t$ para todos os níveis da hierarquia. O segundo membro é composto pela matriz de soma $\mathbfit{S}$ \index{matriz de soma}de dimensão $n \times m$ que define as equações para todo nível de agregação, e pela matriz $\mathbfit{b}_t$ composta pelas séries no nível mais desagregado.
 
 $$
 \mathbfit{y}_t=\mathbfit{Sb}_t
@@ -179,7 +179,7 @@ $$
 \end{bmatrix}
 $$ {#eq-matriz_ha}
 
-## Abordagens top-down e bottom-up
+## Abordagens top-down, bottom-up e middle-out
 
 Talvez as formas mais intuitivas de se pensar em previsões para esses tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a estrutura descrita na @fig-h, por exemplo. Podemos realizar a previsão para o horizonte de tempo $h$ do agregado do PIB brasileiro, representado no topo da hierarquia por *Total* (@eq-topdown_1), e então distribuir os valores previstos proporcionalmente entre os estados e municípios.
 
@@ -383,6 +383,63 @@ $$
 \end{bmatrix}
 $$ {#eq-matriz_bottomup}
 
+Quando $m$ — a quantidade de elementos do nível mais desagregado — é muito grande, tornando muito custoso obter $\mathbfit{\hat{y}_t}$, e não se deseja uma abordagem estritamente *top-down*, pode-se combinar as duas formas. Ainda na estrutura hierárquica descrita na @fig-h, obter de forma criteriosa modelos Arima, por exemplo, para cada um dos municípios é muito custoso em tempo. Por outro lado, pode-se realizar a previsão para os Estados e então obter de maneira *top-down* as previsões para os municípios, enquanto o nível mais agregado é obtido de maneira *bottom-up*.
+
+$$
+\mathbfit{G}
+=
+\begin{bmatrix}
+    0 & p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}
+$$ {#eq-matriz_gmo}
+
+Esse método é chamado de *middle-out*. Nele, o total é o somatório das proporções de um nível intermédiário escolhido, ao invés de proporções do total. Isso permite uma abordagem mais econômica, em termos de custo computacional e de tempo, ao mesmo tempo em que mantém em algum grau as características individuais das hierarquias.
+
+$$
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{BC, t} \\
+    \tilde{y}_{CA, t}
+\end{bmatrix}
+=
+\begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 1 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+    p_1\hat{y}_{A,T+h|T} \\
+    p_2\hat{y}_{A,T+h|T} \\
+    p_3\hat{y}_{A,T+h|T} \\
+    p_4\hat{y}_{B,T+h|T} \\
+    p_5\hat{y}_{B,T+h|T} \\
+    p_6\hat{y}_{B,T+h|T} \\
+    p_7\hat{y}_{C,T+h|T}
+\end{bmatrix}
+$$ {#eq-matriz_mo}
+
 ## Coerência e reconciliação
 
 \index{coerência}
@@ -414,7 +471,7 @@ Como objetivos específicos, tenho:
 
 A primeira etapa da revisão de literatura consistiu na pesquisa bibliográfica relacionada à reconciliação ótima de previsões de séries temporais hierárquicas e agrupadas e sua interseção com o tema *machine learning*.
 
-A pesquisa bibliométrica na base de dados do Google Acadêmico, pesquisando pelas palavras-chave "*hierarchical forecast reconciliation*" para qualquer lugar no corpo do texto, encontrando 27.600 resultados. Utilizando um script para ordenar os resultados pelo número de citações^[https://github.com/WittmannF/sort-google-scholar], verifiquei que o trabalho mais citado é @hyndman2021.
+A pesquisa bibliométrica na base de dados do Google Acadêmico, pesquisando pelas palavras-chave "*hierarchical forecast reconciliation*" para qualquer lugar no corpo do texto, encontrando 27.600 resultados. Utilizando um script para ordenar os resultados pelo número de citações^[https://github.com/WittmannF/sort-google-scholar], verifiquei que o trabalho mais citado é @hyndman_forecasting_2021.
 
 ```{r citacoes}
 #| tbl-cap: Trabalhos mais citados com os termos "hierarquical forecast reconciliation"
@@ -425,7 +482,7 @@ readxl::read_excel("docs/academico.xlsx") |>
     kable_styling(latex_options = "striped", font_size = 10)
 ```
 
-Utilizando essa obra como texto base, obtive os textos referenciados no capítulo 11 "*Forecasting Hierarquical and Grouped Time-Series*", subcapítulo 3 "*Forecast Reconciliation*", além de @hyndman2016, onde o método por MQP foi desenvolvido porém não está citado nas referências do capítulo.
+Utilizando essa obra como texto base, obtive os textos referenciados no capítulo 11 "*Forecasting Hierarquical and Grouped Time-Series*", subcapítulo 3 "*Forecast Reconciliation*", além de @hyndman_fast_2016, onde o método por MQP foi desenvolvido porém não está citado nas referências do capítulo.
 
 ```{r citacoes fpp3}
 #| tbl-cap: Artigos de referência em Hyndman e Athanasopoulos (2021)
@@ -497,21 +554,31 @@ Varone, C Ieracitano, A Özyüksel, T Hussain… & 2022 & 0\\
 \end{quadro}
 ```
 
-Previsões pontuais de séries temporais hierárquicas não é um assunto novo. Ao menos desde a década de 70, pesquisas foram publicadas acerca de abordagens *bottom-up* e *top-down*, suas vantagens e desvantagens, e tentativas de se definir qual é o melhor método^[Uma revisão dessa literatura pode ser encontrada em @athanasopoulos2009.]. Entretanto, é apenas em @hyndman2011 que é formalizada uma abordagem prática que utiliza toda a informação disponível, (i.e. as previsões de todos elementos de todos os níveis da hierarquia) a partir da estimação da matriz $\mathbfit{G}$ via regressão linear por mínimos quadrados generalizados (MQG).
+Previsões pontuais de séries temporais hierárquicas não é um assunto novo. Ao menos desde a década de 70, pesquisas foram publicadas acerca de abordagens *bottom-up* e *top-down*, suas vantagens e desvantagens, e tentativas de se definir qual é o melhor método^[Uma revisão dessa literatura pode ser encontrada em @athanasopoulos_hierarchical_2009.]. Entretanto, é apenas em @hyndman_optimal_2011 que é formalizada uma abordagem prática que utiliza toda a informação disponível, (i.e. as previsões de todos elementos de todos os níveis da hierarquia) a partir da estimação da matriz $\mathbfit{G}$ via regressão linear por mínimos quadrados generalizados (MQG).
 
-Entretanto, para ser capaz de estimar o modelo por MQG, é necessária a matriz de variância-covariância dos erros. @hyndman2011 usam a matriz de erros de coerência, ou seja, a diferença entre as previsões reconciliadas e as previsões base, que tem posto incompleto e não identificada e, portanto, não pode ser estimada. Os autores contornam esse problema adotando no lugar da matriz de variância-covariância dos erros uma matriz diagonal constante, ou seja, assumem variância constante dos erros de reconciliação, e estimam a matriz $\mathbfit{G}$ por mínimos quadrados ordinários (MQO).
+Entretanto, para ser capaz de estimar o modelo por MQG, é necessária a matriz de variância-covariância dos erros. @hyndman_optimal_2011 usam a matriz de erros de coerência, ou seja, a diferença entre as previsões reconciliadas e as previsões base, que tem posto incompleto e não identificada e, portanto, não pode ser estimada. Os autores contornam esse problema adotando no lugar da matriz de variância-covariância dos erros uma matriz diagonal constante, ou seja, assumem variância constante dos erros de reconciliação, e estimam a matriz $\mathbfit{G}$ por mínimos quadrados ordinários (MQO).
 
 A estimação por esse método resulta numa reconciliação ótima que depende apenas da matriz $\mathbfit{S}$, ou seja, da estrutura hierárquica, e independe da variância e covariância das previsões base $\mathbfit{\hat{y}_{T+h}}$ --- o que não é uma conclusão satisfatória.
 
-@hyndman2016 tentam aperfeiçoar o método usando as variâncias das previsões base estimadas (dentro da amostra) como estimativa para a matriz de variância-covariância dos erros de reconciliação, de forma a as utilizar como pesos e realizar a reconciliação ótima por mínimos quadrados ponderados (MQP). Assim, previsões base mais acuradas têm peso maior do que as mais ruidosas. Entretanto, não fornecem justificativa teórica para usar a diagonal da matriz de variância-covariância de $\mathbfit{\hat{e}_{t}}$.
+@hyndman_fast_2016 tentam aperfeiçoar o método usando as variâncias das previsões base estimadas (dentro da amostra) como estimativa para a matriz de variância-covariância dos erros de reconciliação, de forma a as utilizar como pesos e realizar a reconciliação ótima por mínimos quadrados ponderados (MQP). Assim, previsões base mais acuradas têm peso maior do que as mais ruidosas. Entretanto, não fornecem justificativa teórica para usar a diagonal da matriz de variância-covariância de $\mathbfit{\hat{e}_{t}}$.
 
-@wickramasuriya2019 argumentam que o que de fato interessa é que as previsões reconciliadas tenham o menor erro. Então, corrigem a abordagem de reconciliação ótima para o objetivo de minimização dos erros das previsões reconciliadas $\mathbfit{\tilde{y}_{t+h}}$, ao invés dos erros das previsões base $\mathbfit{\hat{y}_{t+h}}$. Dado que isso implica na minimização da variância de $\mathbfit{\tilde{e}_{t+h}}$, ou seja, na minimização do somatório da diagonal, o traço, da matriz de variância-covariância de $\mathbfit{\tilde{e}_{t+h}}$, eles chamaram esse método de Traço Mínimo (MinT, na sigla em inglês). Paralelamente, usam desigualdade triangular para demonstrar que as previsões reconciliadas obtidas por esse método são ao menos tão boas quanto as previsões base.
+@wickramasuriya_optimal_2019 argumentam que o que de fato interessa é que as previsões reconciliadas tenham o menor erro. Então, corrigem a abordagem de reconciliação ótima para o objetivo de minimização dos erros das previsões reconciliadas $\mathbfit{\tilde{y}_{t+h}}$, ao invés dos erros das previsões base $\mathbfit{\hat{y}_{t+h}}$. Dado que isso implica na minimização da variância de $\mathbfit{\tilde{e}_{t+h}}$, ou seja, na minimização do somatório da diagonal, o traço, da matriz de variância-covariância de $\mathbfit{\tilde{e}_{t+h}}$, eles chamaram esse método de Traço Mínimo (MinT, na sigla em inglês). Paralelamente, usam desigualdade triangular para demonstrar que as previsões reconciliadas obtidas por esse método são ao menos tão boas quanto as previsões base.
 
-@panagiotelis2021 reinterpreta a literatura de coerência e reconciliação de previsões pontuais a partir de uma abordagem geométrica, trazendo provas alternativas para conclusões anteriores ao mesmo tempo em que fornece novos teoremas. Além disso, @panagiotelis2021 estende essa interpretação geométrica para o contexto probabilístico, fornecendo métodos paramétricos e não paramétricos (via *bootstrapping*) para reconciliação de previsões probabilísticas, ou seja, para reconciliar previsões $\hat{y}_t$ obtidas a partir de toda a distribuição, e não apenas a média.
+@panagiotelis_forecast_2021 reinterpreta a literatura de coerência e reconciliação de previsões pontuais a partir de uma abordagem geométrica, trazendo provas alternativas para conclusões anteriores ao mesmo tempo em que fornece novos teoremas. Além disso, @panagiotelis_forecast_2021 estende essa interpretação geométrica para o contexto probabilístico, fornecendo métodos paramétricos e não paramétricos (via *bootstrapping*) para reconciliação de previsões probabilísticas, ou seja, para reconciliar previsões $\hat{y}_t$ obtidas a partir de toda a distribuição, e não apenas a média.
+
+@spiliotis_hierarchical_2021 propõem 
+
+# MÉTODOS ANALÍTICOS PARA RECONCILIAÇÃO ÓTIMA
+
+[Escrever *outline* do capítulo]
+
+## Abordagens de nível único
+
+Uma abordagem de nível único é uma abordagem em que as previsões são realizadas para um único nível da hierarquia. A partir dessas previsões, os demais níveis são obtidos, ou desagregando (no caso dos níveis inferiores), ou agregando (no caso dos níveis superiores) essas informações [@hyndman_forecasting_2021].
 
 # MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA
 
-Neste capítulo...
+[Escrever *outline* do capítulo]
 
 ## O processo de ajuste e sobreajuste
 
@@ -533,7 +600,7 @@ Naturalmente, nesse caso estaríamos usando os dados de treino tanto para treina
 
 O problema é que nesses modelos, dadas suficientes iterações, o erro de resubstituição tende a zero. Isso acontece porque conforme o preditor se adapta cada vez mais aos dados de treinamento ele irá memorizar a relação entre o conjunto de pontos $D$ e a imagem $f(x_i)$, ou seja, irá se ajustar perfeitamente ao formato da função a ser modelada. E não necessariamente um modelo perfeitamente ajustado se traduz na capacidade de predição de dados futuros (fora da amostra).
 
-De forma geral, espera-se que o preditor reduza seu viés durante o treino apenas o suficiente para que seja capaz de generalizar sua predição para fora da amostra em um nível ótimo de acurácia. A partir desse ponto, a redução no viés é penalizada com o aumento da variância, ou seja, com a redução de sua capacidade de prever dados futuros. A esse processo se dá o nome de *overfitting* ou **sobreajuste**. Isso quer dizer que não podemos considerar a performance do preditor em $D$ se desejamos estimar honestamente a performance real do modelo.
+De forma geral, espera-se que o preditor reduza seu viés durante o treino apenas o suficiente para que seja capaz de generalizar sua predição para fora da amostra em um nível ótimo de acurácia. A partir desse ponto, a redução no viés é penalizada com o aumento da variância, ou seja, com a redução de sua capacidade de prever dados futuros [@bischl_resampling_2012]. A esse processo se dá o nome de *overfitting* ou **sobreajuste**. Isso quer dizer que não podemos considerar a performance do preditor em $D$ se desejamos estimar honestamente a performance real do modelo.
 
 ## Reamostragem
 
