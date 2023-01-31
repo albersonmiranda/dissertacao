@@ -481,12 +481,15 @@
 % lista de símbolos 
 \begin{simbolos}
   \item[$ t $] Tempo dentro da amostra
-  \item[$ T $] Último tempo dentro da amostra
+  \item[$ T $] Último tempo dentro da amostra, quantidade de observações numa série
   \item[$ h $] Horizonte de previsão, tempo fora da amostra
   \item[$ \Omega $] Conjunto de dados dentro da amostra
   \item[$ y $] Série temporal dentro da amostra
   \item[$ \hat{y} $] Série temporal estimada
   \item[$ \tilde{y} $] Série temporal reconciliada
+  \item[$ n $] Número de séries na hierarquia
+  \item[$ m $] Número de séries no menor nível da hierarquia
+  \item[$ k $] Número de níveis na hierarquia
   \item[$ \mathbfit{S} $] Matriz de soma
   \item[$ \mathbfit{G} $] Matriz de reconciliação
   \item[$\{...\}$] Conjunto
@@ -501,7 +504,7 @@
 % elementos textuais 
 \textual
 
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, borderline west={3pt}{0pt}{shadecolor}, boxrule=0pt, enhanced, frame hidden, interior hidden, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, breakable, interior hidden, enhanced, frame hidden, borderline west={3pt}{0pt}{shadecolor}, sharp corners]}{\end{tcolorbox}}\fi
 
 \hypertarget{introduuxe7uxe3o}{%
 \section{INTRODUÇÃO}\label{introduuxe7uxe3o}}
@@ -719,8 +722,8 @@ equação \ref{eq-topdown_2}.
 }\label{eq-topdown_2}\end{equation}
 
 Para isso, temos de definir uma matriz com todos esses pesos, que,
-seguindo a formulação de \textcite{hyndman2021}, vamos chamar de
-\(\mathbfit{G}\):
+seguindo a formulação de \textcite{hyndman_forecasting_2021}, vamos
+chamar de \(\mathbfit{G}\):
 
 \begin{equation}\protect\hypertarget{eq-matriz_g}{}{
 \mathbfit{G}
@@ -1277,7 +1280,37 @@ Uma abordagem de nível único é uma abordagem em que as previsões são
 realizadas para um único nível da hierarquia. A partir dessas previsões,
 os demais níveis são obtidos, ou desagregando (no caso dos níveis
 inferiores), ou agregando (no caso dos níveis superiores) essas
-informações \autocite{hyndman_forecasting_2021}.
+informações \autocite{hyndman_forecasting_2021}. Os métodos
+\emph{top-down}, \emph{bottom-up} e \emph{middle-out}, demonstrados na
+introdução, são abordagens de nível único.
+
+Enquanto há apenas uma única forma de se agregar níveis na hierarquia
+(\emph{bottom-up}), a desagregação (\emph{top-down}) pode ser realizada
+de, ao menos, duas dezenas de maneiras
+\autocite{gross_disaggregation_1990}. Dois dos métodos mais intuitivos
+são a média das proporções históricas e a proporção das médias
+históricas.
+
+Na média das proporções históricas, cada proporção \(p_j\), com
+\(j = {1,...,m}\), consiste em tomar a média das proporções da série
+desagregada \(y_{j,t}\) em relação ao agregado \(y_t\):
+
+\begin{equation}\protect\hypertarget{eq-td_1}{}{
+p_j = \frac{1}{T} \sum^{T}_{t=1} \frac{y_{j,t}}{y_t}
+}\label{eq-td_1}\end{equation}
+
+Já a proporção das médias históricas consiste em tomar a proporção das
+médias das séries desagregadas em relação à média do
+agregado\footnote{Isso é equivalente a tomar a proporção direta entre os
+  somatórios das séries. Note que, pelas propriedades do operador de
+  somatório,
+  \(\sum^{T}_{t=1} \frac{y_{t}}{T} = \frac{y_1}{T}+...+\frac{y_T}{T} = \frac{y_1+...+y_T}{T} = \frac{\sum^{T}_{t=1} y_t}{T}\).
+  Então, a equação \ref{eq-td_2} pode ser simplificada para
+  \(p_j = \frac{\sum^{T}_{t=1} y_{j,t}}{\sum^{T}_{t=1} y_t}\).}.
+
+\begin{equation}\protect\hypertarget{eq-td_2}{}{
+p_j = \frac{\sum^{T}_{t=1} \frac{y_{j,t}}{T}}{\sum^{T}_{t=1} \frac{y_{t}}{T}}
+}\label{eq-td_2}\end{equation}
 
 \hypertarget{muxe9todos-de-machine-learning-para-reconciliauxe7uxe3o-uxf3tima}{%
 \section{MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO

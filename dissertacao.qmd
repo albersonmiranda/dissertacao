@@ -193,7 +193,7 @@ $$
 \tilde{y}_{AA, T+h | T} = p_{1}\hat{y}_{T+h | T}
 $$ {#eq-topdown_2}
 
-Para isso, temos de definir uma matriz com todos esses pesos, que, seguindo a formulação de @hyndman2021, vamos chamar de $\mathbfit{G}$:
+Para isso, temos de definir uma matriz com todos esses pesos, que, seguindo a formulação de @hyndman_forecasting_2021, vamos chamar de $\mathbfit{G}$:
 
 $$
 \mathbfit{G}
@@ -585,7 +585,19 @@ Para o conjunto de dados utilizados, @spiliotis_hierarchical_2021 afirmam que os
 
 Uma abordagem de nível único é uma abordagem em que as previsões são realizadas para um único nível da hierarquia. A partir dessas previsões, os demais níveis são obtidos, ou desagregando (no caso dos níveis inferiores), ou agregando (no caso dos níveis superiores) essas informações [@hyndman_forecasting_2021]. Os métodos *top-down*, *bottom-up* e *middle-out*, demonstrados na introdução, são abordagens de nível único.
 
-Enquanto há apenas uma única forma de se agregar níveis na hierarquia, a desagregação pode ser realizada de, ao menos, duas dezenas de maneiras [@gross_disaggregation_1990]
+Enquanto há apenas uma única forma de se agregar níveis na hierarquia (*bottom-up*), a desagregação (*top-down*) pode ser realizada de, ao menos, duas dezenas de maneiras [@gross_disaggregation_1990]. Dois dos métodos mais intuitivos são a média das proporções históricas e a proporção das médias históricas.
+
+Na média das proporções históricas, cada proporção $p_j$, com $j = {1,...,m}$, consiste em tomar a média das proporções da série desagregada $y_{j,t}$ em relação ao agregado $y_t$:
+
+$$
+p_j = \frac{1}{T} \sum^{T}_{t=1} \frac{y_{j,t}}{y_t}
+$$ {#eq-td_1}
+
+Já a proporção das médias históricas consiste em tomar a proporção das médias das séries desagregadas em relação à média do agregado^[Isso é equivalente a tomar a proporção direta entre os somatórios das séries. Note que, pelas propriedades do operador de somatório, $\sum^{T}_{t=1} \frac{y_{t}}{T} = \frac{y_1}{T}+...+\frac{y_T}{T} = \frac{y_1+...+y_T}{T} = \frac{\sum^{T}_{t=1} y_t}{T}$. Então, a equação @eq-td_2 pode ser simplificada para $p_j = \frac{\sum^{T}_{t=1} y_{j,t}}{\sum^{T}_{t=1} y_t}$.].
+
+$$
+p_j = \frac{\sum^{T}_{t=1} \frac{y_{j,t}}{T}}{\sum^{T}_{t=1} \frac{y_{t}}{T}}
+$$ {#eq-td_2}
 
 # MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA
 
