@@ -480,11 +480,11 @@
 
 % lista de símbolos 
 \begin{simbolos}
-  \item[$ t $] Tempo dentro-da-amostra
-  \item[$ T $] Último tempo dentro-da-amostra
-  \item[$ h $] Horizonte de previsão, tempo fora-da-amostra
-  \item[$ \Omega $] Conjunto de dados dentro-da-amostra
-  \item[$ y $] Série temporal dentro-da-amostra
+  \item[$ t $] Tempo dentro da amostra
+  \item[$ T $] Último tempo dentro da amostra
+  \item[$ h $] Horizonte de previsão, tempo fora da amostra
+  \item[$ \Omega $] Conjunto de dados dentro da amostra
+  \item[$ y $] Série temporal dentro da amostra
   \item[$ \hat{y} $] Série temporal estimada
   \item[$ \tilde{y} $] Série temporal reconciliada
   \item[$ \mathbfit{S} $] Matriz de soma
@@ -501,7 +501,7 @@
 % elementos textuais 
 \textual
 
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, breakable, boxrule=0pt, interior hidden, frame hidden, borderline west={3pt}{0pt}{shadecolor}, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, borderline west={3pt}{0pt}{shadecolor}, boxrule=0pt, enhanced, frame hidden, interior hidden, sharp corners]}{\end{tcolorbox}}\fi
 
 \hypertarget{introduuxe7uxe3o}{%
 \section{INTRODUÇÃO}\label{introduuxe7uxe3o}}
@@ -1046,7 +1046,7 @@ permitir parâmetros não lineares e poderem aproximar virtualmente
 qualquer função. Além disso, são focados na capacidade preditiva, muitas
 vezes em detrimento da explicativa. Espera-se, portanto, que esses
 métodos alcancem melhor performance no problema da reconciliação ótima,
-devendo receber mais atenção
+devendo receber mais atenção.
 
 \hypertarget{objetivos}{%
 \subsection{Objetivos}\label{objetivos}}
@@ -1222,7 +1222,46 @@ reconciliação de previsões probabilísticas, ou seja, para reconciliar
 previsões \(\hat{y}_t\) obtidas a partir de toda a distribuição, e não
 apenas a média.
 
-\textcite{spiliotis_hierarchical_2021} propõem
+\textcite{spiliotis_hierarchical_2021} propõem a utilização de
+\emph{machine learning} para a reconciliação ótima de séries temporais,
+especificamente os algoritmos de árvore de decisão \emph{Random Forest}
+e \emph{XGBoost}. Os autores descrevem como vantagens desse método em
+relação aos anteriores a descrição de relacionamentos não lineares,
+performance preditiva e a desnecessidade da utilização de todos os
+elementos da hierarquia na combinação ótima. A abordagem utilizada foi:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  dividir a amostra em treino e teste;
+\item
+  treinar um modelo de previsão na amostra treino e obter previsões um
+  passo a frente para a amostra teste;
+\item
+  treinar um modelo de \emph{machine learning} para cada série do menor
+  nível da hierarquia, em que os parâmetros são as previsões obtidas no
+  passo 2 e a variável explicada são os valores observados. Isso resulta
+  em um modelo de reconciliação ótima para cada elemento do menor nível
+  da hierarquia, combinando informações disponíveis de todos os níveis
+  hierárquicos;
+\item
+  obter as previsões base \(\hat{y}_t\);
+\item
+  passar as previsões base ao modelo treinado no passo 3 para se obter
+  as previsões reconciliadas para o menor nível da hierarquia;
+\item
+  agregar as previsões reconciliadas para se obter as previsões nos
+  demais níveis hierárquicos.
+\end{enumerate}
+
+Para o conjunto de dados utilizados,
+\textcite{spiliotis_hierarchical_2021} afirmam que os métodos de
+\emph{machine learning}, especialmente o XGBoost, alcançaram, em média,
+melhor performance que as abordagens de nível único e o MinT. Além
+disso, concluíram que quanto maior é a diferença entre as séries, em
+todos os níveis hierárquicos, maior são os benefícios da abordagem por
+\emph{machine learning}.
 
 \hypertarget{muxe9todos-analuxedticos-para-reconciliauxe7uxe3o-uxf3tima}{%
 \section{MÉTODOS ANALÍTICOS PARA RECONCILIAÇÃO

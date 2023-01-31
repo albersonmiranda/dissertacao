@@ -456,7 +456,7 @@ Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize
 
 Atualmente, os métodos analíticos, especificamente o MinT, são os mais populares na literatura da reconciliação ótima. Entretanto, tais métodos são sujeitos a uma série de restrições, como as do MCLR, e têm sua capacidade preditiva reduzida quando suas hipóteses são violadas.
 
-Em previsões de séries temporais, o objetivo na maioria dos casos é prever valores futuros com a maior acurácia possível. Em vista disso, métodos de *machine learning* são mais gerais, no sentido de permitir parâmetros não lineares e poderem aproximar virtualmente qualquer função. Além disso, são focados na capacidade preditiva, muitas vezes em detrimento da explicativa. Espera-se, portanto, que esses métodos alcancem melhor performance no problema da reconciliação ótima, devendo receber mais atenção
+Em previsões de séries temporais, o objetivo na maioria dos casos é prever valores futuros com a maior acurácia possível. Em vista disso, métodos de *machine learning* são mais gerais, no sentido de permitir parâmetros não lineares e poderem aproximar virtualmente qualquer função. Além disso, são focados na capacidade preditiva, muitas vezes em detrimento da explicativa. Espera-se, portanto, que esses métodos alcancem melhor performance no problema da reconciliação ótima, devendo receber mais atenção.
 
 ## Objetivos
 
@@ -566,7 +566,16 @@ A estimação por esse método resulta numa reconciliação ótima que depende a
 
 @panagiotelis_forecast_2021 reinterpreta a literatura de coerência e reconciliação de previsões pontuais a partir de uma abordagem geométrica, trazendo provas alternativas para conclusões anteriores ao mesmo tempo em que fornece novos teoremas. Além disso, @panagiotelis_forecast_2021 estende essa interpretação geométrica para o contexto probabilístico, fornecendo métodos paramétricos e não paramétricos (via *bootstrapping*) para reconciliação de previsões probabilísticas, ou seja, para reconciliar previsões $\hat{y}_t$ obtidas a partir de toda a distribuição, e não apenas a média.
 
-@spiliotis_hierarchical_2021 propõem 
+@spiliotis_hierarchical_2021 propõem a utilização de *machine learning* para a reconciliação ótima de séries temporais, especificamente os algoritmos de árvore de decisão *Random Forest* e *XGBoost*. Os autores descrevem como vantagens desse método em relação aos anteriores a descrição de relacionamentos não lineares, performance preditiva e a desnecessidade da utilização de todos os elementos da hierarquia na combinação ótima. A abordagem utilizada foi:
+
+1. dividir a amostra em treino e teste;
+1. treinar um modelo de previsão na amostra treino e obter previsões um passo a frente para a amostra teste;
+1. treinar um modelo de *machine learning* para cada série do menor nível da hierarquia, em que os parâmetros são as previsões obtidas no passo 2 e a variável explicada são os valores observados. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos;
+1. obter as previsões base $\hat{y}_t$;
+1. passar as previsões base ao modelo treinado no passo 3 para se obter as previsões reconciliadas para o menor nível da hierarquia;
+1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
+
+Para o conjunto de dados utilizados, @spiliotis_hierarchical_2021 afirmam que os métodos de *machine learning*, especialmente o XGBoost, alcançaram, em média, melhor performance que as abordagens de nível único e o MinT. Além disso, concluíram que quanto maior é a diferença entre as séries, em todos os níveis hierárquicos, maior são os benefícios da abordagem por *machine learning*.
 
 # MÉTODOS ANALÍTICOS PARA RECONCILIAÇÃO ÓTIMA
 
@@ -574,7 +583,9 @@ A estimação por esse método resulta numa reconciliação ótima que depende a
 
 ## Abordagens de nível único
 
-Uma abordagem de nível único é uma abordagem em que as previsões são realizadas para um único nível da hierarquia. A partir dessas previsões, os demais níveis são obtidos, ou desagregando (no caso dos níveis inferiores), ou agregando (no caso dos níveis superiores) essas informações [@hyndman_forecasting_2021].
+Uma abordagem de nível único é uma abordagem em que as previsões são realizadas para um único nível da hierarquia. A partir dessas previsões, os demais níveis são obtidos, ou desagregando (no caso dos níveis inferiores), ou agregando (no caso dos níveis superiores) essas informações [@hyndman_forecasting_2021]. Os métodos *top-down*, *bottom-up* e *middle-out*, demonstrados na introdução, são abordagens de nível único.
+
+Enquanto há apenas uma única forma de se agregar níveis na hierarquia, a desagregação pode ser realizada de, ao menos, duas dezenas de maneiras [@gross_disaggregation_1990]
 
 # MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA
 
