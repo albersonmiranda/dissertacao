@@ -1,0 +1,266 @@
+---
+title: MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA 
+subtitle: SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
+author: Alberson Miranda, PPGEco/UFES
+date: '`r format(Sys.Date(), "%B de %Y")`'
+format:
+    beamer:
+        include-in-header: config/tema/preamble.tex
+        output-file: render/apresentacao.pdf
+execute:
+    echo: false
+---
+
+```{r config}
+#| include = FALSE
+
+# opções
+knitr::opts_chunk$set(
+    out.width = "100%",
+    echo = FALSE
+)
+
+# reprodutibilidade
+set.seed(1)
+
+# pacotes
+pacman::p_load(
+    kableExtra,
+    ggplot2
+)
+
+# tema ggplot
+tema = theme_classic() +
+    theme(
+        text = element_text(family = "serif")
+    )
+
+# gerar bibliografia de pacotes
+knitr::write_bib(file = "config/packages.bib")
+```
+
+# CONTEXTUALIZAÇÃO DA PESQUISA
+
+## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
+
+Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagregadas naturalmente em uma estrutura aninhada
+
+## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
+
+![](img/hierarq.png)
+
+## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
+
+- Cada nível traz informação diferente
+- É razoável supor que exista covariância entre as previsões dos diferentes níveis
+- Toda informação da estrutura pode ser útil
+
+## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
+
+Séries temporais agrupadas são aquelas que não impõem uma única estrutura hierárquica
+
+## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
+
+![](img/agrupadas.png)
+
+## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
+
+![](img/hier_agrup.png)
+
+## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
+
+![](img/hier_agrup_2.png)
+
+## COERÊNCIA E RECONCILIAÇÃO
+
+- Coerência: cada nó da hierarquia deve totalizar os nós filhos
+- Não há razão para que as previsões individuais (e.g., Arima, ETS) sejam coerentes
+
+### RECONCILIAÇÃO ÓTIMA
+Corrigir as previsões de forma que elas sejam coerentes, utilizando toda a informação disponível na estrutura hierárquica, ao mesmo tempo em que minimiza a variância total
+
+## OBJETIVOS
+
+Estudar o problema da reconciliação ótima de previsões pontuais a partir de métodos de *machine learning*
+
+### OBJETIVOS ESPECÍFICOS
+
+1. Estudar métodos para estimação da matriz de reconciliação aplicando algoritmos e fluxos de trabalho de machine learning, como *tuning* e *resampling*;
+
+2. Identificar possíveis vantagens e limitações da abordagem por *machine learning* na reconciliação de previsões pontuais a partir de aplicação do método estudado na previsão de saldos de crédito do Banestes.
+
+# MÉTODOS ANALÍTICOS DE RECONCILIAÇÃO ÓTIMA
+
+## ABORDAGENS DE NÍVEL ÚNICO
+
+::: {.incremental}
+- *Bottom-up*: informações apenas dos níveis mais desagregados
+- *Top-down*: apenas informações do nível mais agregado
+    - proporções históricas $$p_j = \frac{1}{T} \sum^{T}_{t=1} \frac{y_{j,t}}{y_t}$$
+    - médias históricas $$p_j = \frac{\sum^{T}_{t=1} \frac{y_{j,t}}{T}}{\sum^{T}_{t=1} \frac{y_{t}}{T}}$$
+    - proporções das previsões $$p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}$$
+- *middle-out*
+:::
+
+## NOTAÇÃO MATRICIAL
+
+$$\mathbfit{\tilde{y}_t} = \mathbfit{SG\hat{y}_t}$$
+
+Em que
+
+- $\mathbfit{\tilde{y}_t}$ é o vetor de previsões reconciliadas
+- $\mathbfit{S}$ é a matriz de soma
+- $\mathbfit{S}$ é a matriz de reconciliação
+- $\mathbfit{\hat{y}_t}$ é o vetor de previsões base
+
+## MATRIZ DE SOMA
+
+$\mathbfit{S}$ mapeia a estrutura hierárquica a partir da soma dos elementos mais desagregados
+
+$$
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A,t} \\
+    \tilde{y}_{B,t} \\
+    \tilde{y}_{AA,t} \\
+    \tilde{y}_{AB,t} \\
+    \tilde{y}_{AC,t} \\
+    \tilde{y}_{BA,t} \\
+    \tilde{y}_{BB,t}
+  \end{bmatrix}_{n \times 1}
+  =
+  \begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 1 \\
+    1  & 0  & 0  & 0  & 0  \\
+    0  & 1  & 0  & 0  & 0  \\
+    0  & 0  & 1  & 0  & 0  \\
+    0  & 0  & 0  & 1  & 0  \\
+    0  & 0  & 0  & 0  & 1
+  \end{bmatrix}_{n \times m}
+  \begin{bmatrix}
+    \hat{y}_{AA,t} \\
+    \hat{y}_{AB,t} \\
+    \hat{y}_{AC,t} \\
+    \hat{y}_{BA,t} \\
+    \hat{y}_{BB,t}
+  \end{bmatrix}_{m \times 1}
+$$
+
+\begin{center}
+\scriptsize
+\bf{\it{exemplo 1: matriz de soma}}
+\end{center}
+
+## MATRIZ DE RECONCILIAÇÃO
+
+$\mathbfit{G}$ mapeia o nível mais desagregado a partir das previsões de todos os níveis da hierarquia, garantindo a coerência
+
+$$
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t}
+\end{bmatrix}_{n \times 1}
+=
+\mathbfit{S}_{n \times m}
+\begin{bmatrix}
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}_{m \times n}
+\begin{bmatrix}
+    \hat{y}_{T+h|T} \\
+    \hat{y}_{A, T+h|T} \\
+    \hat{y}_{B, T+h|T} \\
+    \hat{y}_{AA, T+h|T} \\
+    \hat{y}_{AB, T+h|T} \\
+    \hat{y}_{AC, T+h|T} \\
+    \hat{y}_{BA, T+h|T} \\
+    \hat{y}_{BB, T+h|T}
+\end{bmatrix}_{n \times 1}
+$$
+
+\begin{center}
+\scriptsize
+\bf{\it{exemplo 2: matriz de reconciliação} top-down}
+\end{center}
+
+## MATRIZ DE RECONCILIAÇÃO
+
+$$
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t}
+\end{bmatrix}_{n \times 1}
+=
+\mathbfit{S}_{n \times m}
+\begin{bmatrix}
+    0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}_{m \times n}
+\begin{bmatrix}
+    \hat{y}_{T+h|T} \\
+    \hat{y}_{A, T+h|T} \\
+    \hat{y}_{B, T+h|T} \\
+    \hat{y}_{AA, T+h|T} \\
+    \hat{y}_{AB, T+h|T} \\
+    \hat{y}_{AC, T+h|T} \\
+    \hat{y}_{BA, T+h|T} \\
+    \hat{y}_{BB, T+h|T}
+\end{bmatrix}_{n \times 1}
+$$
+
+\begin{center}
+\scriptsize
+\bf{\it{exemplo 3: matriz de reconciliação} bottom-up}
+\end{center}
+
+## MATRIZ DE RECONCILIAÇÃO
+
+E se quisermos utilizar toda a informação e não apenas parte do espaço das previsões base?
+
+### O PROBELMA DE PESQUISA DA RECONCILIAÇÃO ÓTIMA
+
+Estimar uma matriz de reconciliação $\mathbfit{G}$ que utilize toda a informação disponível e com o menor erro de previsão
+
+## RECONCILIAÇÃO ÓTIMA
+
+### PROBLEMA DE REGRESSÃO
+
+$$\min_{\tilde{e}} y_{T+h} - \tilde{y}_{T+h}$$
+
+- 1ª abordagem: Mínimos Quadrados Ordinários (MQO)
+    - Não há qualquer razão ou justificativa para supor
+
+### RECONCILIAÇÃO ÓTIMA
+
+- Mínimos Quadrados Generalizados (MQG)
+
+$$\mathbfit{G}=(\mathbfit{S}'\mathbfit{W}_h^{-1}\mathbfit{S})^{-1}\mathbfit{S}'\mathbfit{W}_h^{-1}$$
+
+## REFERÊNCIAS
+
+\footnotesize
+HYNDMAN, R. J.; ATHANASOPOULOS, G. Forecasting: principles and practice. 3. ed. Melbourne, Austrália: OTexts, 2021.
+
+SPILIOTIS, E. et al. Hierarchical forecast reconciliation with machine learning. Applied Soft Computing, v. 112, p. 107756, 1 nov. 2021. 
+
+WICKRAMASURIYA, S. L.; ATHANASOPOULOS, G.; HYNDMAN, R. J. Optimal Forecast Reconciliation for Hierarchical and Grouped Time Series Through TraceMinimization. Journal of the American Statistical Association, v. 114, n. 526, p. 804–819, 3 abr. 2019. 
