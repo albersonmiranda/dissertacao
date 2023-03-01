@@ -14,7 +14,7 @@ format:
 number-sections: true
 crossref:
   fig-prefix: Figura
-  tab-prefix: Tabela
+  tbl-prefix: Tabela
   eq-prefix: ""
   lof-title: LISTA DE FIGURAS
   lot-title: LISTA DE TABELAS
@@ -452,13 +452,13 @@ Os métodos de gerar previsões coerentes a partir de previsões base são chama
 
 Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham o menor erro o possível. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
 
-# Previsão de saldos de crédito de instituições financeiras
+## Previsão de saldos de crédito de instituições financeiras
 
-A literatura relacionada à economia bancária é abundante no tema risco de crédito. Uma pesquisa bibliométrica no *Google Scholar* revela que os trabalhos mais citados estão relacionados com a probabilidade de perdas (fragilidade, crises, falências, *churn*, risco etc)
+A literatura relacionada à economia bancária é abundante no tema risco de crédito. Podemos verificar através de pesquisa bibliométrica no *Google Scholar* que, salvo exceções, os trabalhos mais citados estão relacionados com a previsão de perdas e suas consequências (@tbl-bancos). A nível macroeconômico, a previsão de agregados de crédito é uma preocupação de bancos centrais e se manifestam em trabalhos como @bader_modelo_2014 e 
 
 ```{r citacoes bancos}
 #| tbl-cap: Trabalhos mais citados com os termos "banking forecasting"
-#| label: bancos
+#| label: tbl-bancos
 
 readxl::read_excel("docs/academico.xlsx", sheet = "bancos") |>
     subset(select = c(-Publisher)) |>
