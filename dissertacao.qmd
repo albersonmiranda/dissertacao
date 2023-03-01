@@ -6,7 +6,7 @@ format:
         include-in-header: [config/preamble.tex, config/customizacao.tex, config/glossario.tex]
         include-before-body: config/pre_textuais.tex
         include-after-body: config/pos_textuais.tex
-        keep-tex: true
+        keep-tex: false
         cite-method: biblatex
         output-file: render/dissertacao.pdf
         documentclass: abntex2
@@ -451,6 +451,21 @@ Não fosse essa pré multiplicação, nada garantiria a coerência das previsõe
 Os métodos de gerar previsões coerentes a partir de previsões base são chamados de métodos de *reconciliação*. Os métodos de reconciliação tradicionais apresentados, *top-down* e *bottom-up*, utilizam informação limitada. No método *top-down*, utiliza-se apenas informações do nível mais agregado --- por isso, apenas a primeira coluna em (@eq-matriz_g) é diferente de zero. Já na abordagem *bottom-up*, utiliza-se apenas as informações dos níveis mais desagregados, o que resulta na submatriz identidade $m \times m$ em (@eq-matriz_gbu), enquanto as colunas que representam os níveis mais agregados são nulas.
 
 Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham o menor erro o possível. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
+
+# Previsão de saldos de crédito de instituições financeiras
+
+A literatura relacionada à economia bancária é abundante no tema risco de crédito. Uma pesquisa bibliométrica no *Google Scholar* revela que os trabalhos mais citados estão relacionados com a probabilidade de perdas (fragilidade, crises, falências, *churn*, risco etc)
+
+```{r citacoes bancos}
+#| tbl-cap: Trabalhos mais citados com os termos "banking forecasting"
+#| label: bancos
+
+readxl::read_excel("docs/academico.xlsx", sheet = "bancos") |>
+    subset(select = c(-Publisher)) |>
+    kbl(booktabs = TRUE, escape = TRUE) |>
+    kable_styling(latex_options = "striped", font_size = 10) |>
+    column_spec(2, width = "5cm")
+```
 
 ## Motivação
 
