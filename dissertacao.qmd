@@ -55,7 +55,9 @@ source("scripts/hierarq.R")
 
 Neste trabalho, 
 
-## Séries hierárquicas e séries agrupadas
+## Problema de pesquisa
+
+### Séries hierárquicas e séries agrupadas
 
 Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagregadas naturalmente em uma estrutura aninhada [@hyndman_forecasting_2021]. Para ilustrar, tome a série do PIB brasileiro. Ela pode ser desagregada por estado que, por sua vez, pode ser desagregada por município.
 
@@ -179,7 +181,7 @@ $$
 \end{bmatrix}
 $$ {#eq-matriz_ha}
 
-## Abordagens top-down, bottom-up e middle-out
+### Abordagens top-down, bottom-up e middle-out
 
 Talvez as formas mais intuitivas de se pensar em previsões para esses tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a estrutura descrita na @fig-h, por exemplo. Podemos realizar a previsão para o horizonte de tempo $h$ do agregado do PIB brasileiro, representado no topo da hierarquia por *Total* (@eq-topdown_1), e então distribuir os valores previstos proporcionalmente entre os estados e municípios.
 
@@ -440,7 +442,7 @@ $$
 \end{bmatrix}
 $$ {#eq-matriz_mo}
 
-## Coerência e reconciliação
+### Coerência e reconciliação
 
 \index{coerência}
 \index{reconciliação}
@@ -452,9 +454,9 @@ Os métodos de gerar previsões coerentes a partir de previsões base são chama
 
 Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham o menor erro o possível. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
 
-## Previsão de saldos de crédito de instituições financeiras
+### Previsão de saldos de crédito de instituições financeiras
 
-A literatura relacionada à economia bancária é abundante no tema risco de crédito. Podemos verificar através de pesquisa bibliométrica no *Google Scholar* que, salvo exceções, os trabalhos mais citados estão relacionados com a previsão de perdas e suas consequências (@tbl-bancos). A nível macroeconômico, a previsão de agregados de crédito é uma preocupação de bancos centrais e se manifestam em trabalhos como @bader_modelo_2014 e 
+A literatura relacionada à economia bancária é abundante no tema risco de crédito. Podemos verificar através de pesquisa bibliométrica no *Google Scholar* que, salvo exceções, os trabalhos mais citados estão relacionados com a previsão de perdas e suas consequências (@tbl-bancos). A nível macroeconômico, a previsão de agregados de crédito é uma preocupação de bancos centrais e se manifestam em trabalhos como @bader_modelo_2014 e @colak_tcmb_2019. Já em relação à previsão de saldos de crédito por agência
 
 ```{r citacoes bancos}
 #| tbl-cap: Trabalhos mais citados com os termos "banking forecasting"
