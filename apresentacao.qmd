@@ -5,8 +5,10 @@ author: Alberson Miranda, PPGEco/UFES
 date: '`r format(Sys.Date(), "%B de %Y")`'
 format:
     beamer:
-        include-in-header: config/tema/preamble.tex
+        include-in-header: config/apresentacao/preamble.tex
+        include-after-body: config/apresentacao/backmatter.tex
         output-file: render/apresentacao.pdf
+        keep-tex: false
 execute:
     echo: false
 ---
