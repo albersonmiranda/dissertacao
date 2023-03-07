@@ -454,21 +454,6 @@ Os métodos de gerar previsões coerentes a partir de previsões base são chama
 
 Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham o menor erro o possível. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
 
-### Previsão de saldos de crédito de instituições financeiras
-
-A literatura relacionada à economia bancária é abundante no tema risco de crédito. Podemos verificar através de pesquisa bibliométrica no *Google Scholar* que, salvo exceções, os trabalhos mais citados estão relacionados com a previsão de perdas e suas consequências (@tbl-bancos). A nível macroeconômico, a previsão de agregados de crédito é uma preocupação de bancos centrais e se manifestam em trabalhos como @bader_modelo_2014 e @colak_tcmb_2019. Já em relação à previsão de saldos de crédito por agência
-
-```{r citacoes bancos}
-#| tbl-cap: Trabalhos mais citados com os termos "banking forecasting"
-#| label: tbl-bancos
-
-readxl::read_excel("docs/academico.xlsx", sheet = "bancos") |>
-    subset(select = c(-Publisher)) |>
-    kbl(booktabs = TRUE, escape = TRUE) |>
-    kable_styling(latex_options = "striped", font_size = 10) |>
-    column_spec(2, width = "5cm")
-```
-
 ## Motivação
 
 Atualmente, os métodos analíticos, especificamente o MinT, são os mais populares na literatura da reconciliação ótima. Entretanto, tais métodos são sujeitos a uma série de restrições, como as do MCLR, e têm sua capacidade preditiva reduzida quando suas hipóteses são violadas.
@@ -485,6 +470,8 @@ Como objetivos específicos, tenho:
 2. Identificar possíveis vantagens e limitações da abordagem por *machine learning* na reconciliação de previsões pontuais a partir de aplicação do método estudado na previsão de saldos de crédito do Banestes.
 
 ## Revisão da literatura
+
+### Reconciliação ótima de séries tmeporais hierárquicas
 
 A primeira etapa da revisão de literatura consistiu na pesquisa bibliográfica relacionada à reconciliação ótima de previsões de séries temporais hierárquicas e agrupadas e sua interseção com o tema *machine learning*.
 
@@ -593,6 +580,25 @@ A estimação por esse método resulta numa reconciliação ótima que depende a
 1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
 
 Para o conjunto de dados utilizados, @spiliotis_hierarchical_2021 afirmam que os métodos de *machine learning*, especialmente o XGBoost, alcançaram, em média, melhor performance que as abordagens de nível único e o MinT. Além disso, concluíram que quanto maior é a diferença entre as séries, em todos os níveis hierárquicos, maior são os benefícios da abordagem por *machine learning*.
+
+### Previsão de saldos de crédito de instituições financeiras
+
+A literatura relacionada à economia bancária é abundante no tema risco de crédito. Podemos verificar através de pesquisa bibliométrica no *Google Scholar* que, salvo exceções, os trabalhos mais citados estão relacionados com a previsão de perdas e suas consequências (@tbl-bancos). A nível macroeconômico, a previsão de agregados de crédito é uma preocupação de bancos centrais e se manifestam em trabalhos como @bader_modelo_2014 e @colak_tcmb_2019. Entretanto, em relação à previsão de saldos de crédito por modalidade e agência, a pesquisa não revelou quaisquer trabalhos.
+
+```{r citacoes bancos}
+#| tbl-cap: Trabalhos mais citados com os termos "banking forecasting"
+#| label: tbl-bancos
+
+readxl::read_excel("docs/academico.xlsx", sheet = "bancos") |>
+    subset(select = c(-Publisher)) |>
+    kbl(booktabs = TRUE, escape = TRUE) |>
+    kable_styling(latex_options = "striped", font_size = 10) |>
+    column_spec(2, width = "5cm")
+```
+
+Apesar disso, outras tópicos da economia bancária foram objeto de estudo para previsão de séries temporais, inclusive hierárquicas. @sezer_financial_2019 produziram revisão de literatura de trabalhos publicados entre 2005 e 2019 que realizaram previsão de séries temporais financeiras utilizando *deep learning* e os agruparam em preços de ações individuais, índices (e.g., IBovespa, Dow Jones), preços de commodities, tendência e volatilidade de ativos, preços de títulos, câmbio e preços de criptomoedas. Sobre a demanda por moeda em caixas eletrônicos, uma série de trabalhos foram realizados e @gorodetskaya_machine_2021 trazem uma revisão de literatura recente e sua abordagem para o problema.
+
+
 
 # MÉTODOS ANALÍTICOS PARA RECONCILIAÇÃO ÓTIMA
 
