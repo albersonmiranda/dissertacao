@@ -53,7 +53,7 @@ source("scripts/hierarq.R")
 
 # INTRODUÇÃO
 
-Neste trabalho, 
+[Escrever *outline* da dissertação]
 
 ## Problema de pesquisa
 
@@ -385,7 +385,7 @@ $$
 \end{bmatrix}
 $$ {#eq-matriz_bottomup}
 
-Quando $m$ — a quantidade de elementos do nível mais desagregado — é muito grande, tornando muito custoso obter $\mathbfit{\hat{y}_t}$, e não se deseja uma abordagem estritamente *top-down*, pode-se combinar as duas formas. Ainda na estrutura hierárquica descrita na @fig-h, obter de forma criteriosa modelos Arima, por exemplo, para cada um dos municípios é muito custoso em tempo. Por outro lado, pode-se realizar a previsão para os Estados e então obter de maneira *top-down* as previsões para os municípios, enquanto o nível mais agregado é obtido de maneira *bottom-up*.
+Quando $m$ — a quantidade de elementos do nível mais desagregado — é muito grande, tornando muito custoso obter $\mathbfit{\hat{y}_t}$, e não se deseja uma abordagem estritamente *top-down*, pode-se combinar as duas formas. Ainda na estrutura hierárquica descrita na @fig-h, obter de forma criteriosa modelos Arima, por exemplo, para cada um dos municípios é muito custoso em tempo. Por outro lado, pode-se realizar a previsão para os estados e então obter de maneira *top-down* as previsões para os municípios, enquanto o nível mais agregado é obtido de maneira *bottom-up*.
 
 $$
 \mathbfit{G}
@@ -455,6 +455,8 @@ Os métodos de gerar previsões coerentes a partir de previsões base são chama
 Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham o menor erro o possível. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
 
 ## Motivação
+
+As projeções de saldos da carteira de crédito são peças centrais no planejamento de uma instituição financeira. Elas que irão definir a temperatura das expectativas da instituição para os acionistas e o mercado em relação a rentabilidade, dividendos, posição de mercado (market-share) etc.
 
 Atualmente, os métodos analíticos, especificamente o MinT, são os mais populares na literatura da reconciliação ótima. Entretanto, tais métodos são sujeitos a uma série de restrições, como as do MCLR, e têm sua capacidade preditiva reduzida quando suas hipóteses são violadas.
 
