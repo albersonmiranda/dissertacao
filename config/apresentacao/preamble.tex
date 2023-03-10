@@ -85,7 +85,6 @@
 \newcommand{\hrefcol}[2]{\textcolor{airforceblue}{\href{#1}{#2}}}
 \newcommand{\hlinkcol}[1]{\hrefcol{#1}{#1}}
 
-
 % centering paragraph statement
 \newcommand{\centerstate}[1]{
     \centering
@@ -108,37 +107,5 @@
 \newcommand{\cemph}[1]{\emph{\textcolor{sintefblue}{#1}}}
 \newcommand{\bemph}[1]{\emph{\textcolor{airforceblue}{#1}}}
 
-% about page
-\newcommand{\aboutpage}[2]{
-    \begingroup
-    \setbeamertemplate{footline}{}
-    \themecolor{blue}
-    \begin{frame}[c]{#1}{\,}
-        \centering
-        \begin{minipage}{\textwidth}
-            \usebeamercolor[fg]{normal text}
-            \centering
-            \Large \textsl{\normalsize #2}
-        \end{minipage}
-    \end{frame}
-    \endgroup
-}
-
-% bibliography page
-\newcommand{\bibliographpage}{
-    \section{References}
-
-    \begingroup
-    \themecolor{blue}
-    \begin{frame}[allowframebreaks]{References}{\,}
-        \tiny
-        \printbibliography[heading=none]
-    \end{frame}
-\endgroup
-}
-
-% matrizes
+% allow large matrices
 \setcounter{MaxMatrixCols}{20}
-
-% background
-\titlebackground{img/foto1}
