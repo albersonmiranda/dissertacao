@@ -456,13 +456,13 @@ Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize
 
 ## Motivação
 
-A projeção da carteira de crédito é um dos elementos fundamentais para o planejamento dos bancos comerciais. Juntamente com as projeções de depósitos, provisões para créditos de liquidação duvidosa, eficiência operacional, entre outros indicadores-chave, essas projeções determinam a temperatura das expectativas da instituição em relação a elementos cruciais como rentabilidade, dividendos e posição no mercado (market-share), e isso é essencial para os acionistas e investidores. Essas projeções precisam ser tão precisas quanto possível, para que se possa calcular o risco de transacionar com a instituição financeira, seja como investidor ou cliente.
+A projeção da carteira de crédito é um dos elementos fundamentais para o planejamento dos bancos comerciais. Juntamente com as projeções de depósitos, provisões para créditos de liquidação duvidosa, eficiência operacional, entre outros indicadores-chave, essas projeções determinam a temperatura das expectativas da instituição em relação a elementos cruciais como rentabilidade, dividendos e posição no mercado (*market-share*), e isso é essencial para os acionistas e investidores. Essas projeções precisam ser tão precisas quanto possível, para que se possa calcular o risco de transacionar com a instituição financeira, seja como investidor ou cliente.
 
 Embora não exista penalidades específicas para instituições financeiras que erram (por uma boa margem) em suas projeções, elas podem sofrer consequências negativas em outros aspectos, como na avaliação de seus desempenhos por parte dos investidores e clientes. Os investidores e clientes podem considerar as projeções equivocadas como um sinal de falta de competência ou confiança na instituição financeira, o que pode afetar negativamente a reputação e a imagem da instituição. Isso pode levar a uma redução no número de investimentos e depósitos, o que irá afetar diretamente sua saúde financeira.
 
 Além disso, nos casos em que algum grupo se sentir lesado, as instituições financeiras podem enfrentar ações judiciais se suas projeções forem consideradas enganosas ou fraudulentas. Por exemplo, se uma instituição financeira fizer projeções excessivamente otimistas para incentivar os investidores a comprar seus títulos e, posteriormente, as projeções se mostrarem incorretas, os investidores podem entrar com uma ação judicial contra a instituição alegando fraude.
 
-Por isso, é importante que as instituições financeiras sejam transparentes e precisas em suas projeções, fornecendo informações confiáveis e atualizadas para seus clientes e investidores. Entretanto, pouco foi produzido nesse sentido 
+Por isso, é importante que as instituições financeiras sejam transparentes e precisas em suas projeções, fornecendo informações confiáveis e atualizadas para seus clientes e investidores. Entretanto, pouco foi produzido nesse sentido e a aplicação das técnicas envolvendo séries hieárquicas e agrupadas podem contribuir para a qualidade das projeções.
 
 Atualmente, os métodos analíticos, especificamente o MinT, são os mais populares na literatura da reconciliação ótima. Entretanto, tais métodos são sujeitos a uma série de restrições, como as do MCLR, e têm sua capacidade preditiva reduzida quando suas hipóteses são violadas.
 
@@ -479,9 +479,31 @@ Como objetivos específicos, tenho:
 
 ## Revisão da literatura
 
-### Reconciliação ótima de séries tmeporais hierárquicas
+### Previsão de saldos de crédito de instituições financeiras
 
-A primeira etapa da revisão de literatura consistiu na pesquisa bibliográfica relacionada à reconciliação ótima de previsões de séries temporais hierárquicas e agrupadas e sua interseção com o tema *machine learning*.
+A literatura relacionada à economia bancária é abundante no tema risco de crédito. Podemos verificar através de pesquisa bibliométrica no *Google Scholar* que, salvo exceções, os trabalhos mais citados estão relacionados com a previsão de perdas e suas consequências (@tbl-bancos). A nível macroeconômico, a previsão de agregados de crédito é uma preocupação de bancos centrais e se manifestam em trabalhos como @bader_modelo_2014 e @colak_tcmb_2019. No entanto, a pesquisa não revelou nenhum trabalho que se dedique à previsão de saldos de crédito por modalidade e agência.
+
+```{r citacoes bancos}
+#| tbl-cap: Trabalhos mais citados com os termos "banking forecasting"
+#| label: tbl-bancos
+
+readxl::read_excel("docs/academico.xlsx", sheet = "bancos") |>
+    subset(select = c(-Publisher)) |>
+    kbl(booktabs = TRUE, escape = TRUE) |>
+    kable_styling(latex_options = "striped", font_size = 10) |>
+    column_spec(2, width = "5cm")
+```
+
+Apesar da escassez de estudos sobre a previsão de saldos de crédito por modalidade e agência, outras tópicos da economia bancária foram objeto de estudo para previsão de séries temporais, inclusive hierárquicas. @sezer_financial_2019 produziram revisão de literatura de trabalhos publicados entre 2005 e 2019 que realizaram previsão de séries temporais financeiras utilizando *deep learning* e os agruparam em preços de ações individuais, índices (e.g., IBovespa, Dow Jones), preços de commodities, tendência e volatilidade de ativos, preços de títulos, câmbio e preços de criptomoedas.
+
+Outro tema abordado na literatura é a previsão da demanda por moeda em caixas eletrônicos. @gorodetskaya_machine_2021 realizaram uma revisão de literatura recente sobre o assunto e apresentaram sua abordagem para o problema.
+
+No que diz respeito à previsão de séries temporais em largas hierarquias,
+@prayoga_top-down_2017 trabalharam na previsão do fluxo de caixa do Banco da Indonésia, utilizando uma hierarquia de 3 níveis — 40 agências no nível mais desagregado, as 6 grandes ilhas do país como nível intermediário e o total no nível mais agregado. Os autores realizaram um *benchmark* de 5 modelos para previsão da série no nível mais agregado e utilizando o método *top-down* para obter as previsões no nível mais desagregado, concluindo pela efetividade do método *top-down* por proporções históricas. Entretanto, os autores não incluíram reconciliação ótima, a estimativa *bottom-up* ou mesmo outros métodos *top-down para efeito de comparação, o que limita o alcance do trabalho.
+
+### Reconciliação ótima de séries temporais hierárquicas
+
+A segunda etapa da revisão de literatura consistiu na pesquisa bibliográfica relacionada à reconciliação ótima de previsões de séries temporais hierárquicas e agrupadas e sua interseção com o tema *machine learning*.
 
 A pesquisa bibliométrica na base de dados do Google Acadêmico, pesquisando pelas palavras-chave "*hierarchical forecast reconciliation*" para qualquer lugar no corpo do texto, encontrando 27.600 resultados. Utilizando um script para ordenar os resultados pelo número de citações^[https://github.com/WittmannF/sort-google-scholar], verifiquei que o trabalho mais citado é @hyndman_forecasting_2021.
 
@@ -588,25 +610,6 @@ A estimação por esse método resulta numa reconciliação ótima que depende a
 1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
 
 Para o conjunto de dados utilizados, @spiliotis_hierarchical_2021 afirmam que os métodos de *machine learning*, especialmente o XGBoost, alcançaram, em média, melhor performance que as abordagens de nível único e o MinT. Além disso, concluíram que quanto maior é a diferença entre as séries, em todos os níveis hierárquicos, maior são os benefícios da abordagem por *machine learning*.
-
-### Previsão de saldos de crédito de instituições financeiras
-
-A literatura relacionada à economia bancária é abundante no tema risco de crédito. Podemos verificar através de pesquisa bibliométrica no *Google Scholar* que, salvo exceções, os trabalhos mais citados estão relacionados com a previsão de perdas e suas consequências (@tbl-bancos). A nível macroeconômico, a previsão de agregados de crédito é uma preocupação de bancos centrais e se manifestam em trabalhos como @bader_modelo_2014 e @colak_tcmb_2019. Entretanto, em relação à previsão de saldos de crédito por modalidade e agência, a pesquisa não revelou quaisquer trabalhos.
-
-```{r citacoes bancos}
-#| tbl-cap: Trabalhos mais citados com os termos "banking forecasting"
-#| label: tbl-bancos
-
-readxl::read_excel("docs/academico.xlsx", sheet = "bancos") |>
-    subset(select = c(-Publisher)) |>
-    kbl(booktabs = TRUE, escape = TRUE) |>
-    kable_styling(latex_options = "striped", font_size = 10) |>
-    column_spec(2, width = "5cm")
-```
-
-Apesar disso, outras tópicos da economia bancária foram objeto de estudo para previsão de séries temporais, inclusive hierárquicas. @sezer_financial_2019 produziram revisão de literatura de trabalhos publicados entre 2005 e 2019 que realizaram previsão de séries temporais financeiras utilizando *deep learning* e os agruparam em preços de ações individuais, índices (e.g., IBovespa, Dow Jones), preços de commodities, tendência e volatilidade de ativos, preços de títulos, câmbio e preços de criptomoedas. Sobre a demanda por moeda em caixas eletrônicos, uma série de trabalhos foram realizados e @gorodetskaya_machine_2021 trazem uma revisão de literatura recente e sua abordagem para o problema.
-
-
 
 # MÉTODOS ANALÍTICOS PARA RECONCILIAÇÃO ÓTIMA
 
