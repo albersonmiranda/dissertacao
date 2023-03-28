@@ -3,9 +3,9 @@ author: ALBERSON DA SILVA MIRANDA
 date: "2023"
 format:
     pdf:
-        include-in-header: [config/preamble.tex, config/customizacao.tex, config/glossario.tex]
-        include-before-body: config/pre_textuais.tex
-        include-after-body: config/pos_textuais.tex
+        include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
+        include-before-body: config/elementos/pre_textuais.tex
+        include-after-body: config/elementos/pos_textuais.tex
         keep-tex: false
         cite-method: biblatex
         output-file: render/dissertacao.pdf
@@ -25,7 +25,7 @@ crossref:
 
 # opções
 knitr::opts_chunk$set(
-    out.width = "70%",
+    out.width = "90%",
     echo = FALSE
 )
 
@@ -45,10 +45,13 @@ tema = theme_classic() +
     )
 
 # gerar bibliografia de pacotes
-knitr::write_bib(file = "config/packages.bib")
+knitr::write_bib(file = "config/elementos/packages.bib")
 
 # scripts
 source("scripts/hierarq.R")
+
+# dados
+estban = readRDS("data/estban.rds")
 ```
 
 # INTRODUÇÃO
@@ -477,9 +480,9 @@ Como objetivos específicos, tenho:
 1. Estudar métodos para estimação da matriz de reconciliação aplicando algoritmos e fluxos de trabalho de *machine learning*, como *tuning* e *resampling*;
 2. Identificar possíveis vantagens e limitações da abordagem por *machine learning* na reconciliação de previsões pontuais a partir de aplicação do método estudado na previsão de saldos de crédito do Banestes.
 
-## Revisão da literatura
+# REVISÃO DE LITERATURA
 
-### Previsão de saldos de crédito de instituições financeiras
+## Previsão de saldos de crédito de instituições financeiras
 
 A literatura relacionada à economia bancária é abundante no tema risco de crédito. Podemos verificar através de pesquisa bibliométrica no *Google Scholar* que, salvo exceções, os trabalhos mais citados estão relacionados com a previsão de perdas e suas consequências (@tbl-bancos). A nível macroeconômico, a previsão de agregados de crédito é uma preocupação de bancos centrais e se manifestam em trabalhos como @bader_modelo_2014 e @colak_tcmb_2019. No entanto, a pesquisa não revelou nenhum trabalho que se dedique à previsão de saldos de crédito por modalidade e agência.
 
@@ -501,7 +504,7 @@ Outro tema abordado na literatura é a previsão da demanda por moeda em caixas 
 No que diz respeito à previsão de séries temporais em largas hierarquias,
 @prayoga_top-down_2017 trabalharam na previsão do fluxo de caixa do Banco da Indonésia, utilizando uma hierarquia de 3 níveis — 40 agências no nível mais desagregado, as 6 grandes ilhas do país como nível intermediário e o total no nível mais agregado. Os autores realizaram um *benchmark* de 5 modelos para previsão da série no nível mais agregado e utilizando o método *top-down* para obter as previsões no nível mais desagregado, concluindo pela efetividade do método *top-down* por proporções históricas. Entretanto, os autores não incluíram reconciliação ótima, a estimativa *bottom-up* ou mesmo outros métodos *top-down para efeito de comparação, o que limita o alcance do trabalho.
 
-### Reconciliação ótima de séries temporais hierárquicas
+## Previsão de séries temporais hierárquicas e agrupadas
 
 A segunda etapa da revisão de literatura consistiu na pesquisa bibliográfica relacionada à reconciliação ótima de previsões de séries temporais hierárquicas e agrupadas e sua interseção com o tema *machine learning*.
 
@@ -588,34 +591,7 @@ Varone, C Ieracitano, A Özyüksel, T Hussain… & 2022 & 0\\
 \end{quadro}
 ```
 
-Previsões pontuais de séries temporais hierárquicas não é um assunto novo. Ao menos desde a década de 70, pesquisas foram publicadas acerca de abordagens *bottom-up* e *top-down*, suas vantagens e desvantagens, e tentativas de se definir qual é o melhor método^[Uma revisão dessa literatura pode ser encontrada em @athanasopoulos_hierarchical_2009.]. Entretanto, é apenas em @hyndman_optimal_2011 que é formalizada uma abordagem prática que utiliza toda a informação disponível, (i.e. as previsões de todos elementos de todos os níveis da hierarquia) a partir da estimação da matriz $\mathbfit{G}$ via regressão linear por mínimos quadrados generalizados (MQG).
-
-Entretanto, para ser capaz de estimar o modelo por MQG, é necessária a matriz de variância-covariância dos erros. @hyndman_optimal_2011 usam a matriz de erros de coerência, ou seja, a diferença entre as previsões reconciliadas e as previsões base, que tem posto incompleto e não identificada e, portanto, não pode ser estimada. Os autores contornam esse problema adotando no lugar da matriz de variância-covariância dos erros uma matriz diagonal constante, ou seja, assumem variância constante dos erros de reconciliação, e estimam a matriz $\mathbfit{G}$ por mínimos quadrados ordinários (MQO).
-
-A estimação por esse método resulta numa reconciliação ótima que depende apenas da matriz $\mathbfit{S}$, ou seja, da estrutura hierárquica, e independe da variância e covariância das previsões base $\mathbfit{\hat{y}_{T+h}}$ --- o que não é uma conclusão satisfatória.
-
-@hyndman_fast_2016 tentam aperfeiçoar o método usando as variâncias das previsões base estimadas (dentro da amostra) como estimativa para a matriz de variância-covariância dos erros de reconciliação, de forma a as utilizar como pesos e realizar a reconciliação ótima por mínimos quadrados ponderados (MQP). Assim, previsões base mais acuradas têm peso maior do que as mais ruidosas. Entretanto, não fornecem justificativa teórica para usar a diagonal da matriz de variância-covariância de $\mathbfit{\hat{e}_{t}}$.
-
-@wickramasuriya_optimal_2019 argumentam que o que de fato interessa é que as previsões reconciliadas tenham o menor erro. Então, corrigem a abordagem de reconciliação ótima para o objetivo de minimização dos erros das previsões reconciliadas $\mathbfit{\tilde{y}_{t+h}}$, ao invés dos erros das previsões base $\mathbfit{\hat{y}_{t+h}}$. Dado que isso implica na minimização da variância de $\mathbfit{\tilde{e}_{t+h}}$, ou seja, na minimização do somatório da diagonal, o traço, da matriz de variância-covariância de $\mathbfit{\tilde{e}_{t+h}}$, eles chamaram esse método de Traço Mínimo (MinT, na sigla em inglês). Paralelamente, usam desigualdade triangular para demonstrar que as previsões reconciliadas obtidas por esse método são ao menos tão boas quanto as previsões base.
-
-@panagiotelis_forecast_2021 reinterpreta a literatura de coerência e reconciliação de previsões pontuais a partir de uma abordagem geométrica, trazendo provas alternativas para conclusões anteriores ao mesmo tempo em que fornece novos teoremas. Além disso, @panagiotelis_forecast_2021 estende essa interpretação geométrica para o contexto probabilístico, fornecendo métodos paramétricos e não paramétricos (via *bootstrapping*) para reconciliação de previsões probabilísticas, ou seja, para reconciliar previsões $\hat{y}_t$ obtidas a partir de toda a distribuição, e não apenas a média.
-
-@spiliotis_hierarchical_2021 propõem a utilização de *machine learning* para a reconciliação ótima de séries temporais, especificamente os algoritmos de árvore de decisão *Random Forest* e *XGBoost*. Os autores descrevem como vantagens desse método em relação aos anteriores a descrição de relacionamentos não lineares, performance preditiva e a desnecessidade da utilização de todos os elementos da hierarquia na combinação ótima. A abordagem utilizada foi:
-
-1. dividir a amostra em treino e teste;
-1. treinar um modelo de previsão na amostra treino e obter previsões um passo a frente para a amostra teste;
-1. treinar um modelo de *machine learning* para cada série do menor nível da hierarquia, em que os parâmetros são as previsões obtidas no passo 2 e a variável explicada são os valores observados. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos;
-1. obter as previsões base $\hat{y}_t$;
-1. passar as previsões base ao modelo treinado no passo 3 para se obter as previsões reconciliadas para o menor nível da hierarquia;
-1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
-
-Para o conjunto de dados utilizados, @spiliotis_hierarchical_2021 afirmam que os métodos de *machine learning*, especialmente o XGBoost, alcançaram, em média, melhor performance que as abordagens de nível único e o MinT. Além disso, concluíram que quanto maior é a diferença entre as séries, em todos os níveis hierárquicos, maior são os benefícios da abordagem por *machine learning*.
-
-# MÉTODOS ANALÍTICOS PARA RECONCILIAÇÃO ÓTIMA
-
-[Escrever *outline* do capítulo]
-
-## Abordagens de nível único
+### Abordagens de nível único
 
 Uma abordagem de nível único é uma abordagem em que as previsões são realizadas para um único nível da hierarquia. A partir dessas previsões, os demais níveis são obtidos, ou desagregando (no caso dos níveis inferiores), ou agregando (no caso dos níveis superiores) essas informações [@hyndman_forecasting_2021]. Os métodos *top-down*, *bottom-up* e *middle-out*, demonstrados na introdução, são abordagens de nível único.
 
@@ -633,11 +609,34 @@ $$
 p_j = \frac{\sum^{T}_{t=1} \frac{y_{j,t}}{T}}{\sum^{T}_{t=1} \frac{y_{t}}{T}}
 $$ {#eq-td_2}
 
-# MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA
+### Métodos analíticos para reconciliação ótima
 
-[Escrever *outline* do capítulo]
+Previsões pontuais de séries temporais hierárquicas não é um assunto novo. Ao menos desde a década de 70, pesquisas foram publicadas acerca de abordagens *bottom-up* e *top-down*, suas vantagens e desvantagens, e tentativas de se definir qual é o melhor método^[Uma revisão dessa literatura pode ser encontrada em @athanasopoulos_hierarchical_2009.]. Entretanto, é apenas em @hyndman_optimal_2011 que é formalizada uma abordagem prática que utiliza toda a informação disponível, (i.e. as previsões de todos elementos de todos os níveis da hierarquia) a partir da estimação da matriz $\mathbfit{G}$ via regressão linear por mínimos quadrados generalizados (MQG).
 
-## O processo de ajuste e sobreajuste
+Entretanto, para ser capaz de estimar o modelo por MQG, é necessária a matriz de variância-covariância dos erros. @hyndman_optimal_2011 usam a matriz de erros de coerência, ou seja, a diferença entre as previsões reconciliadas e as previsões base, que tem posto incompleto e não identificada e, portanto, não pode ser estimada. Os autores contornam esse problema adotando no lugar da matriz de variância-covariância dos erros uma matriz diagonal constante, ou seja, assumem variância constante dos erros de reconciliação, e estimam a matriz $\mathbfit{G}$ por mínimos quadrados ordinários (MQO).
+
+A estimação por esse método resulta numa reconciliação ótima que depende apenas da matriz $\mathbfit{S}$, ou seja, da estrutura hierárquica, e independe da variância e covariância das previsões base $\mathbfit{\hat{y}_{T+h}}$ --- o que não é uma conclusão satisfatória.
+
+@hyndman_fast_2016 tentam aperfeiçoar o método usando as variâncias das previsões base estimadas (dentro da amostra) como estimativa para a matriz de variância-covariância dos erros de reconciliação, de forma a as utilizar como pesos e realizar a reconciliação ótima por mínimos quadrados ponderados (MQP). Assim, previsões base mais acuradas têm peso maior do que as mais ruidosas. Entretanto, não fornecem justificativa teórica para usar a diagonal da matriz de variância-covariância de $\mathbfit{\hat{e}_{t}}$.
+
+@wickramasuriya_optimal_2019 argumentam que o que de fato interessa é que as previsões reconciliadas tenham o menor erro. Então, corrigem a abordagem de reconciliação ótima para o objetivo de minimização dos erros das previsões reconciliadas $\mathbfit{\tilde{y}_{t+h}}$, ao invés dos erros das previsões base $\mathbfit{\hat{y}_{t+h}}$. Dado que isso implica na minimização da variância de $\mathbfit{\tilde{e}_{t+h}}$, ou seja, na minimização do somatório da diagonal, o traço, da matriz de variância-covariância de $\mathbfit{\tilde{e}_{t+h}}$, eles chamaram esse método de Traço Mínimo (MinT, na sigla em inglês). Paralelamente, usam desigualdade triangular para demonstrar que as previsões reconciliadas obtidas por esse método são ao menos tão boas quanto as previsões base.
+
+@panagiotelis_forecast_2021 reinterpreta a literatura de coerência e reconciliação de previsões pontuais a partir de uma abordagem geométrica, trazendo provas alternativas para conclusões anteriores ao mesmo tempo em que fornece novos teoremas. Além disso, @panagiotelis_forecast_2021 estende essa interpretação geométrica para o contexto probabilístico, fornecendo métodos paramétricos e não paramétricos (via *bootstrapping*) para reconciliação de previsões probabilísticas, ou seja, para reconciliar previsões $\hat{y}_t$ obtidas a partir de toda a distribuição, e não apenas a média.
+
+### Métodos de *machine learning* para reconciliação ótima
+
+@spiliotis_hierarchical_2021 propõem a utilização de *machine learning* para a reconciliação ótima de séries temporais, especificamente os algoritmos de árvore de decisão *Random Forest* e *XGBoost*. Os autores descrevem como vantagens desse método em relação aos anteriores a descrição de relacionamentos não lineares, performance preditiva e a desnecessidade da utilização de todos os elementos da hierarquia na combinação ótima. A abordagem utilizada foi:
+
+1. dividir a amostra em treino e teste;
+1. treinar um modelo de previsão na amostra treino e obter previsões um passo a frente para a amostra teste;
+1. treinar um modelo de *machine learning* para cada série do menor nível da hierarquia, em que os parâmetros são as previsões obtidas no passo 2 e a variável explicada são os valores observados. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos;
+1. obter as previsões base $\hat{y}_t$;
+1. passar as previsões base ao modelo treinado no passo 3 para se obter as previsões reconciliadas para o menor nível da hierarquia;
+1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
+
+Para o conjunto de dados utilizados, @spiliotis_hierarchical_2021 afirmam que os métodos de *machine learning*, especialmente o XGBoost, alcançaram, em média, melhor performance que as abordagens de nível único e o MinT. Além disso, concluíram que quanto maior é a diferença entre as séries, em todos os níveis hierárquicos, maior são os benefícios da abordagem por *machine learning*.
+
+#### O processo de ajuste e sobreajuste
 
 Considere uma função de ajuste $f$, um conjunto de pontos $D = {d_1, ..., d_n}$ com $d_i = (x_i y_i)´$, variáveis de decisão ou parâmetros $x_i \in \mathbb{R}^m$ e imagem $y_i = f(x_i) \in \mathbb{R}$. Diferentemente da abordagem clássica, em que, no caso do modelo clássico de regressão linear, há um modelo teórico de coeficientes estimados por mínimos quadrados ordinários (MQO) que é garantido pelo teorema de Gauss-Markov ser o melhor estimador linear não viesado (BLUE), em *machine learning* o objetivo é encontrar, de forma iterativa, um meta-modelo que melhor aproxima a função $f$ usando a informação contida em $D$, ou seja, queremos ajustar uma função de regressão $\hat{f}_D$ aos nossos dados $D$ de forma que $\hat{y} = \hat{f}_D(x, \varepsilon)$ tenha o menor erro de aproximação $\varepsilon$.
 
@@ -659,7 +658,7 @@ O problema é que nesses modelos, dadas suficientes iterações, o erro de resub
 
 De forma geral, espera-se que o preditor reduza seu viés durante o treino apenas o suficiente para que seja capaz de generalizar sua predição para fora da amostra em um nível ótimo de acurácia. A partir desse ponto, a redução no viés é penalizada com o aumento da variância, ou seja, com a redução de sua capacidade de prever dados futuros [@bischl_resampling_2012]. A esse processo se dá o nome de *overfitting* ou **sobreajuste**. Isso quer dizer que não podemos considerar a performance do preditor em $D$ se desejamos estimar honestamente a performance real do modelo.
 
-## Reamostragem
+#### Reamostragem
 
 Uma forma de se corrigir esse problema é dividindo a amostra em um conjunto para treino $D_\text{treino}$ e outro conjunto para teste $D_\text{teste}$ de forma que $D_\text{treino} \cup D_\text{teste} = D$ e $D_\text{treino} \cap D_\text{teste} = \empty$. Assim, pode-se treinar o modelo em $D_\text{treino}$ para se obter $\hat{f}_{D_{\text{treino}}}$ e calcular seu erro de generalização usando os dados de $D_\text{teste}$. Essa abordagem é chamada de *hold-out* e ela é de simples implementação e utilização, uma vez que as observações do conjunto teste são completamente independentes das observações com as quais o modelo foi treinado. A estimativa do erro de generalização então se torna
 $$\widehat{GE}_\text{hold-out} = \widehat{GE}(\hat{f}_{D_{\text{treino}}}, D_{\text{teste}})$$
@@ -681,3 +680,61 @@ Sendo que o viés expressa a diferença média entre um estimador e o valor real
 $$\text{Bias}(\widehat{GE}_\text{samp}) = \mathbb{E}[\widehat{GE}_\text{samp}] - \mathbb{E}[GE(\hat{f}_D, p)]$$
 e
 $$\text{Variância}(\widehat{GE}_\text{samp}) = \mathbb{E}[(\widehat{GE}_\text{samp} - \mathbb{E}[\widehat{GE}_\text{samp}])^2]$$
+
+# METODOLOGIA
+
+[Escrever *outline* do capítulo]
+
+## Dados e variávels
+
+```{r}
+#| label: fig-verbete
+#| fig-cap: "Verbete agregado"
+
+# plot por mesorregião
+estban |>
+    dplyr::filter(
+        fabletools::is_aggregated(id_municipio),
+        fabletools::is_aggregated(cnpj_agencia),
+        fabletools::is_aggregated(nome_mesorregiao),
+        !fabletools::is_aggregated(verbete),
+        ref >= "2010-01-01"
+    ) |>
+    as.data.frame() |>
+    ggplot(aes(x = ref, y = valor, color = factor(verbete))) +
+        geom_line() +
+        scale_y_continuous(labels = scales::number_format(scale = 1 / 1000000000)) +
+        labs(x = "", y = "Valor (em R$ bi)", color = "Verbete") +
+        tema
+```
+
+```{r}
+#| label: fig-verbete_meso
+#| fig-cap: "Verbete por mesorregião"
+
+# plot por mesorregião
+estban |>
+    dplyr::filter(
+        fabletools::is_aggregated(id_municipio),
+        fabletools::is_aggregated(cnpj_agencia),
+        !fabletools::is_aggregated(nome_mesorregiao),
+        !fabletools::is_aggregated(verbete),
+        ref >= "2010-01-01"
+    ) |>
+    as.data.frame() |>
+    ggplot(aes(x = ref, y = valor, color = factor(verbete))) +
+        geom_line() +
+        facet_wrap(~factor(nome_mesorregiao), scales = "free_y") +
+        scale_y_continuous(labels = scales::number_format(scale = 1 / 1000000)) +
+        labs(x = "", y = "Valor (em R$ mi)", color = "Verbete") +
+        tema +
+        theme(
+            legend.text = element_text(size = 6),
+            legend.title = element_text(size = 6),
+            strip.text = element_text(size = 6)
+        )
+```
+
+# RESULTADOS
+
+[Escrever *outline* do capítulo]
