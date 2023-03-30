@@ -11,6 +11,7 @@ format:
         output-file: render/dissertacao.pdf
         documentclass: abntex2
         classoption: [12pt, oneside, a4paper, chapter=TITLE, section=TITLE, brazil]
+        pdf-engine-opt: '--shell-escape'
 number-sections: true
 crossref:
   fig-prefix: Figura
@@ -127,7 +128,7 @@ Combinando as duas, temos a estrutura de séries hierárquicas agrupadas. Ao con
 
 ![Séries Hierárquicas Agrupadas (b)](img/hier_agrup_2.png){#fig-ha2}
 
-Na notação matricial, a estrutura da @fig-ha2 é representada como abaixo. Formalmente, o primeiro membro da igualdade é composto pelo vetor $\mathbfit{y}_t$ $n$-dimensional com todas as observações no tempo $t$ para todos os níveis da hierarquia. O segundo membro é composto pela matriz de soma $\mathbfit{S}$ \index{matriz de soma}de dimensão $n \times m$ que define as equações para todo nível de agregação, e pela matriz $\mathbfit{b}_t$ composta pelas séries no nível mais desagregado.
+Na notação matricial, a estrutura da @fig-ha2 é representada como abaixo. Formalmente, o primeiro membro da igualdade é composto pelo vetor $\mathbfit{y}_t$ $n$-dimensional com todas as observações no tempo $t$ para todos os níveis da hierarquia. O segundo membro é composto pela matriz de soma $\mathbfit{S}$ de dimensão $n \times m$ que define as equações para todo nível de agregação, e pela matriz $\mathbfit{b}_t$ composta pelas séries no nível mais desagregado.
 
 $$
 \mathbfit{y}_t=\mathbfit{Sb}_t
@@ -347,7 +348,7 @@ $$
 \end{bmatrix}
 $$ {#eq-matriz_gbu}
 
-O que resulta nas equações desejadas. Portanto, $\mathbfit{G}$ define a abordagem --- se *top-down* ou *bottom-up* ---, e $\mathbfit{S}$ define a maneira da qual as previsões são somadas para formar as equações de previsão para cada elemento da estrutura. Portanto, chamo $\mathbfit{G}$ de matriz de reconciliação. \index{matriz de reconciliação}
+O que resulta nas equações desejadas. Portanto, $\mathbfit{G}$ define a abordagem --- se *top-down* ou *bottom-up* ---, e $\mathbfit{S}$ define a maneira da qual as previsões são somadas para formar as equações de previsão para cada elemento da estrutura. Portanto, chamo $\mathbfit{G}$ de matriz de reconciliação.
 
 $$
 \begin{bmatrix}
@@ -447,8 +448,6 @@ $$ {#eq-matriz_mo}
 
 ### Coerência e reconciliação
 
-\index{coerência}
-\index{reconciliação}
 Seja somando as previsões do nível mais desagregado para formar os níveis superiores da hierarquia (*bottom-up*) ou distribuindo proporcionalmente as previsões do nível mais agregado (*top-down*), o vetor $\mathbfit{\tilde{y}}_t$ representa as previsões *coerentes*. Isso significa que as previsões são totalizadas corretamente --- as previsões de cada elemento agregado corresponde ao somatório das previsões dos níveis inferiores da hierarquia. Isso é garantido pela multiplicação das matrizes $\mathbfit{SG}$.
 
 Não fosse essa pré multiplicação, nada garantiria a coerência das previsões. Tomando a estrutura da @fig-h como exemplo, seria um acaso improvável que as previsões do agregado para o estado do Espírito Santo sejam exatamente a soma das previsões individuais de seus municípios. Isso porque não há qualquer razão para que cada série siga o mesmo processo (e.g., arima) com coeficientes idênticos.
@@ -685,7 +684,7 @@ $$\text{Variância}(\widehat{GE}_\text{samp}) = \mathbb{E}[(\widehat{GE}_\text{s
 
 [Escrever *outline* do capítulo]
 
-## Dados e variávels
+## Dados e variáveis
 
 ```{r}
 #| label: fig-verbete

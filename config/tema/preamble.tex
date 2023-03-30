@@ -36,7 +36,7 @@
 \usepackage{psfrag, fancyhdr}
 \usepackage{amsmath, amsfonts, amssymb, amsthm}									% escrita matemática
 \usepackage{xcolor, url, placeins, enumitem}
-\usepackage{dcolumn, lastpage}
+\usepackage{dcolumn, lastpage, listings}
 \usepackage[skip = 2pt, size = normalsize, labelfont = bf]{caption}
 % ---
 
@@ -144,3 +144,15 @@
 % posição das figuras
 \setfloatlocations{figure}{hbtp}
 \setfloatlocations{table}{hbtp}
+
+% code snippets
+\lstset{language=R,
+    basicstyle=\small\ttfamily,
+    stringstyle=\color{DarkGreen},
+    otherkeywords={0,1,2,3,4,5,6,7,8,9},
+    morekeywords={TRUE,FALSE},
+    deletekeywords={data,frame,length,as,character},
+    keywordstyle=\color{blue},
+    commentstyle=\color{DarkGreen},
+	showstringspaces=false
+}
