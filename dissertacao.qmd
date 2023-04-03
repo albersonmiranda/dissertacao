@@ -11,7 +11,6 @@ format:
         output-file: render/dissertacao.pdf
         documentclass: abntex2
         classoption: [12pt, oneside, a4paper, chapter=TITLE, section=TITLE, brazil]
-        pdf-engine-opt: '--shell-escape'
 number-sections: true
 crossref:
   fig-prefix: Figura
@@ -685,6 +684,8 @@ $$\text{Variância}(\widehat{GE}_\text{samp}) = \mathbb{E}[(\widehat{GE}_\text{s
 [Escrever *outline* do capítulo]
 
 ## Dados e variáveis
+
+Os dados usados nesse trabalho são gerados pelas instituições financeiras
 
 ```{r}
 #| label: fig-verbete
