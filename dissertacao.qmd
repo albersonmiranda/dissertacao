@@ -600,8 +600,6 @@ Varone, C. Ieracitano, A. Özyüksel, T. Hussain & 2022 & 0\\
 \end{quadro}
 ```
 
-@li_hierarchical_2016 compararam dois algoritmos de *machine learning* para previsão da produção de energia solar no estado da Flórida/EUA: ANN e SVR. Argumentando que tradicionalmente as previsões nesse problema são realizadas com os dados de produção total da planta, eles propõem uma abordagem hierárquica *bottom-up*, com previsões base de cada inversor solar. Os autores concluem que a abordagem hierárquica *bottom-up* é mais precisa do que a previsão do agregado, ao menos na previsão um passo a frente.
-
 ### Abordagens de nível único
 
 Uma abordagem de nível único é uma abordagem em que as previsões são realizadas para um único nível da hierarquia. A partir dessas previsões, os demais níveis são obtidos, ou desagregando (no caso dos níveis inferiores), ou agregando (no caso dos níveis superiores) essas informações [@hyndman_forecasting_2021]. Os métodos *top-down*, *bottom-up* e *middle-out*, demonstrados na introdução, são abordagens de nível único.
@@ -620,7 +618,9 @@ $$
 p_j = \frac{\sum^{T}_{t=1} \frac{y_{j,t}}{T}}{\sum^{T}_{t=1} \frac{y_{t}}{T}}
 $$ {#eq-td_2}
 
+[escrever método de proporções de previsões]
 
+@li_hierarchical_2016 compararam dois algoritmos de *machine learning* para previsão da produção de energia solar no estado da Flórida/EUA: ANN e SVR. Argumentando que tradicionalmente as previsões nesse problema são realizadas com os dados de produção total da planta, eles propõem uma abordagem hierárquica *bottom-up*, com previsões base de cada inversor solar. Os autores concluem que a abordagem hierárquica *bottom-up* é mais precisa do que a previsão do agregado, ao menos na previsão um passo a frente. Embora os autores utilizem algoritmos de *machine learning* para as previsões base, eles não utilizam esses algoritmos para a reconciliação ótima, caracterizando a abordagem do trabalho ainda como nível único.
 
 ### Métodos analíticos para reconciliação ótima
 
@@ -794,10 +794,6 @@ estban |>
             strip.text = element_text(size = 6)
         )
 ```
-
-Atualmente, os verbetes que mais contribuem para o saldo do crédito são os verbetes de financiamentos imobiliários e financiamentos rurais. Isso é explicado pelo fato de que o Banestes é o principal financiador de imóveis no Espírito Santo, com 50% do mercado^[https://www.banestes.com.br/imprensa/noticias/banestes-e-o-maior-financiador-de-imoveis-no-es/].
-
-```{r}
 
 # RESULTADOS
 
