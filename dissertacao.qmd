@@ -45,13 +45,24 @@ tema = theme_classic() +
     )
 
 # gerar bibliografia de pacotes
-knitr::write_bib(file = "config/elementos/packages.bib")
+knitr::write_bib(
+    c(.packages(), "basedosdados")
+    , file = "config/elementos/packages.bib"
+)
 
 # scripts
 source("scripts/hierarq.R")
 
 # dados
 estban = readRDS("data/estban.rds")
+estban_df = readRDS("data/estban_df.rds")
+
+# filtrando dados
+estban = subset(estban, ref >= "2010-01-01")
+estban_df = subset(estban_df,
+    ref >= "2010-01-01",
+    select = c(ref, nome_mesorregiao, verbete, id_municipio, cnpj_agencia, valor)
+)
 ```
 
 # INTRODUÇÃO
@@ -506,7 +517,7 @@ No que diz respeito à previsão de séries temporais em largas hierarquias,
 
 A segunda etapa da revisão de literatura consistiu na pesquisa bibliográfica relacionada à reconciliação ótima de previsões de séries temporais hierárquicas e agrupadas e sua interseção com o tema *machine learning*.
 
-A pesquisa bibliométrica na base de dados do Google Acadêmico, pesquisando pelas palavras-chave "*hierarchical forecast reconciliation*" para qualquer lugar no corpo do texto, encontrando 27.600 resultados. Utilizando um script para ordenar os resultados pelo número de citações^[https://github.com/WittmannF/sort-google-scholar], verifiquei que o trabalho mais citado é @hyndman_forecasting_2021.
+A pesquisa bibliométrica na base de dados do Google Acadêmico, pesquisando pelas palavras-chave "*hierarchical forecast reconciliation*" para qualquer lugar no corpo do texto, encontrando 27.600 resultados. Ordenando os resultados pelo número de citações^[Para a funcionalidade, ver https://github.com/WittmannF/sort-google-scholar.], verifiquei que o trabalho mais citado é @hyndman_forecasting_2021.
 
 ```{r citacoes}
 #| tbl-cap: Trabalhos mais citados com os termos "hierarquical forecast reconciliation"
@@ -572,22 +583,24 @@ readxl::read_excel("docs/academico.xlsx", sheet = "ml") |>
 \toprule
 Autor & Ano & Citacoes\\
 \midrule
-\cellcolor{gray!6}{Li, SMM Rahman, R Vega, B Dong} & \cellcolor{gray!6}{2016} & \cellcolor{gray!6}{114}\\
-Mancuso, V Piccialli, AM Sudoso & 2021 & 17\\
-\cellcolor{gray!6}{Abolghasemi, RJ Hyndman, G Tarr} & \cellcolor{gray!6}{2019} & \cellcolor{gray!6}{13}\\
-Afolabi, SU Guan, KL Man, PWH Wong, X Zhao & 2017 & 20\\
-\cellcolor{gray!6}{Saatloo, A Moradzadeh, H Moayyed} & \cellcolor{gray!6}{2021} & \cellcolor{gray!6}{6}\\
+\cellcolor{gray!6}{Li, S.M.M. Rahman, R. Vega, B. Dong} & \cellcolor{gray!6}{2016} & \cellcolor{gray!6}{114}\\
+Mancuso, V. Piccialli, A.M. Sudoso & 2021 & 17\\
+\cellcolor{gray!6}{Abolghasemi, R.J. Hyndman, G. Tarr} & \cellcolor{gray!6}{2019} & \cellcolor{gray!6}{13}\\
+Afolabi, Su Guan, K.L. Man, P.W.H. Wong, X. Zhao & 2017 & 20\\
+\cellcolor{gray!6}{Saatloo, A. Moradzadeh, H. Moayyed} & \cellcolor{gray!6}{2021} & \cellcolor{gray!6}{6}\\
 \addlinespace
-Abolghasemi, G Tarr, C Bergmeir & 2022 & 0\\
-\cellcolor{gray!6}{C Neto, BL Fernando…} & \cellcolor{gray!6}{2022} & \cellcolor{gray!6}{0}\\
+Abolghasemi, G. Tarr, C. Bergmeir & 2022 & 0\\
+\cellcolor{gray!6}{C. Neto, B.L. Fernando} & \cellcolor{gray!6}{2022} & \cellcolor{gray!6}{0}\\
 Moon & 2012 & 0\\
-\cellcolor{gray!6}{YAN, C SHENG} & \cellcolor{gray!6}{2018} & \cellcolor{gray!6}{1}\\
-Varone, C Ieracitano, A Özyüksel, T Hussain… & 2022 & 0\\
+\cellcolor{gray!6}{Yan, C. Sheng} & \cellcolor{gray!6}{2018} & \cellcolor{gray!6}{1}\\
+Varone, C. Ieracitano, A. Özyüksel, T. Hussain & 2022 & 0\\
 \bottomrule
 \end{tabular}
 \endgroup{}
 \end{quadro}
 ```
+
+@li_hierarchical_2016 compararam dois algoritmos de *machine learning* para previsão da produção de energia solar no estado da Flórida/EUA: ANN e SVR. Argumentando que tradicionalmente as previsões nesse problema são realizadas com os dados de produção total da planta, eles propõem uma abordagem hierárquica *bottom-up*, com previsões base de cada inversor solar. Os autores concluem que a abordagem hierárquica *bottom-up* é mais precisa do que a previsão do agregado, ao menos na previsão um passo a frente.
 
 ### Abordagens de nível único
 
@@ -606,6 +619,8 @@ Já a proporção das médias históricas consiste em tomar a proporção das m�
 $$
 p_j = \frac{\sum^{T}_{t=1} \frac{y_{j,t}}{T}}{\sum^{T}_{t=1} \frac{y_{t}}{T}}
 $$ {#eq-td_2}
+
+
 
 ### Métodos analíticos para reconciliação ótima
 
@@ -681,15 +696,61 @@ $$\text{Variância}(\widehat{GE}_\text{samp}) = \mathbb{E}[(\widehat{GE}_\text{s
 
 # METODOLOGIA
 
-[Escrever *outline* do capítulo]
+Neste capítulo estão contidas explicações sobre os dados e variáveis, sobre o *design* da modelagem e sobre a avaliação dos modelos.
 
 ## Dados e variáveis
 
-Os dados usados nesse trabalho são gerados pelas instituições financeiras
+Os dados usados nesse trabalho são dados terciários obtidos do *datalake* público Base dos Dados [@R-basedosdados]. A fonte primária são os bancos comerciais e múltiplos com carteira comercial que disponibilizam mensalmente os saldos dos principais verbetes do balancete via documento 4500^[Esses documentos são relatórios eletrônicos obrigatórios demandados pelo Bacen às instituições financeiras que permitem ao regulador o conhecimento minucioso dos bancos e de seus clientes.] ao Banco Central do Brasil, que os compila e publica, agrupados por agência bancária e por município, no relatório ESTBAN — Estatística Bancária Mensal e por Município^[https://www4.bcb.gov.br/fis/cosif/estban.asp?frame=1].
+
+Além das estatísticas bancárias, foram obtidos informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
+
+Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros na para UF e na raiz do CNPJ. Além disso, foram mantidos apenas os verbetes relacionados a crédito. Quanto ao período, há dados disponíveis desde 1988. Entretanto, escolhi manter apenas os dados a partir de 2010 para evitar problemas relacionados a séries muito longas. Isso porque é seria muito otimista assumir que o processo de autocorrelação e o padrão sazonal se manteria ao longo de várias décadas^["It is, perhaps, unrealistic to assume that the seasonal pattern remains the same over nearly three decades. So we could simply fit a model to the most recent years instead" [@hyndman_forecasting_2021]]. Além disso, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta na escolha do período.
+
+Por fim, as variáveis mantidas no *dataset* foram:
+
+1. ref: data de referência do relatório ESTBAN
+2. nome_mesorregiao: nome da mesorregião do ES:
+    - Central Espírito-Santense
+    - Litoral Norte Espírito-Santense
+    - Noroeste Espírito-Santense
+    - Sul Espírito-Santense
+3. verbete:
+    - empréstimos e títulos descontados
+    - financiamentos
+    - financiamentos imobiliários
+    - financiamentos rurais
+4. id_município: código do município
+5. cnpj_agencia
+6. valor: saldo do verbete no município
+
+Os dados foram organizados de forma hierárquica, do mais agregado para o mais desagregado, por estado, mesorregião, município e agência bancária; e de forma agrupada, por verbete (@fig-estban).
+
+![Hierarquia dos dados](img/hier_agrup_est.png){#fig-estban height=30%}
+
+O detalhamento da construção do *dataset* se encontra no Anexo \ref{anexo_a}.
+
+![Modelo de dados](img/data_model.png){#fig-data_model height=25%}
+
+## Análise exploratória dos dados
+
+```{r skim}
+#| label: tab-estban
+#| tbl-cap: "Estrutura do dataset ESTBAN"
+
+lapply(
+    estban_df[sapply(estban_df, function(x) !is.numeric(x))],
+    unique
+) |>
+lengths() |>
+kbl(booktabs = TRUE) |>
+kable_styling(latex_options = c("striped"))
+```
+
+Analisando os verbetes no agregado do estado, 
 
 ```{r}
 #| label: fig-verbete
-#| fig-cap: "Verbete agregado"
+#| fig-cap: "Verbete no agregado do ES"
 
 # plot por mesorregião
 estban |>
@@ -697,20 +758,19 @@ estban |>
         fabletools::is_aggregated(id_municipio),
         fabletools::is_aggregated(cnpj_agencia),
         fabletools::is_aggregated(nome_mesorregiao),
-        !fabletools::is_aggregated(verbete),
-        ref >= "2010-01-01"
+        !fabletools::is_aggregated(verbete)
     ) |>
     as.data.frame() |>
     ggplot(aes(x = ref, y = valor, color = factor(verbete))) +
         geom_line() +
-        scale_y_continuous(labels = scales::number_format(scale = 1 / 1000000000)) +
+        scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
         labs(x = "", y = "Valor (em R$ bi)", color = "Verbete") +
         tema
 ```
 
 ```{r}
 #| label: fig-verbete_meso
-#| fig-cap: "Verbete por mesorregião"
+#| fig-cap: "Verbete por mesorregião do ES"
 
 # plot por mesorregião
 estban |>
@@ -734,6 +794,10 @@ estban |>
             strip.text = element_text(size = 6)
         )
 ```
+
+Atualmente, os verbetes que mais contribuem para o saldo do crédito são os verbetes de financiamentos imobiliários e financiamentos rurais. Isso é explicado pelo fato de que o Banestes é o principal financiador de imóveis no Espírito Santo, com 50% do mercado^[https://www.banestes.com.br/imprensa/noticias/banestes-e-o-maior-financiador-de-imoveis-no-es/].
+
+```{r}
 
 # RESULTADOS
 
