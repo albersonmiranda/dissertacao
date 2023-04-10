@@ -20,7 +20,7 @@ FROM `basedosdados.br_bd_diretorios_brasil.municipio`
 WHERE sigla_uf = 'ES'
 ")
 
-# importando dados
+# estban
 estban = basedosdados::read_sql("
 SELECT
   CAST(ano AS STRING) AS ano
@@ -58,6 +58,19 @@ agencias_fim = subset(estban, ref == max(ref), select = cnpj_agencia) |>
 
 # filtrando apenas agências em atividade
 estban = subset(estban, cnpj_agencia %in% agencias_fim)
+
+# criando modelo de dados
+estban$pk = seq_len(nrow(estban))
+dm::dm(estban, municipios) |>
+  # indicando chave primária
+  dm::dm_add_pk(estban, pk) |>
+  dm::dm_add_pk(municipios, id_municipio) |>
+  # indicando chave estrangeira
+  dm::dm_add_fk(estban, id_municipio, municipios, id_municipio, check = FALSE) |>
+  dm::dm_draw(view_type = "all") |>
+  DiagrammeRsvg::export_svg() |>
+  xml2::read_xml() |>
+  xml2::write_xml("img/data_model.svg")
 
 # mesclando com tabela municípios
 estban_df = merge(estban, municipios, by = "id_municipio")
