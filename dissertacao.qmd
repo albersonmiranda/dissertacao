@@ -35,7 +35,10 @@ set.seed(1)
 # pacotes
 pacman::p_load(
     kableExtra,
-    ggplot2
+    ggplot2,
+    tsibble,
+    fable,
+    fabletools
 )
 
 # tema ggplot
@@ -55,14 +58,28 @@ source("scripts/hierarq.R")
 
 # dados
 estban = readRDS("data/estban.rds")
-estban_df = readRDS("data/estban_df.rds")
 
 # filtrando dados
-estban = subset(estban, ref >= "2010-01-01")
-estban_df = subset(estban_df,
+estban = subset(estban,
     ref >= "2010-01-01",
-    select = c(ref, nome_mesorregiao, verbete, id_municipio, cnpj_agencia, valor)
-)
+    select = c(
+        ref,
+        nome_mesorregiao,
+        nome_microrregiao,
+        nome,
+        cnpj_agencia,
+        verbete,
+        valor
+    )
+) |>
+(\(x) x[order(
+    x$ref,
+    x$nome_mesorregiao,
+    x$nome_microrregiao,
+    x$nome,
+    x$cnpj_agencia,
+    x$verbete
+), ])()
 ```
 
 # INTRODUÇÃO
@@ -704,7 +721,7 @@ Os dados usados nesse trabalho são dados terciários obtidos do *datalake* púb
 
 Além das estatísticas bancárias, foram obtidos informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
 
-Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros na para UF e na raiz do CNPJ. Além disso, foram mantidos apenas os verbetes relacionados a crédito. Quanto ao período, há dados disponíveis desde 1988. Entretanto, escolhi manter apenas os dados a partir de 2010 para evitar problemas relacionados a séries muito longas. Isso porque é seria muito otimista assumir que o processo de autocorrelação e o padrão sazonal se manteria ao longo de várias décadas^["It is, perhaps, unrealistic to assume that the seasonal pattern remains the same over nearly three decades. So we could simply fit a model to the most recent years instead" [@hyndman_forecasting_2021]]. Além disso, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta na escolha do período.
+Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram mantidos apenas os verbetes relacionados a crédito e mantidas apenas as agências em atividade durante todo o período. Quanto ao período, há dados disponíveis desde 1988. Entretanto, escolhi manter apenas os dados a partir de 2010 para evitar problemas relacionados a séries muito longas. Isso porque é seria muito otimista assumir que o processo de autocorrelação e o padrão sazonal se manteria ao longo de várias décadas^["It is, perhaps, unrealistic to assume that the seasonal pattern remains the same over nearly three decades. So we could simply fit a model to the most recent years instead" [@hyndman_forecasting_2021]]. Além disso, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta na escolha do período.
 
 Por fim, as variáveis mantidas no *dataset* foram:
 
@@ -714,18 +731,30 @@ Por fim, as variáveis mantidas no *dataset* foram:
     - Litoral Norte Espírito-Santense
     - Noroeste Espírito-Santense
     - Sul Espírito-Santense
+3. nome_microrregião: nome da microrregião do ES:
+    - Afonso Cláudio
+    - Guarapari
+    - Santa Teresa
+    - Vitória
+    - Linhares
+    - Montanha
+    - São Mateus
+    - Barra de São Francisco
+    - Colatina
+    - Nova Venécia
+    - Alegre
+    - Cachoeiro de Itapemirim
+    - Itapemirim
 3. verbete:
     - empréstimos e títulos descontados
     - financiamentos
     - financiamentos imobiliários
     - financiamentos rurais
-4. id_município: código do município
+4. nome: nome do município
 5. cnpj_agencia
 6. valor: saldo do verbete no município
 
-Os dados foram organizados de forma hierárquica, do mais agregado para o mais desagregado, por estado, mesorregião, município e agência bancária; e de forma agrupada, por verbete (@fig-estban).
-
-![Hierarquia dos dados](img/hier_agrup_est.png){#fig-estban height=30%}
+Os dados foram organizados de forma hierárquica, do mais agregado para o mais desagregado, por estado, mesorregião, microrregião, município e agência bancária; e de forma agrupada, por verbete.
 
 O detalhamento da construção do *dataset* se encontra no Anexo \ref{anexo_a}.
 
@@ -733,32 +762,117 @@ O detalhamento da construção do *dataset* se encontra no Anexo \ref{anexo_a}.
 
 ## Análise exploratória dos dados
 
-```{r skim}
-#| label: tab-estban
-#| tbl-cap: "Estrutura do dataset ESTBAN"
+Após limpeza, o *dataset* adquiriu a estrutura apresentada na @tbl-dataset. As microrregiões que compõem cada mesorregião são apresentadas na @tbl-microrregioes e os municípios que compõem cada microrregião são apresentados na @tbl-municipios.
 
-lapply(
-    estban_df[sapply(estban_df, function(x) !is.numeric(x))],
+```{r}
+#| label: tbl-dataset
+#| tbl-cap: "Estrutura do dataset"
+  
+estban |>
+    head() |>
+    kbl(booktabs = TRUE, row.names = FALSE) |>
+    kable_styling(latex_options = c("striped", "scale_down"))
+```
+
+```{r}
+#| label: tbl-microrregioes
+#| tbl-cap: "Microrregiões do ES incluídas nos dados"
+  
+aggregate(
+        nome_microrregiao ~ nome_mesorregiao,
+        data = estban,
+        FUN = unique
+    ) |>
+    kbl(booktabs = TRUE, row.names = FALSE) |>
+    kable_styling(latex_options = c("striped"))
+```
+
+```{r}
+#| label: tbl-municipios
+#| tbl-cap: "Municípios por microrregião do ES incluídos nos dados"
+  
+aggregate(
+        nome ~ nome_microrregiao,
+        data = estban,
+        FUN = unique
+    ) |>
+    kbl(booktabs = TRUE, row.names = FALSE) |>
+    kable_styling(latex_options = c("striped"), font_size = 10) |>
+    column_spec(2, width = "10cm")
+```
+
+O tamanho de uma estrutura hierárquica, em termos de observações, é determinada por seu nível mais desagregado. Assim, sendo `r length(unique(estban$ref))` meses e `r length(unique(estban$cnpj_agencia))` agências, a estrutura hierárquica conta com `r length(unique(estban$ref))`\times`r length(unique(estban$cnpj_agencia))` $=$ `r length(unique(estban$ref)) * length(unique(estban$cnpj_agencia))` observações. Sendo também uma estrutura agrupada por 4 verbetes, a quantidade de observações é multiplicada pela quantidade de níveis transversais, totalizando `r length(unique(estban$ref)) * length(unique(estban$cnpj_agencia)) * length(unique(estban$verbete))` observações.
+
+```{r skim}
+#| label: tbl-estban
+#| tbl-cap: "Contagem de únicos no dataset ESTBAN"
+
+temp = lapply(
+    estban[sapply(estban, function(x) !is.numeric(x))],
     unique
 ) |>
-lengths() |>
-kbl(booktabs = TRUE) |>
+lengths()
+
+temp |>
+kbl(booktabs = TRUE, col.names = "unique_n") |>
 kable_styling(latex_options = c("striped"))
 ```
 
-Analisando os verbetes no agregado do estado, 
+A série temporal do agregado de crédito no Banestes no Espírito Santo é apresentada na @fig-agregado. Podemos observar tendência de crescimento a partir de 2020, indicando que a série seja não estacionária e que talvez seja interessante adicionar um regressor externo para o período da pandemia, quando foram implementados programas de crédito emergenciais no país.
+
+```{r}
+#| label: fig-agregado
+#| fig-cap: "Série temporal do agregado de crédito do Banestes no ES"
+
+# adicionando estrutura hierárquica e agrupada
+estban_aggr = tsibble::tsibble(
+  estban,
+  index = ref,
+  key = c("nome", "cnpj_agencia", "verbete", "nome_mesorregiao", "nome_microrregiao")
+)
+
+estban_aggr = estban_aggr |>
+  fabletools::aggregate_key((nome_mesorregiao / nome_microrregiao / nome / cnpj_agencia) * verbete, valor = sum(valor))
+
+# plot agregado
+estban_aggr |>
+    dplyr::filter(
+        is_aggregated(nome),
+        is_aggregated(cnpj_agencia),
+        is_aggregated(nome_mesorregiao),
+        is_aggregated(nome_microrregiao),
+        is_aggregated(verbete)
+    ) |>
+    ggplot(aes(x = ref, y = valor)) +
+        geom_line() +
+        scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
+        labs(x = "", y = "Valor (em R$ bi)") +
+        tema
+```
+
+Analisando o agregado por verbetes, a @fig-verbete indica que o crescimento é liderado pelas alíneas empréstimos e títulos descontados e financiamentos imobiliários. Especificamente quanto ao segundo, a competitividade da taxa de juros é um fator que pode ter contribuído para o crescimento, o que também pode ser analisado com o auxílio de um regressor externo.
 
 ```{r}
 #| label: fig-verbete
 #| fig-cap: "Verbete no agregado do ES"
 
+# adicionando estrutura hierárquica e agrupada
+estban_meso = tsibble::tsibble(
+  estban,
+  index = ref,
+  key = c("nome", "cnpj_agencia", "verbete", "nome_mesorregiao")
+)
+
+estban_meso = estban_meso |>
+  fabletools::aggregate_key((nome_mesorregiao / nome / cnpj_agencia) * verbete, valor = sum(valor))
+
 # plot por mesorregião
-estban |>
+estban_meso |>
     dplyr::filter(
-        fabletools::is_aggregated(id_municipio),
-        fabletools::is_aggregated(cnpj_agencia),
-        fabletools::is_aggregated(nome_mesorregiao),
-        !fabletools::is_aggregated(verbete)
+        is_aggregated(nome),
+        is_aggregated(cnpj_agencia),
+        is_aggregated(nome_mesorregiao),
+        !is_aggregated(verbete)
     ) |>
     as.data.frame() |>
     ggplot(aes(x = ref, y = valor, color = factor(verbete))) +
@@ -773,12 +887,12 @@ estban |>
 #| fig-cap: "Verbete por mesorregião do ES"
 
 # plot por mesorregião
-estban |>
+estban_meso |>
     dplyr::filter(
-        fabletools::is_aggregated(id_municipio),
-        fabletools::is_aggregated(cnpj_agencia),
-        !fabletools::is_aggregated(nome_mesorregiao),
-        !fabletools::is_aggregated(verbete),
+        is_aggregated(nome),
+        is_aggregated(cnpj_agencia),
+        !is_aggregated(nome_mesorregiao),
+        !is_aggregated(verbete),
         ref >= "2010-01-01"
     ) |>
     as.data.frame() |>

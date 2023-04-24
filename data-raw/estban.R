@@ -52,12 +52,19 @@ estban = within(estban, {
   ref = as.Date(paste(ano, mes, "01", sep = "-"))
 })
 
+# identificando agências iniciais
+agencias_ini = subset(estban, ref == min(ref), select = cnpj_agencia) |>
+  (\(x) unique(x$cnpj_agencia))()
+
 # identificando agências em atividade
 agencias_fim = subset(estban, ref == max(ref), select = cnpj_agencia) |>
   (\(x) unique(x$cnpj_agencia))()
 
-# filtrando apenas agências em atividade
-estban = subset(estban, cnpj_agencia %in% agencias_fim)
+# filtrando apenas agências em atividade que já estavam no inicio do período
+estban = subset(
+  estban,
+  cnpj_agencia %in% agencias_fim & cnpj_agencia %in% agencias_ini
+)
 
 # criando modelo de dados
 estban$pk = seq_len(nrow(estban))
@@ -73,18 +80,7 @@ dm::dm(estban, municipios) |>
   xml2::write_xml("img/data_model.svg")
 
 # mesclando com tabela municípios
-estban_df = merge(estban, municipios, by = "id_municipio")
-
-# adicionando estrutura hierárquica e agrupada
-estban = tsibble::tsibble(
-  estban_df,
-  index = ref,
-  key = c("id_municipio", "cnpj_agencia", "verbete", "nome_mesorregiao")
-)
-
-estban = estban |>
-  fabletools::aggregate_key((nome_mesorregiao / id_municipio / cnpj_agencia) * verbete, valor = sum(valor))
+estban = merge(estban, municipios, by = "id_municipio")
 
 # salvando dataframe
-saveRDS(estban_df, "data/estban_df.RDS", compress = FALSE)
 saveRDS(estban, "data/estban.RDS", compress = FALSE)

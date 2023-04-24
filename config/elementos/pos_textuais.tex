@@ -25,6 +25,9 @@
 # pacotes
 library(magrittr, include.only = "%>%")
 
+# set Google BigQuery project
+basedosdados::set_billing_id("monografia-359922")
+
 # municípios x regiões imediatas
 municipios = basedosdados::read_sql("
 SELECT
@@ -39,7 +42,7 @@ FROM `basedosdados.br_bd_diretorios_brasil.municipio`
 WHERE sigla_uf = 'ES'
 ")
 
-# importando dados
+# estban
 estban = basedosdados::read_sql("
 SELECT
   CAST(ano AS STRING) AS ano
@@ -71,28 +74,23 @@ estban = within(estban, {
   ref = as.Date(paste(ano, mes, "01", sep = "-"))
 })
 
+# identificando agências iniciais
+agencias_ini = subset(estban, ref == min(ref), select = cnpj_agencia) |>
+  (\(x) unique(x$cnpj_agencia))()
+
 # identificando agências em atividade
 agencias_fim = subset(estban, ref == max(ref), select = cnpj_agencia) |>
   (\(x) unique(x$cnpj_agencia))()
 
-# filtrando apenas agências em atividade
-estban = subset(estban, cnpj_agencia %in% agencias_fim)
+# filtrando apenas agências em atividade que já estavam no inicio do período
+estban = subset(
+  estban,
+  cnpj_agencia %in% agencias_fim & cnpj_agencia %in% agencias_ini
+)
 
 # mesclando com tabela municípios
-estban_df = merge(estban, municipios, by = "id_municipio")
+estban = merge(estban, municipios, by = "id_municipio")
 
-# adicionando estrutura hierárquica e agrupada
-estban = tsibble::tsibble(
-  estban_df,
-  index = ref,
-  key = c("id_municipio", "cnpj_agencia", "verbete", "nome_mesorregiao")
-)
-
-estban = estban |>
-  fabletools::aggregate_key(
-    (nome_mesorregiao / id_municipio / cnpj_agencia) * verbete,
-    valor = sum(valor)
-)
 \end{lstlisting}
 
 \end{anexosenv}
