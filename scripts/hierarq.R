@@ -69,11 +69,11 @@ create_graph(attr_theme = "tb") |>
 nodes_a = tibble::tribble(
     ~id, ~tipo, ~label,
     1, "total", "Total",
-    2, "setor", "Lavoura",
-    3, "setor", "Rebanho",
+    2, "setor", "Agricultura",
+    3, "setor", "Ind. Extrativa",
     4, "setor", "Ind. Transf.",
-    5, "setor", "Ind. Extrativa",
-    6, "setor", "Bens de K",
+    5, "setor", "Eletricidade",
+    6, "setor", "Construção",
     7, "setor", "..."
 )
 
