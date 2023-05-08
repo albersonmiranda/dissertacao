@@ -13,9 +13,9 @@ format:
         classoption: [12pt, oneside, a4paper, chapter=TITLE, section=TITLE, brazil]
 number-sections: true
 crossref:
-  fig-prefix: Fig.
+  fig-prefix: Figura
   tbl-prefix: Tabela
-  eq-prefix: Eq.
+  eq-prefix: Equação
   lof-title: LISTA DE FIGURAS
   lot-title: LISTA DE TABELAS
 ---
@@ -88,13 +88,17 @@ estban = subset(estban,
 
 ## Motivação
 
-A projeção da carteira de crédito é um dos elementos fundamentais para o planejamento dos bancos comerciais. Juntamente com as projeções de depósitos, provisões para créditos de liquidação duvidosa, eficiência operacional, entre outros indicadores-chave, essas projeções determinam a temperatura das expectativas da instituição em relação a elementos cruciais como rentabilidade, dividendos e posição no mercado (*market-share*), e isso é essencial para os acionistas e investidores. Essas projeções precisam ser tão precisas quanto possível, para que se possa calcular o risco de transacionar com a instituição financeira, seja como investidor ou cliente.
+Embora há décadas houvesse espaço para uma gestão guiada por instinto [@wallander_budgeting_1999], atualmente é impensável um banco não realizar previsões e as comunicar ao mercado. Nesse documento, ou *guidance*, a projeção da carteira de crédito — o total de crédito emprestado — é frequentemente a primeira informação fornecida, uma vez que é um dos principais elementos para o planejamento dos bancos comerciais. Juntamente com as projeções de depósitos, provisões para créditos de liquidação duvidosa, eficiência operacional, entre outros indicadores-chave, essas projeções determinam a temperatura das expectativas da instituição em relação a elementos cruciais como rentabilidade, dividendos e posição no mercado (*market-share*), e isso é essencial para os acionistas e investidores. Essas projeções precisam ser tão precisas quanto possível, para que se possa calcular o risco de transacionar com a instituição financeira, seja como investidor ou cliente.
 
-Embora não exista penalidades específicas para instituições financeiras que erram (por uma boa margem) em suas projeções, elas podem sofrer consequências negativas em outros aspectos, como na avaliação de seus desempenhos por parte dos investidores e clientes. Os investidores e clientes podem considerar as projeções equivocadas como um sinal de falta de competência ou confiança na instituição financeira, o que pode afetar negativamente a reputação e a imagem da instituição. Isso pode levar a uma redução no número de investimentos e depósitos, o que irá afetar diretamente sua saúde financeira.
+Ainda que não exista penalidades específicas para instituições financeiras que erram (por uma boa margem) em suas projeções, elas podem sofrer consequências negativas em outros aspectos, como na avaliação de seus desempenhos por parte dos investidores e clientes. Os investidores e clientes podem considerar as projeções equivocadas como um sinal de falta de competência ou confiança na instituição financeira, o que pode afetar negativamente a reputação e a imagem da instituição. Isso pode levar a uma redução no número de investimentos e depósitos, o que irá afetar diretamente sua saúde financeira.
 
-Além disso, nos casos em que algum grupo se sentir lesado, as instituições financeiras podem enfrentar ações judiciais se suas projeções forem consideradas enganosas ou fraudulentas. Por exemplo, se uma instituição financeira fizer projeções excessivamente otimistas para incentivar os investidores a comprar seus títulos e, posteriormente, as projeções se mostrarem incorretas, os investidores podem entrar com uma ação judicial contra a instituição alegando fraude.
+Além disso, nos casos em que algum grupo se sentir lesado, as instituições financeiras podem enfrentar ações judiciais se suas projeções forem consideradas enganosas ou fraudulentas. Por exemplo, se uma instituição financeira fizer projeções excessivamente otimistas para incentivar os investidores a comprar seus títulos e, posteriormente, as projeções se mostrarem incorretas, os investidores podem entrar com uma ação judicial contra a instituição alegando fraude^[Lei nº 7.492/1986, Art. 3º: Divulgar informação falsa ou prejudicialmente incompleta sobre instituição financeira. Pena: Reclusão, de 2 (dois) a 6 (seis) anos, e multa. Art. 4º: Gerir fraudulentamente instituição financeira. Pena: Reclusão, de 3 (três) a 12 (doze) anos, e multa.] ou, ao menos, gestão temerária^[Lei nº 7.492/1986, Art. 4º, parágrafo único: Se a gestão é temerária: Pena: Reclusão, de 2 (dois) a 8 (oito) anos, e multa.] — ambos caracterizados como crime contra o Sistema Financeiro Nacional.
 
-Por isso, é importante que as instituições financeiras sejam transparentes e precisas em suas projeções, fornecendo informações confiáveis e atualizadas para seus clientes e investidores. Entretanto, pouco foi produzido nesse sentido e a aplicação das técnicas envolvendo séries hieárquicas e agrupadas podem contribuir para a qualidade das projeções.
+Não são raros os casos em que bancos manipulam seus demonstrativos para se apresentarem mais saudáveis do que realmente o são para atrair clientes e investidores. [Escrever sobre Banco Santos e Banco Panamericano, DINHEIRO PODRE]
+
+Por isso, é importante que as instituições financeiras sejam transparentes e precisas em suas projeções, fornecendo informações confiáveis e atualizadas para seus clientes e investidores. Mas há também motivações estratégicas para essa atividade. A utilização de *guidance* aumenta em 15% a probabilidade de alcançar ou superar as expectativas de mercado, o que, por sua vez, está associado a um incremento de até 5% no retorno por ação em relação aos bancos que não alcançaram ou superaram as expectativas [@beccalli_earnings_2015].
+
+No que concerne a elaboração dessas previsões, a prática usual em *budgeting*, principalmente para empresas com elevado número de filiais, é a *top-down*, ou seja, realizar uma única previsão para o total agregado e então distribuir para os níveis abaixo seguindo algum método de desagregação proporcional. No caso dos bancos de varejo, com muitas agências espalhadas pelo território, especialmente em um país grande como o Brasil, esse método é muito prático porém incapaz de gerar previsões não viesadas para os níveis mais desagregados [@hyndman_optimal_2011].
 
 Atualmente, os métodos analíticos, especificamente o MinT, são os mais populares na literatura da reconciliação ótima. Entretanto, tais métodos são sujeitos a uma série de restrições, como as do MCLR, e têm sua capacidade preditiva reduzida quando suas hipóteses são violadas.
 
@@ -445,13 +449,13 @@ $$ {#eq-matriz_ha}
 Talvez as formas mais intuitivas de se pensar em previsões para esses tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a estrutura descrita na @fig-h, por exemplo. Podemos realizar a previsão para o horizonte de tempo $h$ do agregado do PIB brasileiro, representado no topo da hierarquia por *Total* (@eq-topdown_1), e então distribuir os valores previstos proporcionalmente entre os estados e municípios.
 
 $$
-\hat{y}_{T+h | T} = E[y_{T+h} | \Omega_T]
+\mathbfit{\hat{y}}_{T+h | T} = E[\mathbfit{y}_{T+h} | \Omega_T]
 $$ {#eq-topdown_1}
 
 Essa é a abordagem top-down. Nela, a previsão para os níveis mais desagregados da hierarquia são determinadas por uma proporção $p_i$ do nível agregado. Por exemplo, as previsões para Vitória são dadas pela equação @eq-topdown_2.
 
 $$
-\tilde{y}_{AA, T+h | T} = p_{1}\hat{y}_{T+h | T}
+\mathbfit{\tilde{y}}_{AA, T+h | T} = p_{1}\mathbfit{\hat{y}}_{T+h | T}
 $$ {#eq-topdown_2}
 
 Para isso, temos de definir uma matriz com todos esses pesos, que, seguindo a formulação de @hyndman_forecasting_2021, vamos chamar de $\mathbfit{G}$:
