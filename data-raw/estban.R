@@ -52,18 +52,14 @@ estban = within(estban, {
   ref = as.Date(paste(ano, mes, "01", sep = "-"))
 })
 
-# identificando agências iniciais
-agencias_ini = subset(estban, ref == min(ref), select = cnpj_agencia) |>
-  (\(x) unique(x$cnpj_agencia))()
-
 # identificando agências em atividade
 agencias_fim = subset(estban, ref == max(ref), select = cnpj_agencia) |>
   (\(x) unique(x$cnpj_agencia))()
 
-# filtrando apenas agências em atividade que já estavam no inicio do período
+# filtrando apenas agências em atividade
 estban = subset(
   estban,
-  cnpj_agencia %in% agencias_fim & cnpj_agencia %in% agencias_ini
+  cnpj_agencia %in% agencias_fim
 )
 
 # criando modelo de dados
