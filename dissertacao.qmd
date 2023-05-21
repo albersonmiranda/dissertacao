@@ -127,18 +127,10 @@ Como objetivos específicos, tenho:
 
 ## Previsão de saldos de crédito de instituições financeiras
 
-A literatura relacionada à economia bancária é abundante no tema risco de crédito. Podemos verificar através de pesquisa bibliométrica no *Google Scholar* que, salvo exceções, os trabalhos mais citados estão relacionados com a previsão de perdas e suas consequências (@tbl-bancos). A nível macroeconômico, a previsão de agregados de crédito é uma preocupação de bancos centrais e se manifestam em trabalhos como @bader_modelo_2014 e @colak_tcmb_2019. No entanto, a pesquisa não revelou nenhum trabalho que se dedique à previsão de saldos de crédito por modalidade e agência.
+A literatura relacionada à economia bancária é abundante no tema risco de crédito e, a nível macroeconômico, a previsão de agregados de crédito é uma preocupação de bancos centrais. @bader_modelo_2014 aprimoram o método FAVAR com uma etapa de análise de correlação canônica para identificar as melhores, em termos de correlação com as variáveis de crédito do SFN, combinações lineares de componentes principais. Esse método, que chamaram de FAVAR canônico, alcançou resultado superior aos FAVAR em 1 e 2 estágios na previsão das variáveis de crédito utilizadas, que foram : concessão e saldo da carteira de crédito ; . O trabalho abordou apenas o nível mais agregado, no total do SFN.
 
-```{r citacoes bancos}
-#| tbl-cap: Trabalhos mais citados com os termos "banking forecasting"
-#| label: tbl-bancos
+@colak_tcmb_2019. No entanto, a pesquisa não revelou nenhum trabalho que se dedique à previsão de saldos de crédito por modalidade e agência.
 
-readxl::read_excel("docs/academico.xlsx", sheet = "bancos") |>
-    subset(select = c(-Publisher)) |>
-    kbl(booktabs = TRUE, escape = TRUE) |>
-    kable_styling(latex_options = "striped", font_size = 10) |>
-    column_spec(2, width = "5cm")
-```
 
 Apesar da escassez de estudos sobre a previsão de saldos de crédito por modalidade e agência, outras tópicos da economia bancária foram objeto de estudo para previsão de séries temporais, inclusive hierárquicas. @sezer_financial_2019 produziram revisão de literatura de trabalhos publicados entre 2005 e 2019 que realizaram previsão de séries temporais financeiras utilizando *deep learning* e os agruparam em preços de ações individuais, índices (e.g., IBovespa, Dow Jones), preços de commodities, tendência e volatilidade de ativos, preços de títulos, câmbio e preços de criptomoedas.
 
