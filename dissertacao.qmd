@@ -129,34 +129,19 @@ Como objetivos específicos, tenho:
 
 A nível macroeconômico, a previsão do agregado de crédito das instituições financeiras é uma preocupação de bancos centrais ao redor do mundo. No Brasil, @bader_modelo_2014 aprimoram o método FAVAR com uma etapa de análise de correlação canônica para identificar as melhores, em termos de correlação com as variáveis de crédito do SFN, combinações lineares de componentes principais. Esse método, que chamaram de FAVAR canônico, alcançou resultado superior aos FAVAR em 1 e 2 estágios na previsão das variáveis de crédito utilizadas, que foram: a concessão de crédito total com recursos livres, o saldo da carteira de crédito total com recursos livres, o saldo da carteira de crédito total com recursos direcionados, a taxa de inadimplência da carteira de crédito total com recursos livres e a taxa média de juros das operações de crédito total com recursos Livre. O trabalho abordou apenas o nível mais agregado, no total do SFN.
 
-@colak_tcmb_2019 produzem uma série de indicadores para monitoramento dos períodos de expansão e desaceleração moderada a excessiva de crédito no setor bancário turco. Os autores utilizam a partir da aplicação de filtros para prever o saldo de crédito total do sistema bancário turco. O modelo foi estimado com 3 fatores e 3 lags, e os resultados foram comparados com os de um modelo ARDL. O modelo de fatores dinâmicos apresentou melhor performance em termos de erro de previsão médio quadrático (*Mean Squared Prediction Error* — MSPE) e erro de previsão médio absoluto (*Mean Absolute Prediction Error* — MAPE). 
+@colak_tcmb_2019 produzem uma série de indicadores para monitoramento dos períodos de expansão e desaceleração moderada ou excessiva de crédito no setor bancário turco. Os autores utilizam séries filtradas do agregados de crédito, crédito comercial, crédito direto ao consumidor, crédito imobiliário e fincanciamento de veículos, além de diversos setores da economia, como agricultura, manufatura, construção, comércio, dentre outros, para prever os ciclos de crédito no sistema bancário turco. Os autores concluem que os indicadores com maior poder de explicação para as variáveis macroeconômicas são a taxa de crescimento real do crédito e a taxa de resposta ao impulso do crédito.
 
-No entanto, a pesquisa não revelou nenhum trabalho que se dedique à previsão de saldos de crédito por modalidade e agência.
+No entanto, para niveis abaixo do agregado de crédito, poucos trabalhos foram encontrados. Tangenciando o tema da previsão de saldos de crédito, outros tópicos da economia bancária foram objeto de estudo para previsão de séries temporais. @sezer_financial_2019 produziram revisão de literatura de trabalhos publicados entre 2005 e 2019 que realizaram previsão de séries temporais financeiras utilizando *deep learning* e os agruparam em preços de ações individuais, índices (e.g., IBovespa, Dow Jones), preços de commodities, tendência e volatilidade de ativos, preços de títulos, câmbio e preços de criptomoedas. Apesar da extensa revisão, não foram encontrados trabalhos que combinassem estruturas hierárquicas com *machine learning*.
 
+@gorodetskaya_machine_2021 fornecem uma metodologia "universal" para aplicação automática de *machine learning* para previsão de séries temporais no setor bancário, que poderia ser aplicada em qualquer tipo de problema. A metodologia consiste em obter preditores a partir da própria variável defasada, das estatísticas básicas da variável (máximo, mínimo, média, variância etc.), e de anomalias periódicas detectadas, e selecioná-las pela medida de importância. Realizaram uma revisão de literatura recente sobre o assunto e apresentaram sua abordagem para o problema da previsão da demanda por moeda em caixas eletrônicos.
 
-Apesar da escassez de estudos sobre a previsão de saldos de crédito por modalidade e agência, outras tópicos da economia bancária foram objeto de estudo para previsão de séries temporais, inclusive hierárquicas. @sezer_financial_2019 produziram revisão de literatura de trabalhos publicados entre 2005 e 2019 que realizaram previsão de séries temporais financeiras utilizando *deep learning* e os agruparam em preços de ações individuais, índices (e.g., IBovespa, Dow Jones), preços de commodities, tendência e volatilidade de ativos, preços de títulos, câmbio e preços de criptomoedas.
-
-Outro tema abordado na literatura é a previsão da demanda por moeda em caixas eletrônicos. @gorodetskaya_machine_2021 realizaram uma revisão de literatura recente sobre o assunto e apresentaram sua abordagem para o problema.
-
-No que diz respeito à previsão de séries temporais em largas hierarquias,
-@prayoga_top-down_2017 trabalharam na previsão do fluxo de caixa do Banco da Indonésia, utilizando uma hierarquia de 3 níveis — 40 agências no nível mais desagregado, as 6 grandes ilhas do país como nível intermediário e o total no nível mais agregado. Os autores realizaram um *benchmark* de 5 modelos para previsão da série no nível mais agregado e utilizando o método *top-down* para obter as previsões no nível mais desagregado, concluindo pela efetividade do método *top-down* por proporções históricas. Entretanto, os autores não incluíram reconciliação ótima, a estimativa *bottom-up* ou mesmo outros métodos *top-down para efeito de comparação, o que limita o alcance do trabalho.
+No que diz respeito à previsão de séries temporais em largas hierarquias, @prayoga_top-down_2017 trabalharam na previsão do fluxo de caixa do Banco da Indonésia, utilizando uma hierarquia de 3 níveis — 40 agências no nível mais desagregado, as 6 grandes ilhas do país como nível intermediário e o total no nível mais agregado. Os autores realizaram um *benchmark* de 5 modelos para previsão da série no nível mais agregado e utilizando o método *top-down* para obter as previsões no nível mais desagregado, concluindo pela efetividade do método *top-down* por proporções históricas. Entretanto, os autores não incluíram reconciliação ótima, a estimativa *bottom-up* ou mesmo outros métodos *top-down para efeito de comparação, o que limita o alcance do trabalho.
 
 ## Previsão de séries temporais hierárquicas e agrupadas
 
 A segunda etapa da revisão de literatura consistiu na pesquisa bibliográfica relacionada à reconciliação ótima de previsões de séries temporais hierárquicas e agrupadas e sua interseção com o tema *machine learning*.
 
-A pesquisa bibliométrica na base de dados do Google Acadêmico, pesquisando pelas palavras-chave "*hierarchical forecast reconciliation*" para qualquer lugar no corpo do texto, encontrando 27.600 resultados. Ordenando os resultados pelo número de citações^[Para a funcionalidade, ver https://github.com/WittmannF/sort-google-scholar.], verifiquei que o trabalho mais citado é @hyndman_forecasting_2021.
-
-```{r citacoes}
-#| tbl-cap: Trabalhos mais citados com os termos "hierarquical forecast reconciliation"
-
-readxl::read_excel("docs/academico.xlsx") |>
-    subset(select = c(-Publisher, -Venue, -Título)) |>
-    kbl(booktabs = TRUE, escape = TRUE) |>
-    kable_styling(latex_options = "striped", font_size = 10)
-```
-
-Utilizando essa obra como texto base, obtive os textos referenciados no capítulo 11 "*Forecasting Hierarquical and Grouped Time-Series*", subcapítulo 3 "*Forecast Reconciliation*", além de @hyndman_fast_2016, onde o método por MQP foi desenvolvido porém não está citado nas referências do capítulo.
+Uma fonte introdutória para o tema de séries temporais hierárquicas e agrupadas é o livro \citefield{hyndman_forecasting_2021}{title} [@hyndman_forecasting_2021] que reúne, de forma didática e com exemplos em R, boa parte dos desenvolvimentos na última década. Utilizando essa obra como texto base, obtive os textos referenciados no capítulo 11 "*Forecasting Hierarquical and Grouped Time-Series*", subcapítulo 3 "*Forecast Reconciliation*", e adicionei @hyndman_fast_2016, artigo em que o método de reconciliação ótima por MQP foi desenvolvido porém não está citado nas referências do capítulo do livro. Além desses artigos, foram também incluídos aqueles que tratam do tema da previsão de séries temporais hierárquicas através de *machine learning*.
 
 ```{r citacoes fpp3}
 #| tbl-cap: Artigos de referência em Hyndman e Athanasopoulos (2021)
@@ -188,46 +173,6 @@ Rob J. Hyndman and Alan J. Lee and Earo Wang & 2016\\
 \end{quadro}
 ```
 
-Adicionando o termo "*machine learning*" e refinando a pesquisa para encontrar as palavras chave no título dos trabalhos, 10 resultados foram encontrados.
-
-```{r citacoes machine learning}
-#| tbl-cap: Trabalhos encontrados na busca estendida
-#| include: false
-
-readxl::read_excel("docs/academico.xlsx", sheet = "ml") |>
-    subset(select = c(Autor, Ano, Citacoes)) |>
-    kbl(booktabs = TRUE, escape = TRUE) |>
-    kable_styling(latex_options = "striped", font_size = 10)
-```
-
-```{=latex}
-
-\begin{quadro}
-\caption{Trabalhos encontrados na busca estendida}\tabularnewline
-
-\centering\begingroup\fontsize{10}{12}\selectfont
-
-\begin{tabular}[t]{lrr}
-\toprule
-Autor & Ano & Citacoes\\
-\midrule
-\cellcolor{gray!6}{Li, S.M.M. Rahman, R. Vega, B. Dong} & \cellcolor{gray!6}{2016} & \cellcolor{gray!6}{114}\\
-Mancuso, V. Piccialli, A.M. Sudoso & 2021 & 17\\
-\cellcolor{gray!6}{Abolghasemi, R.J. Hyndman, G. Tarr} & \cellcolor{gray!6}{2019} & \cellcolor{gray!6}{13}\\
-Afolabi, Su Guan, K.L. Man, P.W.H. Wong, X. Zhao & 2017 & 20\\
-\cellcolor{gray!6}{Saatloo, A. Moradzadeh, H. Moayyed} & \cellcolor{gray!6}{2021} & \cellcolor{gray!6}{6}\\
-\addlinespace
-Abolghasemi, G. Tarr, C. Bergmeir & 2022 & 0\\
-\cellcolor{gray!6}{C. Neto, B.L. Fernando} & \cellcolor{gray!6}{2022} & \cellcolor{gray!6}{0}\\
-Moon & 2012 & 0\\
-\cellcolor{gray!6}{Yan, C. Sheng} & \cellcolor{gray!6}{2018} & \cellcolor{gray!6}{1}\\
-Varone, C. Ieracitano, A. Özyüksel, T. Hussain & 2022 & 0\\
-\bottomrule
-\end{tabular}
-\endgroup{}
-\end{quadro}
-```
-
 ### Abordagens de nível único
 
 Uma abordagem de nível único é uma abordagem em que as previsões são realizadas para um único nível da hierarquia. A partir dessas previsões, os demais níveis são obtidos, ou desagregando (no caso dos níveis inferiores), ou agregando (no caso dos níveis superiores) essas informações [@hyndman_forecasting_2021]. Os métodos *top-down*, *bottom-up* e *middle-out*, demonstrados na introdução, são abordagens de nível único.
@@ -246,7 +191,10 @@ $$
 p_j = \frac{\sum^{T}_{t=1} \frac{y_{j,t}}{T}}{\sum^{T}_{t=1} \frac{y_{t}}{T}}
 $$ {#eq-td_2}
 
-[escrever método de proporções de previsões]
+@athanasopoulos_hierarchical_2009 desenvolvem o método proporções de previsão, que consiste em um método *top-down* em que os pesos são calculados a partir das proporções das previsões base ao invés do passado. A vantagem do método é que os pesos estarão os mais próximos das características mais recentes da série, ao invés de serem baseados em dados históricos. A desvantagem é que se deve realizar previsões para toda a hierarquia, perdendo o ganho de agilidade dos demais métodos *top-down*.
+$$
+p_j = \prod^{K-1}_{i=0}\frac{\hat{Y}^{(i)}_{j,n}(h)}{\sum(\hat{Y}^{(i+1)}_{j,n}(h))}
+$$
 
 @li_hierarchical_2016 compararam dois algoritmos de *machine learning* para previsão da produção de energia solar no estado da Flórida/EUA: ANN e SVR. Argumentando que tradicionalmente as previsões nesse problema são realizadas com os dados de produção total da planta, eles propõem uma abordagem hierárquica *bottom-up*, com previsões base de cada inversor solar. Os autores concluem que a abordagem hierárquica *bottom-up* é mais precisa do que a previsão do agregado, ao menos na previsão um passo a frente. Embora os autores utilizem algoritmos de *machine learning* para as previsões base, eles não utilizam esses algoritmos para a reconciliação ótima, caracterizando a abordagem do trabalho ainda como nível único.
 
@@ -262,7 +210,7 @@ A estimação por esse método resulta numa reconciliação ótima que depende a
 
 @wickramasuriya_optimal_2019 argumentam que o que de fato interessa é que as previsões reconciliadas tenham o menor erro. Então, corrigem a abordagem de reconciliação ótima para o objetivo de minimização dos erros das previsões reconciliadas $\mathbfit{\tilde{y}_{t+h}}$, ao invés dos erros das previsões base $\mathbfit{\hat{y}_{t+h}}$. Dado que isso implica na minimização da variância de $\mathbfit{\tilde{e}_{t+h}}$, ou seja, na minimização do somatório da diagonal, o traço, da matriz de variância-covariância de $\mathbfit{\tilde{e}_{t+h}}$, eles chamaram esse método de Traço Mínimo (MinT, na sigla em inglês). Paralelamente, usam desigualdade triangular para demonstrar que as previsões reconciliadas obtidas por esse método são ao menos tão boas quanto as previsões base.
 
-@panagiotelis_forecast_2021 reinterpreta a literatura de coerência e reconciliação de previsões pontuais a partir de uma abordagem geométrica, trazendo provas alternativas para conclusões anteriores ao mesmo tempo em que fornece novos teoremas. Além disso, @panagiotelis_forecast_2021 estende essa interpretação geométrica para o contexto probabilístico, fornecendo métodos paramétricos e não paramétricos (via *bootstrapping*) para reconciliação de previsões probabilísticas, ou seja, para reconciliar previsões $\hat{y}_t$ obtidas a partir de toda a distribuição, e não apenas a média.
+@panagiotelis_forecast_2021 reinterpreta a literatura de coerência e reconciliação de previsões pontuais a partir de uma abordagem geométrica, trazendo provas alternativas para conclusões anteriores ao mesmo tempo em que fornece novos teoremas. Além disso, os autores estendem essa interpretação geométrica para o contexto probabilístico, fornecendo métodos paramétricos e não paramétricos (via *bootstrapping*) para reconciliação de previsões probabilísticas, ou seja, para reconciliar previsões $\hat{y}_t$ obtidas a partir de toda a distribuição, e não apenas a média.
 
 ### Métodos de *machine learning* para reconciliação ótima
 
@@ -276,51 +224,6 @@ A estimação por esse método resulta numa reconciliação ótima que depende a
 1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
 
 Para o conjunto de dados utilizados, @spiliotis_hierarchical_2021 afirmam que os métodos de *machine learning*, especialmente o XGBoost, alcançaram, em média, melhor performance que as abordagens de nível único e o MinT. Além disso, concluíram que quanto maior é a diferença entre as séries, em todos os níveis hierárquicos, maior são os benefícios da abordagem por *machine learning*.
-
-#### O processo de ajuste e sobreajuste
-
-Considere uma função de ajuste $f$, um conjunto de pontos $D = {d_1, ..., d_n}$ com $d_i = (x_i y_i)´$, variáveis de decisão ou parâmetros $x_i \in \mathbb{R}^m$ e imagem $y_i = f(x_i) \in \mathbb{R}$. Diferentemente da abordagem clássica, em que, no caso do modelo clássico de regressão linear, há um modelo teórico de coeficientes estimados por mínimos quadrados ordinários (MQO) que é garantido pelo teorema de Gauss-Markov ser o melhor estimador linear não viesado (BLUE), em *machine learning* o objetivo é encontrar, de forma iterativa, um meta-modelo que melhor aproxima a função $f$ usando a informação contida em $D$, ou seja, queremos ajustar uma função de regressão $\hat{f}_D$ aos nossos dados $D$ de forma que $\hat{y} = \hat{f}_D(x, \varepsilon)$ tenha o menor erro de aproximação $\varepsilon$.
-
-Para verificar o quão bem o modelo $\hat{f}_D$ se aproxima da função real $f$, é necessário uma função de perda $L(y, \hat{f}(x))$ que, no caso de regressão, será a perda quadrática $(y - \hat{f}(y))^2$ ou a perda absoluta $|y - \hat{f}(y)|$. Esses valores são agregados pela média para formar as funções de custo erro médio quadrático (MSE) e erro médio absoluto (MAE).
-
-Dada a função de perda, pode-se definir o risco associado ao modelo de função de ajuste
-$$R(f, p) = \int_{\mathbb{R}}{}\int_{\mathbb{R}^m}{} L(y, f(x))p(x, y)dxdy$$
-em que $p(x, y)$ é a função densidade de probabilidade conjunta. Como não temos a função real mas procuramos uma função estimada que se aproxime dela, temos
-$$GE(\hat{f}_D, p) = \int_{\mathbb{R}}{}\int_{\mathbb{R}^m}{} L(y, \hat{f}_D(x))p(x, y)dxdy \tag{1}$$
-que é o erro de generalização ou risco condicional associado ao preditor.
-
-Então, podemos estimar o erro de generalização do modelo. Como não conhecemos a distribuição $P$, a substituímos pela amostra de teste $D^*$ e ficamos com
-$$\widehat{GE}(\hat{f}_D, D^*) = \sum_{(xy)´ \in D^*} \frac{L(y, \hat{f}_D(x))}{|D^*|}$$
-Se substituirmos a amostra teste pela amostra treino $D$ usada para ajustar o modelo, teremos o chamado erro de resubstituição
-$$\widehat{GE}_\text{resub} = \widehat{GE}(\hat{f}_D, D)$$
-Naturalmente, nesse caso estaríamos usando os dados de treino tanto para treinar o preditor quanto para estimar o erro de generalização, o que nos levaria a uma estimativa enviesada do erro de generalização. Caso usássemos essa estimativa para seleção de modelos, esse viés favoreceria modelos mais adaptados à amostra.
-
-O problema é que nesses modelos, dadas suficientes iterações, o erro de resubstituição tende a zero. Isso acontece porque conforme o preditor se adapta cada vez mais aos dados de treinamento ele irá memorizar a relação entre o conjunto de pontos $D$ e a imagem $f(x_i)$, ou seja, irá se ajustar perfeitamente ao formato da função a ser modelada. E não necessariamente um modelo perfeitamente ajustado se traduz na capacidade de predição de dados futuros (fora da amostra).
-
-De forma geral, espera-se que o preditor reduza seu viés durante o treino apenas o suficiente para que seja capaz de generalizar sua predição para fora da amostra em um nível ótimo de acurácia. A partir desse ponto, a redução no viés é penalizada com o aumento da variância, ou seja, com a redução de sua capacidade de prever dados futuros [@bischl_resampling_2012]. A esse processo se dá o nome de *overfitting* ou **sobreajuste**. Isso quer dizer que não podemos considerar a performance do preditor em $D$ se desejamos estimar honestamente a performance real do modelo.
-
-#### Reamostragem
-
-Uma forma de se corrigir esse problema é dividindo a amostra em um conjunto para treino $D_\text{treino}$ e outro conjunto para teste $D_\text{teste}$ de forma que $D_\text{treino} \cup D_\text{teste} = D$ e $D_\text{treino} \cap D_\text{teste} = \empty$. Assim, pode-se treinar o modelo em $D_\text{treino}$ para se obter $\hat{f}_{D_{\text{treino}}}$ e calcular seu erro de generalização usando os dados de $D_\text{teste}$. Essa abordagem é chamada de *hold-out* e ela é de simples implementação e utilização, uma vez que as observações do conjunto teste são completamente independentes das observações com as quais o modelo foi treinado. A estimativa do erro de generalização então se torna
-$$\widehat{GE}_\text{hold-out} = \widehat{GE}(\hat{f}_{D_{\text{treino}}}, D_{\text{teste}})$$
-Dois problemas permanecem:
-
-1. É necessária uma amostra grande, uma vez que deve-se ter dados suficientes tanto na amostra treino para ajustar um modelo adequado, quanto na amostra teste para realizar uma avaliação de performance estatisticamente válida.
-
-2. Esse método não é suficiente para detectar variância e instabilidades na amostra treino. Modelos mais complexos, especialmente não lineares, podem produzir resultados muito diferentes com mudanças pequenas nos dados de treino.
-
-É exatamente para lidar com essas situações que foram desenvolvidas as técnicas de reamostragem. Todas essas tecnicas geram repetidamente $i$ subconjuntos de treino $D_{\text{treino}}^{(i)}$ e teste $D_{\text{teste}}^{(i)}$ com o dataset disponível, ajustam um modelo com cada conjunto de treino e atestam sua qualidade no conjunto de teste correspondente. A estimativa do erro de generalização então se torna
-$$\widehat{GE}_\text{samp} = \frac{1}{k}\sum_{i=1}^{k}\widehat{GE}(\hat{f}_{D_{\text{treino}}^{(i)}}, D_{\text{teste}}^{(i)}) \tag{2}$$
-O erro de generalização dado na equação (1) depende tanto do tamanho da amostra usada para treinar quanto para testar o modelo ajustado. Portanto, devemos garantir que o tamanho da amostra usado para verificar o erro de generalização de um modelo estimado a partir de $n$ *data points* seja próximo de *n*. Se, por exemplo, o conjunto de treino for muito menor que a amostra total o erro será superestimado, uma vez que muito menos informação foi usada para calcular o estimador.
-
-Da mesma forma, a qualidade do estimador do erro de generalização obtido em (2) a partir de uma estratégia de reamostragem também depende muito do tamanho dos conjuntos $D^{(i)}$ em relação à amostra original, da quantidade $k$ de subconjuntos utilizados e da estrutura de dependência entre os subconjuntos $D^{(i)}$ — novamente, modelos mais complexos são mais sensíveis a alterações no dataset e a variância entre os subconjuntos tende a ser maior. O erro do estimador é geralmente medido pelo erro médio quadrático (MSE):
-$$\text{MSE}(\widehat{GE}_\text{samp}) = \mathbb{E}[(\widehat{GE}_\text{samp} - GE(\hat{f}_D, P))^2]$$
-Esse estimador também pode ser representado como a soma do quadrado do viés e a variância:
-$$\text{MSE}(\widehat{GE}_\text{samp}) = \text{Bias}(\widehat{GE}_\text{samp})^2 + \text{Variância}(\widehat{GE}_\text{samp})$$
-Sendo que o viés expressa a diferença média entre um estimador e o valor real, enquanto a variância mede a dispersão média do estimador. Essas quantidades são definidas da seguinte forma:
-$$\text{Bias}(\widehat{GE}_\text{samp}) = \mathbb{E}[\widehat{GE}_\text{samp}] - \mathbb{E}[GE(\hat{f}_D, p)]$$
-e
-$$\text{Variância}(\widehat{GE}_\text{samp}) = \mathbb{E}[(\widehat{GE}_\text{samp} - \mathbb{E}[\widehat{GE}_\text{samp}])^2]$$
 
 # MÉTODOS PARA RECONCILIAÇÃO DE SÉRIES TEMPORAIS
 
@@ -456,7 +359,7 @@ $$
 \mathbfit{\hat{y}}_{T+h | T} = E[\mathbfit{y}_{T+h} | \Omega_T]
 $$ {#eq-topdown_1}
 
-Essa é a abordagem top-down. Nela, a previsão para os níveis mais desagregados da hierarquia são determinadas por uma proporção $p_i$ do nível agregado. Por exemplo, as previsões para Vitória são dadas pela equação @eq-topdown_2.
+Essa é a abordagem top-down. Nela, a previsão para os níveis mais desagregados da hierarquia são determinadas por uma proporção $p_i$ do nível agregado. Por exemplo, as previsões para Vitória são dadas pela @eq-topdown_2.
 
 $$
 \mathbfit{\tilde{y}}_{AA, T+h | T} = p_{1}\mathbfit{\hat{y}}_{T+h | T}
@@ -719,6 +622,50 @@ Os métodos de gerar previsões coerentes a partir de previsões base são chama
 
 Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham o menor erro o possível. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
 
+## Métodos analíticos de reconciliação ótima
+
+[Descrever o MinT]
+
+## Métodos de reconciliação ótima baseados em aprendizado de máquina
+
+[Descrever o algorítmo, os learners — GLMnet para Lasso e Ridge (incluindo as normas L1 e L2), XGBoost, SVM e rede neural —, o espaço de hyperparâmetros para cada e o processo de reamostragem]
+
+### O processo de ajuste e sobreajuste
+
+Considere uma função de ajuste $f$, um conjunto de pontos $D = {d_1, ..., d_n}$ com $d_i = (\mathbf{x}_i \; \mathbf{y}_i)'$, variáveis de decisão ou parâmetros $\mathbf{x}_i \in \mathbb{R}^m$ e imagem $\mathbf{y}_i = f(\mathbf{x}_i) \in \mathbb{R}$. Diferentemente da abordagem do modelo clássico de regressão linear em que, cumpridas certas hipóteses, há um modelo teórico de coeficientes estimados por mínimos quadrados ordinários (MQO) que é garantido pelo teorema de Gauss-Markov ser o melhor estimador linear não viesado (BLUE), em *machine learning* o objetivo é encontrar, de forma iterativa, um modelo que melhor aproxima a função $f$ usando a informação contida em $D$, ou seja, queremos ajustar uma função de regressão $\hat{f}_D$ aos nossos dados $D$ de forma que $\hat{\mathbf{y}} = \hat{f}_D(\mathbf{x}, \varepsilon)$ tenha o menor erro de aproximação $\varepsilon$ [@bischl_resampling_2012].
+
+Para verificar o quão bem o modelo $\hat{f}_D$ se aproxima da função real $f$, é necessário uma função de perda $L(\mathbf{y}, \hat{f}(\mathbf{x}))$ que, no caso de regressão, será a perda quadrática $(\mathbf{y} - \hat{f}(\mathbf{x}))^2$ ou a perda absoluta $|\mathbf{\mathbf{x}} - \hat{f}(\mathbf{x})|$. Esses valores são agregados pela média para formar as funções de custo erro médio quadrático (MSE) e erro médio absoluto (MAE).
+
+Calculando o custo sobre a amostra $D$ usada para ajustar o modelo, teremos o chamado erro de resubstituição (@eq-ge-resub). Nesse caso, estaríamos usando o mesmo conjunto de dados tanto para treinar o preditor quanto para estimar o erro, o que nos levaria a uma estimativa enviesada do erro de generalização. Caso usássemos essa estimativa para seleção de modelos, esse viés favoreceria modelos mais adaptados à amostra. Dadas suficientes iterações, o erro de resubstituição tende a zero. Isso acontece porque conforme o preditor se adapta cada vez mais aos dados de treinamento ele irá memorizar a relação entre o conjunto de pontos $D$ e a imagem $f(\mathbf{x}_i)$, ou seja, irá se ajustar perfeitamente ao formato da função a ser modelada. E não necessariamente um modelo perfeitamente ajustado se traduz na capacidade de predição de dados futuros (fora da amostra). De forma geral, espera-se que o preditor reduza seu viés durante o treino apenas o suficiente para que seja capaz de generalizar sua predição para fora da amostra em um nível ótimo de acurácia. A partir desse ponto, a redução no viés é penalizada com o aumento da variância, ou seja, com a redução de sua capacidade de prever dados futuros. A esse processo se dá o nome de *overfitting* ou sobreajuste. Isso quer dizer que não podemos considerar a performance do preditor em $D$ se desejamos estimar honestamente a performance real do modelo [@bischl_resampling_2012].
+
+$$
+\widehat{GE}(\hat{f}_{D}, D) = \sum_{(x \; y)' \in D} \frac{L(y, \hat{f}_{D}(x))}{|D|}
+$$ {#eq-ge-resub}
+
+### Reamostragem
+
+Uma forma de se corrigir esse problema é dividindo a amostra em um conjunto para treino $D^\phi$ e outro conjunto para teste $D^*$ de forma que $D^\phi \cup D^\theta = D$ e $D^\phi \cap D^\theta = \varnothing$. Assim, pode-se treinar um meta-modelo em $D^\phi$ para se obter $\hat{f}_{D^\phi}$ e calcular seu erro de generalização usando os dados de $D^\theta$. Essa abordagem é chamada de *hold-out* e ela é de simples implementação e utilização, uma vez que as observações do conjunto teste são completamente independentes das observações com as quais o modelo foi treinado. Então, podemos estimar o erro de generalização do modelo, que consiste no cômputo do custo de $\hat{f}_D^\phi$ aplicada à amostra de teste $D^\theta$.
+
+$$
+\widehat{GE}(\hat{f}_{D^\phi}, D^\theta) = \sum_{(x \; y)' \in D^\theta} \frac{L(y, \hat{f}_{D^\phi}(x))}{|D^\theta|}
+$$ {#eq-ge}
+
+Como esse método mais simples pode não ser suficiente para detectar a variância e instabilidade de modelos mais complexos, foram desenvolvidas diferentes técnicas de reamostragem ao longo do tempo. Uma das mais populares é a validação cruzada [@stone_cross-validation_1974], que consiste em gerar repetidamente $i$ subconjuntos de treino $D_i^\phi$ e teste $D_i^\theta$ com o dataset disponível, ajustar um meta-modelo com cada conjunto de treino e atestar sua qualidade no conjunto de teste correspondente. A estimativa do erro de generalização então se torna:
+
+$$
+\widehat{GE} = \frac{1}{k}\sum_{i=1}^{k}\widehat{GE}(\hat{f}_{D_i^\phi}, D_i^\theta)
+$$ {#eq-ge-cv}
+
+Dividindo a amostra em $k$ subconjuntos, utilizando $k-1$ para ajustar um meta-modelo e validando a performance no subconjunto restante — e repetindo esse procedimento para todas as possibilidades de subconjuntos —, temos a validação cruzada $k$-fold. A validação cruzada $k$-fold é uma técnica de reamostragem que permite estimar o erro de generalização de um modelo de forma mais robusta e confiável que o *hold-out* simples. Isso porque, ao contrário do *hold-out*, a validação cruzada permite que todos os dados sejam usados tanto para treino quanto para teste, o que reduz a variância da estimativa do erro de generalização.
+
+### Validação cruzada $k$-fold em séries temporais
+
+Para dados *cross-section*, essa definição de validação cruzada $k$-fold é suficiente para qualquer caso. Entretanto, no caso de séries temporais, o analista deve tomar alguns cuidados na escolha da abordagem de validação cruzada. Isso porque, ao contrário de dados *cross-section*, os dados de séries temporais são dependentes no tempo. Portanto, ao dividir a amostra em $k$ subconjuntos aleatórios, o meta-modelo será treinado em períodos descontínuos e com dados futuros aos dados de teste.
+
+@bergmeir_note_2018 abordam esse problema teórica e empiricamente, conluindo que é possível o uso de validação cruzada $k$-fold quando a série não apresenta autocorrelação serial nos resíduos, o que pode ser facilmente detectado via teste de Ljung-Box ou Breusch-Godfrey, por exemplo. Entretanto, para o caso de hierarquias largas, como a de objeto deste estudo, testar individualmente a autocorrelação serial de cada série pode ser indesejado.
+
+Para contornar esse problema, foram desenvolvidas algumas abordagens de validação cruzada para séries temporais, como a validação cruzada $k$-fold com avanço de janelas e a validação cruzada $k$-fold com avanço de origem.
+
 # METODOLOGIA
 
 Neste capítulo estão contidas explicações sobre os dados e variáveis, sobre o *design* da modelagem e sobre a avaliação dos modelos.
@@ -932,8 +879,6 @@ estban_aggr |>
         labs(x = "", y = "Valor (em R$ bi)", color = "Verbete") +
         tema
 ```
-
-Na
 
 ```{r}
 #| label: fig-verbete_meso
