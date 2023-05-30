@@ -106,7 +106,7 @@ Dada tal complexidade, a abordagem *top-down* se coloca como uma opção viável
 
 Tomando o caminho inverso, a abordagem *bottom-up* consiste em realizar previsões para cada série temporal individualmente e, então, agregá-las para obter a previsão para o total. Essa abordagem pode ser mais precisa, pois leva em consideração as características individuais de cada série temporal do nível mais desagregado. No entanto, ela é mais custosa em termos de tempo de processamento e análise. Nesse sentido, cabe ao analista avaliar o *trade-off* entre os ganhos de precisão percebidos com a geração de previsões individuais e a economia de tempo e processamento em realizar o contrário [@gross_disaggregation_1990].
 
-Além disso, ambas são abordagens de nível único, isto é, são realizadas as previsões para um único nível e então os demais níveis são obtidos agregando ou desagregando. O problema com esses tipos de abordagem é que elas utilizam informação imcompleta [@hyndman_forecasting_2021]. Por exemplo, suponha-se que escolha estimar modelos para cada uma das 96 agências e agregá-las (*bottom-up*). Nesse caso, ignora-se a influência que os níveis mais agregados — aqui a carteira de crédito da região ou de todo o estado — pode ter na estimação do saldo de crédito de cada agência. Por outro lado, se escolher estimar modelos para os níveis mais agregados (*top-down*), ignora-se a informação individual de cada agência.
+Além disso, ambas são abordagens de nível único, isto é, são realizadas as previsões para um único nível e então os demais níveis são obtidos agregando ou desagregando. O problema com esses tipos de abordagem é que elas utilizam informação imcompleta [@hyndman_forecasting_2021]. Por exemplo, suponha-se que se escolha estimar modelos para cada uma das 96 agências e agregá-las (*bottom-up*). Nesse caso, ignora-se a influência que os níveis mais agregados — aqui a carteira de crédito da região ou de todo o estado — pode ter na estimação do saldo de crédito de cada agência. Por outro lado, se escolher estimar modelos para os níveis mais agregados (*top-down*), ignora-se a informação individual de cada agência.
 
 A reconciliação ótima de previsões pontuais é uma abordagem que busca resolver esse problema. Ela consiste em realizar previsões para todos os níveis hierárquicos e, então, estimar um modelo para reescrever as previsões do nível mais desagregado como uma combinação linear de todos os elementos da hierarquia, para então agregá-las de forma semelhante ao *bottom-up*, obtendo previsões coerentes nos níveis superiores. Dessa forma, a informação de todos os níveis é utilizada na estimação dos modelos e na geração das previsões, ao mesmo tempo em que a variância do erro de previsão é minimizado [@hyndman_optimal_2011].
 
@@ -121,7 +121,7 @@ O objetivo geral da dissertação é estudar o problema da reconciliação ótim
 Como objetivos específicos, tenho:
 
 1. Estudar métodos para estimação da matriz de reconciliação aplicando algoritmos e fluxos de trabalho de *machine learning*, como *tuning* e *resampling*;
-2. Identificar possíveis vantagens e limitações da abordagem por *machine learning* na reconciliação de previsões pontuais a partir de aplicação do método estudado na previsão de saldos de crédito do Banestes.
+2. Identificar possíveis vantagens e limitações da abordagem por *machine learning* na reconciliação de previsões pontuais a partir de aplicação do métodos estudados na previsão de saldos de crédito do Banestes.
 
 # REVISÃO DE LITERATURA
 
@@ -131,51 +131,19 @@ A nível macroeconômico, a previsão do agregado de crédito das instituições
 
 @colak_tcmb_2019 produzem uma série de indicadores para monitoramento dos períodos de expansão e desaceleração moderada ou excessiva de crédito no setor bancário turco. Os autores utilizam séries filtradas do agregados de crédito, crédito comercial, crédito direto ao consumidor, crédito imobiliário e fincanciamento de veículos, além de diversos setores da economia, como agricultura, manufatura, construção, comércio, dentre outros, para prever os ciclos de crédito no sistema bancário turco. Os autores concluem que os indicadores com maior poder de explicação para as variáveis macroeconômicas são a taxa de crescimento real do crédito e a taxa de resposta ao impulso do crédito.
 
-No entanto, para niveis abaixo do agregado de crédito, poucos trabalhos foram encontrados. Tangenciando o tema da previsão de saldos de crédito, outros tópicos da economia bancária foram objeto de estudo para previsão de séries temporais. @sezer_financial_2019 produziram revisão de literatura de trabalhos publicados entre 2005 e 2019 que realizaram previsão de séries temporais financeiras utilizando *deep learning* e os agruparam em preços de ações individuais, índices (e.g., IBovespa, Dow Jones), preços de commodities, tendência e volatilidade de ativos, preços de títulos, câmbio e preços de criptomoedas. Apesar da extensa revisão, não foram encontrados trabalhos que combinassem estruturas hierárquicas com *machine learning*.
+Já para niveis abaixo do agregado de crédito, poucos trabalhos foram encontrados. Tangenciando o tema da previsão de saldos de crédito, outros tópicos da economia bancária foram objeto de estudo para previsão de séries temporais. @sezer_financial_2019 produziram revisão de literatura de trabalhos publicados entre 2005 e 2019 que realizaram previsão de séries temporais financeiras utilizando *deep learning* e os agruparam em preços de ações individuais, índices (e.g., IBovespa, Dow Jones), preços de commodities, tendência e volatilidade de ativos, preços de títulos, câmbio e preços de criptomoedas. Apesar da extensa revisão, não foram encontrados trabalhos que combinassem estruturas hierárquicas com *machine learning*.
 
-@gorodetskaya_machine_2021 fornecem uma metodologia "universal" para aplicação automática de *machine learning* para previsão de séries temporais no setor bancário, que poderia ser aplicada em qualquer tipo de problema. A metodologia consiste em obter preditores a partir da própria variável defasada, das estatísticas básicas da variável (máximo, mínimo, média, variância etc.), e de anomalias periódicas detectadas, e selecioná-las pela medida de importância. Realizaram uma revisão de literatura recente sobre o assunto e apresentaram sua abordagem para o problema da previsão da demanda por moeda em caixas eletrônicos.
+@gorodetskaya_machine_2021 fornecem uma metodologia "universal" para aplicação automática de *machine learning* na previsão de séries temporais do setor bancário, que poderia ser aplicada em qualquer tipo de problema. A metodologia consiste em obter preditores a partir da própria variável defasada, das estatísticas básicas da variável (máximo, mínimo, média, variância etc.), e de anomalias periódicas detectadas, e selecioná-las pela medida de importância. Realizaram uma revisão de literatura recente sobre o assunto e apresentaram sua abordagem para o problema da previsão da demanda por moeda em caixas eletrônicos.
 
-No que diz respeito à previsão de séries temporais em largas hierarquias, @prayoga_top-down_2017 trabalharam na previsão do fluxo de caixa do Banco da Indonésia, utilizando uma hierarquia de 3 níveis — 40 agências no nível mais desagregado, as 6 grandes ilhas do país como nível intermediário e o total no nível mais agregado. Os autores realizaram um *benchmark* de 5 modelos para previsão da série no nível mais agregado e utilizando o método *top-down* para obter as previsões no nível mais desagregado, concluindo pela efetividade do método *top-down* por proporções históricas. Entretanto, os autores não incluíram reconciliação ótima, a estimativa *bottom-up* ou mesmo outros métodos *top-down para efeito de comparação, o que limita o alcance do trabalho.
+No que diz respeito à previsão de séries temporais em largas hierarquias, @prayoga_top-down_2017 trabalharam na previsão do fluxo de caixa do Banco da Indonésia, utilizando uma hierarquia de 3 níveis — 40 agências no nível mais desagregado, as 6 grandes ilhas do país como nível intermediário e o total no nível mais agregado. Os autores realizaram um *benchmark* de 5 modelos para previsão da série no nível mais agregado e utilizando o método *top-down* para obter as previsões no nível mais desagregado, concluindo pela efetividade do método *top-down* por proporções históricas. Entretanto, os autores não incluíram reconciliação ótima, a estimativa *bottom-up* ou mesmo outros métodos *top-down* para efeito de comparação, o que limita o alcance do trabalho.
 
 ## Previsão de séries temporais hierárquicas e agrupadas
 
 A segunda etapa da revisão de literatura consistiu na pesquisa bibliográfica relacionada à reconciliação ótima de previsões de séries temporais hierárquicas e agrupadas e sua interseção com o tema *machine learning*.
 
-Uma fonte introdutória para o tema de séries temporais hierárquicas e agrupadas é o livro \citefield{hyndman_forecasting_2021}{title} [@hyndman_forecasting_2021] que reúne, de forma didática e com exemplos em R, boa parte dos desenvolvimentos na última década. Utilizando essa obra como texto base, obtive os textos referenciados no capítulo 11 "*Forecasting Hierarquical and Grouped Time-Series*", subcapítulo 3 "*Forecast Reconciliation*", e adicionei @hyndman_fast_2016, artigo em que o método de reconciliação ótima por MQP foi desenvolvido porém não está citado nas referências do capítulo do livro. Além desses artigos, foram também incluídos aqueles que tratam do tema da previsão de séries temporais hierárquicas através de *machine learning*.
-
-```{r citacoes fpp3}
-#| tbl-cap: Artigos de referência em Hyndman e Athanasopoulos (2021)
-#| include: false
-
-readxl::read_excel("docs/academico.xlsx", sheet = "fpp3") |>
-    subset(select = c(-Título)) |>
-    kbl(booktabs = TRUE, escape = TRUE) |>
-    kable_styling(latex_options = "striped", font_size = 10)
-```
-
-```{=latex}
-\begin{quadro}
-\caption{Artigos de referência em Hyndman e Athanasopoulos (2021)}\tabularnewline
-
-\centering\begingroup\fontsize{10}{12}\selectfont
-
-\begin{tabular}[t]{lr}
-\toprule
-Autor & Ano\\
-\midrule
-\cellcolor{gray!6}{Hyndman, R. J., Ahmed, R. A., Athanasopoulos, G., Shang, H. L.} & \cellcolor{gray!6}{2011}\\
-Panagiotelis, A., Athanasopoulos, G., Gamakumara, P., Hyndman, R. J. & 2021\\
-\cellcolor{gray!6}{Wickramasuriya, S. L., Athanasopoulos, G., Hyndman, R. J.} & \cellcolor{gray!6}{2019}\\
-Rob J. Hyndman and Alan J. Lee and Earo Wang & 2016\\
-\bottomrule
-\end{tabular}
-\endgroup{}
-\end{quadro}
-```
-
 ### Abordagens de nível único
 
-Uma abordagem de nível único é uma abordagem em que as previsões são realizadas para um único nível da hierarquia. A partir dessas previsões, os demais níveis são obtidos, ou desagregando (no caso dos níveis inferiores), ou agregando (no caso dos níveis superiores) essas informações [@hyndman_forecasting_2021]. Os métodos *top-down*, *bottom-up* e *middle-out*, demonstrados na introdução, são abordagens de nível único.
+Uma abordagem de nível único é uma abordagem em que as previsões são realizadas para um único nível da hierarquia. A partir dessas previsões, os demais níveis são obtidos, ou desagregando (no caso dos níveis inferiores), ou agregando (no caso dos níveis superiores) essas informações [@hyndman_forecasting_2021]. Os métodos *top-down*, *bottom-up* e *middle-out* são abordagens de nível único.
 
 Enquanto há apenas uma única forma de se agregar níveis na hierarquia (*bottom-up*), a desagregação (*top-down*) pode ser realizada de, ao menos, duas dezenas de maneiras [@gross_disaggregation_1990]. Dois dos métodos mais intuitivos são a média das proporções históricas e a proporção das médias históricas.
 
@@ -381,7 +349,7 @@ $$
 \end{bmatrix}
 $$ {#eq-matriz_g}
 
-$\mathbfit{G}$ é uma matriz $m \times n$ que multiplica a matriz $\hat{\mathbfit{y}}_{T+h|T}$ que, por sua vez, é composta pelas previsões base --- as previsões individuais para todos os níveis de agregação. A equação para a abordagem *top-down* será, então:
+$\mathbfit{G}$ é uma matriz $m \times n$ que multiplica o vetor $\hat{\mathbfit{y}}_{T+h|T}$ que chamamos de *previsões base* --- as previsões individuais para todos os níveis de agregação. A equação para a abordagem *top-down* será, então:
 
 $$
 \mathbfit{\tilde{y}}_{T+h | T} = \mathbfit{SG\hat{y}}_{T+h | T}
@@ -514,7 +482,7 @@ $$
 \end{bmatrix}
 $$ {#eq-matriz_gbu}
 
-O que resulta nas equações desejadas. Portanto, $\mathbfit{G}$ define a abordagem --- se *top-down* ou *bottom-up* ---, e $\mathbfit{S}$ define a maneira da qual as previsões são somadas para formar as equações de previsão para cada elemento da estrutura. Portanto, chamo $\mathbfit{G}$ de matriz de reconciliação.
+O que resulta nas equações desejadas. Portanto, $\mathbfit{G}$ define a abordagem --- se *top-down* ou *bottom-up* ---, e $\mathbfit{S}$ define a maneira da qual as previsões são somadas para formar as equações de previsão para cada elemento da estrutura. Portanto, chamamos $\mathbfit{G}$ de matriz de reconciliação.
 
 $$
 \begin{bmatrix}
@@ -618,7 +586,7 @@ Seja somando as previsões do nível mais desagregado para formar os níveis sup
 
 Não fosse essa pré multiplicação, nada garantiria a coerência das previsões. Tomando a estrutura da @fig-h como exemplo, seria um acaso improvável que as previsões do agregado para o estado do Espírito Santo sejam exatamente a soma das previsões individuais de seus municípios. Isso porque não há qualquer razão para que cada série siga o mesmo processo (e.g., arima) com coeficientes idênticos.
 
-Os métodos de gerar previsões coerentes a partir de previsões base são chamados de métodos de *reconciliação*. Os métodos de reconciliação tradicionais apresentados, *top-down* e *bottom-up*, utilizam informação limitada. No método *top-down*, utiliza-se apenas informações do nível mais agregado --- por isso, apenas a primeira coluna em (@eq-matriz_g) é diferente de zero. Já na abordagem *bottom-up*, utiliza-se apenas as informações dos níveis mais desagregados, o que resulta na submatriz identidade $m \times m$ em (@eq-matriz_gbu), enquanto as colunas que representam os níveis mais agregados são nulas.
+Os métodos de gerar previsões coerentes a partir de previsões base são chamados de métodos de *reconciliação*. Os métodos de reconciliação tradicionais apresentados, *top-down*, *bottom-up* e *middle-out*, utilizam informação limitada. No método *top-down*, utiliza-se apenas informações do nível mais agregado --- por isso, apenas a primeira coluna em (@eq-matriz_g) é diferente de zero. Já na abordagem *bottom-up*, utiliza-se apenas as informações dos níveis mais desagregados, o que resulta na submatriz identidade $m \times m$ em (@eq-matriz_gbu), enquanto as colunas que representam os níveis mais agregados são nulas. Por fim, a abordagem *middle-out* não utiliza a mesma, mas utiliza a mesma quantidade de informação que a *top-down* (@eq-matriz_gmo).
 
 Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham o menor erro o possível. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
 
@@ -632,15 +600,17 @@ Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize
 
 ### O processo de ajuste e sobreajuste
 
-Considere uma função de ajuste $f$, um conjunto de pontos $D = {d_1, ..., d_n}$ com $d_i = (\mathbf{x}_i \; \mathbf{y}_i)'$, variáveis de decisão ou parâmetros $\mathbf{x}_i \in \mathbb{R}^m$ e imagem $\mathbf{y}_i = f(\mathbf{x}_i) \in \mathbb{R}$. Diferentemente da abordagem do modelo clássico de regressão linear em que, cumpridas certas hipóteses, há um modelo teórico de coeficientes estimados por mínimos quadrados ordinários (MQO) que é garantido pelo teorema de Gauss-Markov ser o melhor estimador linear não viesado (BLUE), em *machine learning* o objetivo é encontrar, de forma iterativa, um modelo que melhor aproxima a função $f$ usando a informação contida em $D$, ou seja, queremos ajustar uma função de regressão $\hat{f}_D$ aos nossos dados $D$ de forma que $\hat{\mathbf{y}} = \hat{f}_D(\mathbf{x}, \varepsilon)$ tenha o menor erro de aproximação $\varepsilon$ [@bischl_resampling_2012].
+Dada uma função de ajuste $f$, um conjunto de pontos $D = {d_1, ..., d_n}$ com $d_i = (\mathbf{x}_i \; \mathbf{y}_i)'$, variáveis de decisão ou parâmetros $\mathbf{x}_i \in \mathbb{R}^m$ e imagem $\mathbf{y}_i = f(\mathbf{x}_i) \in \mathbb{R}$. Diferentemente da abordagem do modelo clássico de regressão linear em que, cumpridas certas hipóteses, há um modelo teórico de coeficientes estimados por mínimos quadrados ordinários (MQO) que é garantido pelo teorema de Gauss-Markov ser o melhor estimador linear não viesado (BLUE), em *machine learning* o objetivo é encontrar, de forma iterativa, um modelo que melhor aproxima a função $f$ usando a informação contida em $D$, ou seja, queremos ajustar uma função de regressão $\hat{f}_D$ aos nossos dados $D$ de forma que $\hat{\mathbf{y}} = \hat{f}_D(\mathbf{x}, \varepsilon)$ tenha o menor erro de aproximação $\varepsilon$ [@bischl_resampling_2012].
 
 Para verificar o quão bem o modelo $\hat{f}_D$ se aproxima da função real $f$, é necessário uma função de perda $L(\mathbf{y}, \hat{f}(\mathbf{x}))$ que, no caso de regressão, será a perda quadrática $(\mathbf{y} - \hat{f}(\mathbf{x}))^2$ ou a perda absoluta $|\mathbf{\mathbf{x}} - \hat{f}(\mathbf{x})|$. Esses valores são agregados pela média para formar as funções de custo erro médio quadrático (MSE) e erro médio absoluto (MAE).
 
-Calculando o custo sobre a amostra $D$ usada para ajustar o modelo, teremos o chamado erro de resubstituição (@eq-ge-resub). Nesse caso, estaríamos usando o mesmo conjunto de dados tanto para treinar o preditor quanto para estimar o erro, o que nos levaria a uma estimativa enviesada do erro de generalização. Caso usássemos essa estimativa para seleção de modelos, esse viés favoreceria modelos mais adaptados à amostra. Dadas suficientes iterações, o erro de resubstituição tende a zero. Isso acontece porque conforme o preditor se adapta cada vez mais aos dados de treinamento ele irá memorizar a relação entre o conjunto de pontos $D$ e a imagem $f(\mathbf{x}_i)$, ou seja, irá se ajustar perfeitamente ao formato da função a ser modelada. E não necessariamente um modelo perfeitamente ajustado se traduz na capacidade de predição de dados futuros (fora da amostra). De forma geral, espera-se que o preditor reduza seu viés durante o treino apenas o suficiente para que seja capaz de generalizar sua predição para fora da amostra em um nível ótimo de acurácia. A partir desse ponto, a redução no viés é penalizada com o aumento da variância, ou seja, com a redução de sua capacidade de prever dados futuros. A esse processo se dá o nome de *overfitting* ou sobreajuste. Isso quer dizer que não podemos considerar a performance do preditor em $D$ se desejamos estimar honestamente a performance real do modelo [@bischl_resampling_2012].
+Calculando o custo sobre a amostra $D$ usada para ajustar o modelo, teremos o chamado erro de resubstituição (@eq-ge-resub). Nesse caso, estaríamos usando o mesmo conjunto de dados tanto para treinar o preditor quanto para estimar o erro, o que nos levaria a uma estimativa enviesada do erro de generalização. Caso usássemos essa estimativa para seleção de modelos, esse viés favoreceria modelos mais adaptados à amostra.
 
 $$
 \widehat{GE}(\hat{f}_{D}, D) = \sum_{(x \; y)' \in D} \frac{L(y, \hat{f}_{D}(x))}{|D|}
 $$ {#eq-ge-resub}
+
+Dadas suficientes iterações, o erro de resubstituição tende a zero. Isso acontece porque conforme o preditor se adapta cada vez mais aos dados de treinamento ele irá memorizar a relação entre o conjunto de pontos $D$ e a imagem $f(\mathbf{x}_i)$, ou seja, irá se ajustar perfeitamente ao formato da função a ser modelada. E não necessariamente um modelo perfeitamente ajustado se traduz na capacidade de predição de dados futuros (fora da amostra). De forma geral, espera-se que o preditor reduza seu viés durante o treino apenas o suficiente para que seja capaz de generalizar sua predição para fora da amostra em um nível ótimo de acurácia. A partir desse ponto, a redução no viés é penalizada com o aumento da variância, ou seja, com a redução de sua capacidade de prever dados futuros. A esse processo se dá o nome de *overfitting* ou sobreajuste. Isso quer dizer que não podemos considerar a performance do preditor em $D$ se desejamos estimar honestamente a performance real do modelo [@bischl_resampling_2012].
 
 ### Reamostragem
 
@@ -656,15 +626,15 @@ $$
 \widehat{GE} = \frac{1}{k}\sum_{i=1}^{k}\widehat{GE}(\hat{f}_{D_i^\phi}, D_i^\theta)
 $$ {#eq-ge-cv}
 
-Dividindo a amostra em $k$ subconjuntos, utilizando $k-1$ para ajustar um meta-modelo e validando a performance no subconjunto restante — e repetindo esse procedimento para todas as possibilidades de subconjuntos —, temos a validação cruzada $k$-fold. A validação cruzada $k$-fold é uma técnica de reamostragem que permite estimar o erro de generalização de um modelo de forma mais robusta e confiável que o *hold-out* simples. Isso porque, ao contrário do *hold-out*, a validação cruzada permite que todos os dados sejam usados tanto para treino quanto para teste, o que reduz a variância da estimativa do erro de generalização.
+Dividindo a amostra em $k$ subconjuntos, utilizando $k-1$ para ajustar um meta-modelo e validando a performance no subconjunto restante — e repetindo esse procedimento para todas as possibilidades de subconjuntos —, temos a validação cruzada $k$-*fold*. A validação cruzada $k$-*fold* é uma técnica de reamostragem que permite estimar o erro de generalização de um modelo de forma mais robusta e confiável que o *hold-out* simples. Isso porque, ao contrário do *hold-out*, a validação cruzada permite que todos os dados sejam usados tanto para treino quanto para teste, o que reduz a variância da estimativa do erro de generalização.
 
 ### Validação cruzada $k$-fold em séries temporais
 
-Para dados *cross-section*, essa definição de validação cruzada $k$-fold é suficiente para qualquer caso. Entretanto, no caso de séries temporais, o analista deve tomar alguns cuidados na escolha da abordagem de validação cruzada. Isso porque, ao contrário de dados *cross-section*, os dados de séries temporais são dependentes no tempo. Portanto, ao dividir a amostra em $k$ subconjuntos aleatórios, o meta-modelo será treinado em períodos descontínuos e com dados futuros aos dados de teste.
+Para dados *cross-section*, essa definição de validação cruzada $k$-*fold* é suficiente para qualquer caso. Entretanto, no caso de séries temporais, o analista deve tomar alguns cuidados na escolha da abordagem de validação cruzada. Isso porque, ao contrário de dados *cross-section*, os dados de séries temporais são dependentes no tempo. Portanto, ao dividir a amostra em $k$ subconjuntos aleatórios, o meta-modelo será treinado em períodos descontínuos e com dados futuros aos dados de teste.
 
-@bergmeir_note_2018 abordam esse problema teórica e empiricamente, conluindo que é possível o uso de validação cruzada $k$-fold quando a série não apresenta autocorrelação serial nos resíduos, o que pode ser facilmente detectado via teste de Ljung-Box ou Breusch-Godfrey, por exemplo. Entretanto, para o caso de hierarquias largas, como a de objeto deste estudo, testar individualmente a autocorrelação serial de cada série pode ser indesejado.
+@bergmeir_note_2018 abordam esse problema teórica e empiricamente, conluindo que é possível o uso de validação cruzada $k$-*fold* quando a série não apresenta autocorrelação serial nos resíduos, o que pode ser facilmente detectado via teste de Ljung-Box ou Breusch-Godfrey, por exemplo. Entretanto, para o caso de hierarquias largas, como a de objeto deste estudo, testar e corrigir individualmente a autocorrelação serial de cada série pode ser indesejado.
 
-Para contornar esse problema, foram desenvolvidas algumas abordagens de validação cruzada para séries temporais, como a validação cruzada $k$-fold com avanço de janelas e a validação cruzada $k$-fold com avanço de origem.
+Para contornar esse problema, foram desenvolvidas algumas abordagens de validação cruzada para séries temporais, como a validação cruzada $k$-*fold* com avanço de janelas e com avanço de origem.
 
 # METODOLOGIA
 

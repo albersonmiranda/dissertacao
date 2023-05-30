@@ -123,8 +123,8 @@ create_graph(attr_theme = "tb") |>
 nodes_ha = tibble::tribble(
     ~id, ~tipo, ~label,
     1, "total", "Total",
-    2, "setor", "Agro (X)",
-    3, "setor", "Ind (Y)",
+    2, "setor", "Agricultura (X)",
+    3, "setor", "Indústria Extrativa (Y)",
     4, "setor", "... (Z)",
     5, "estado", "ES (AX)",
     6, "estado", "RJ (BX)",
@@ -150,7 +150,7 @@ nodes_ha = within(nodes_ha, {
     fillcolor = ifelse(tipo == "municipio", "white", fillcolor)
     fontcolor = ifelse(tipo == "municipio", "#004B8D", "white")
     color = ifelse(tipo == "municipio", "#004B8D", fillcolor)
-    width = ifelse(tipo == "municipio", 1.5, 1)
+    width = ifelse(tipo %in% c("municipio", "setor"), 1.5, 1)
 })
 
 edges_ha = tibble::tribble(
@@ -198,17 +198,17 @@ create_graph(attr_theme = "tb") |>
 nodes_ha = tibble::tribble(
     ~id, ~tipo, ~label,
     1, "total", "Total",
-    2, "setor", "Agro (AX)",
-    3, "setor", "Ind (AY)",
+    2, "setor", "Agr. (AX)",
+    3, "setor", "Ind. (AY)",
     4, "setor", "... (AZ)",
     5, "estado", "ES (A)",
     6, "estado", "RJ (B)",
     7, "estado", "... (C)",
-    8, "setor", "Agro (BX)",
-    9, "setor", "Ind (BY)",
+    8, "setor", "Agr. (BX)",
+    9, "setor", "Ind. (BY)",
     10, "setor", "... (BZ)",
-    11, "setor", "Agro (CX)",
-    12, "setor", "Ind (CY)",
+    11, "setor", "Agr. (CX)",
+    12, "setor", "Ind. (CY)",
     13, "setor", "... (CZ)",
 )
 
