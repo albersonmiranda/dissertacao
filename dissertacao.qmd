@@ -5,7 +5,7 @@ format:
     pdf:
         include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
         include-before-body: config/elementos/pre_textuais.tex
-        include-after-body: config/elementos/pos_textuais.tex
+        #include-after-body: config/elementos/pos_textuais.tex
         keep-tex: false
         cite-method: biblatex
         output-file: render/dissertacao.pdf
@@ -632,7 +632,7 @@ Dividindo a amostra em $k$ subconjuntos, utilizando $k-1$ para ajustar um meta-m
 
 Para dados *cross-section*, essa definição de validação cruzada $k$-*fold* é suficiente para qualquer caso. Entretanto, no caso de séries temporais, o analista deve tomar alguns cuidados na escolha da abordagem de validação cruzada. Isso porque, ao contrário de dados *cross-section*, os dados de séries temporais são dependentes no tempo. Portanto, ao dividir a amostra em $k$ subconjuntos aleatórios, o meta-modelo será treinado em períodos descontínuos e com dados futuros aos dados de teste.
 
-@bergmeir_note_2018 abordam esse problema teórica e empiricamente, conluindo que é possível o uso de validação cruzada $k$-*fold* quando a série não apresenta autocorrelação serial nos resíduos, o que pode ser facilmente detectado via teste de Ljung-Box ou Breusch-Godfrey, por exemplo. Entretanto, para o caso de hierarquias largas, como a de objeto deste estudo, testar e corrigir individualmente a autocorrelação serial de cada série pode ser indesejado.
+@bergmeir_note_2018 abordam esse problema teórica e empiricamente, conluindo que é possível o uso de validação cruzada $k$-*fold* quando a série não apresenta autocorrelação serial nos resíduos, o que pode ser facilmente detectado via teste de Ljung-Box ou Breusch-Godfrey, por exemplo. Entretanto, para os casos em que a ausência de autocorreçalação não pode ser alcançada ou na presença de hierarquias largas, como a de objeto deste estudo, em que testar e corrigir individualmente a autocorrelação serial de cada série pode ser indesejado, foram necessário desenvolver abordagens alternativas.
 
 Para contornar esse problema, foram desenvolvidas algumas abordagens de validação cruzada para séries temporais, como a validação cruzada $k$-*fold* com avanço de janelas e com avanço de origem.
 
@@ -642,7 +642,7 @@ Neste capítulo estão contidas explicações sobre os dados e variáveis, sobre
 
 ## Dados e variáveis
 
-Os dados usados nesse trabalho são dados terciários obtidos do *datalake* público Base dos Dados [@R-basedosdados]. A fonte primária são os bancos comerciais e múltiplos com carteira comercial que disponibilizam mensalmente os saldos dos principais verbetes do balancete via documento 4500^[Esses documentos são relatórios eletrônicos obrigatórios demandados pelo Bacen às instituições financeiras que permitem ao regulador o conhecimento minucioso dos bancos e de seus clientes.] ao Banco Central do Brasil, que os compila e publica, agrupados por agência bancária e por município, no relatório ESTBAN — Estatística Bancária Mensal e por Município^[https://www4.bcb.gov.br/fis/cosif/estban.asp?frame=1].
+Os dados usados nesse trabalho são dados terciários obtidos do *datalake* público Base dos Dados [@dahis_data_2022]. A fonte primária são os bancos comerciais e múltiplos com carteira comercial que disponibilizam mensalmente os saldos dos principais verbetes do balancete via documento 4500^[Esses documentos são relatórios eletrônicos obrigatórios demandados pelo Bacen às instituições financeiras que permitem ao regulador o conhecimento minucioso dos bancos e de seus clientes.] ao Banco Central do Brasil, que os compila e publica, agrupados por agência bancária e por município, no relatório ESTBAN — Estatística Bancária Mensal e por Município^[https://www4.bcb.gov.br/fis/cosif/estban.asp?frame=1].
 
 Além das estatísticas bancárias, foram obtidos informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
 
