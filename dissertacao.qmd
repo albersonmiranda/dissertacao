@@ -5,7 +5,7 @@ format:
     pdf:
         include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
         include-before-body: config/elementos/pre_textuais.tex
-        include-after-body: config/elementos/pos_textuais.tex
+        #include-after-body: config/elementos/pos_textuais.tex
         keep-tex: false
         cite-method: biblatex
         output-file: render/dissertacao.pdf
@@ -630,11 +630,19 @@ Dividindo a amostra em $k$ subconjuntos, utilizando $k-1$ para ajustar um meta-m
 
 ### Validação cruzada $k$-fold em séries temporais
 
-Para dados *cross-section*, essa definição de validação cruzada $k$-*fold* é suficiente para qualquer caso. Entretanto, no caso de séries temporais, o analista deve tomar alguns cuidados na escolha da abordagem de validação cruzada. Isso porque, ao contrário de dados *cross-section*, os dados de séries temporais são dependentes no tempo. Portanto, ao dividir a amostra em $k$ subconjuntos aleatórios, o meta-modelo será treinado em períodos descontínuos e com dados futuros aos dados de teste.
+Para dados *cross-section*, essa definição de validação cruzada $k$-*fold* é suficiente para qualquer caso. Entretanto, no caso de séries temporais, o analista deve tomar alguns cuidados na escolha da abordagem de validação cruzada. Isso porque, ao contrário de dados *cross-section*, os dados de séries temporais são dependentes no tempo. Isso traz dois aparentes problemas: primeiramente, ao dividir a amostra em $k$ subconjuntos aleatórios, o meta-modelo será treinado em períodos descontínuos e com dados futuros aos dados de teste em, ao menos, $k-1$ subconjuntos. Em segundo lugar, realizando o *split* treino-teste em $y_t$, com $y_{t-1}$ na amostra treino, significa que os subconjuntos de treino e teste são dependentes (@fig-cv-aleatoria).
 
-@bergmeir_note_2018 abordam esse problema teórica e empiricamente, conluindo que é possível o uso de validação cruzada $k$-*fold* quando a série não apresenta autocorrelação serial nos resíduos, o que pode ser facilmente detectado via teste de Ljung-Box ou Breusch-Godfrey, por exemplo. Entretanto, para os casos em que a ausência de autocorreçalação não pode ser alcançada ou na presença de hierarquias largas, como a de objeto deste estudo, em que testar e corrigir individualmente a autocorrelação serial de cada série pode ser indesejado, foram necessário desenvolver abordagens alternativas.
+![Validação $k$-fold aleatória](img/cv-aleatorio.png){#fig-cv-aleatoria width=70%}
 
-Para contornar esse problema, foram desenvolvidas algumas abordagens de validação cruzada para séries temporais, como a validação cruzada $k$-*fold* não-dependente e a validação cruzada $k$-*fold* com avanço de origem.
+Para contornar esse problema, outros métodos de validação cruzada foram desenvolvidos pensando em séries temporais. Tomando o conjunto de validação com dados exclusivamente posteriores aos dados de treino, temos o método conhecido como validação cruzada com origem móvel (@fig-cv-blocked).
+
+![Validação $k$-fold com origem móvel](img/cv-blocked.png){#fig-cv-blocked width=70%}
+
+Já quando excluímos as defasagens dependentes do subconjunto de treino (em relação ao conjunto de validação), temos a validação cruzada não dependente (@fig-cv-n-dep). Para ilustrar esse caso, tome um processo AR(3). Excluir as defasagens dependentes significa que, se o conjunto de validação começa em $y_t$, então o conjunto de treino pode apenas ir até $y_{t-4}$. O problema evidente dessa abordagem é que, dependendo do tamanho da estrutura de autocorrelação da série, muitas defasagens são excluídas, podendo inviabilizar o processo de validação.
+
+![Validação $k$-fold não-dependente](img/cv-n-dep.png){#fig-cv-n-dep width=70%}
+
+Entretanto, esses problemas são apenas aparentes. @bergmeir_use_2012 comparam uma série de métodos de validação em séries temporais e concluem que, considerando séries estacionárias, os problemas teóricos relacionados à dependência não produzem impactos empíricos. @bergmeir_note_2018 vão além e abordam esse problema teórica e empiricamente, concluindo que não apenas é possível o uso de validação cruzada $k$-*fold* quando a série não apresenta autocorrelação serial nos resíduos, mas também é uma melhor escolha do que a validação fora da amostra^[*Out-of-sample evaluation* é o método padrão na literatura de séries temporais e consiste na separação da porção final da série — geralmente entre 20% e 30% — para validação.].
 
 # METODOLOGIA
 
@@ -646,7 +654,7 @@ Os dados usados nesse trabalho são dados terciários obtidos do *datalake* púb
 
 Além das estatísticas bancárias, foram obtidos informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
 
-Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram mantidos apenas os verbetes relacionados a crédito e mantidas apenas as agências em atividade durante todo o período. Quanto ao período, há dados disponíveis desde 1988. Entretanto, escolhi manter apenas os dados a partir de 2010 para evitar problemas relacionados a séries muito longas. Isso porque é seria muito otimista assumir que o processo de autocorrelação e o padrão sazonal se manteria ao longo de várias décadas^["It is, perhaps, unrealistic to assume that the seasonal pattern remains the same over nearly three decades. So we could simply fit a model to the most recent years instead" [@hyndman_forecasting_2021]]. Além disso, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta na escolha do período.
+Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram mantidos apenas os verbetes relacionados a crédito e mantidas apenas as agências em atividade durante todo o período. Quanto ao período, há dados disponíveis desde 1988. Entretanto, escolhi manter apenas os dados a partir de 2010 pois, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta.
 
 Por fim, as variáveis mantidas no *dataset* foram:
 
@@ -694,7 +702,8 @@ Após limpeza, o *dataset* adquiriu a estrutura apresentada na @tbl-dataset. As 
 #| tbl-cap: "Estrutura do dataset"
   
 estban |>
-    head() |>
+    subset(nome == "Vitória") |>
+    tail() |>
     kbl(booktabs = TRUE, row.names = FALSE) |>
     kable_styling(latex_options = c("striped", "scale_down"))
 ```
