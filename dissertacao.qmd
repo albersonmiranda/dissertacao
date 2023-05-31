@@ -5,7 +5,7 @@ format:
     pdf:
         include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
         include-before-body: config/elementos/pre_textuais.tex
-        include-after-body: config/elementos/pos_textuais.tex
+        #include-after-body: config/elementos/pos_textuais.tex
         keep-tex: false
         cite-method: biblatex
         output-file: render/dissertacao.pdf
@@ -90,7 +90,7 @@ estban = subset(estban,
 
 Embora no séc. XX ainda houvesse espaço para uma gestão guiada apenas por instinto [@wallander_budgeting_1999], atualmente é impensável um banco não realizar previsões de seus resultados e comunicar suas expectativas ao mercado. Nesse documento, ou *guidance*, a projeção da carteira de crédito — o total de empréstimos e financiamentos, dentre outros itens — é frequentemente a primeira informação fornecida, uma vez que é um dos principais elementos para o planejamento dos bancos comerciais. Juntamente com as projeções de depósitos, provisões para créditos de liquidação duvidosa, eficiência operacional, entre outros indicadores-chave, essas projeções determinam a temperatura das expectativas da instituição em relação a elementos cruciais como rentabilidade, dividendos e posição no mercado (*market-share*), e isso é essencial para os acionistas e investidores. Essas projeções precisam ser tão precisas quanto possível, para que se possa calcular o risco de transacionar com a instituição financeira, seja como investidor ou cliente.
 
-Ainda que não exista penalidades específicas para instituições financeiras que erram (por uma boa margem) em suas projeções, elas podem sofrer consequências negativas em outros aspectos, como na avaliação de seus desempenhos por parte dos investidores e clientes. Os investidores e clientes podem considerar as projeções equivocadas como um sinal de falta de competência ou confiança na instituição financeira, o que pode afetar negativamente a reputação e a imagem da instituição. Isso pode levar a uma redução no número de investimentos e depósitos, o que irá afetar diretamente sua saúde financeira.
+Ainda que não existam penalidades específicas para instituições financeiras que erram (por uma boa margem) em suas projeções, elas podem sofrer consequências negativas em outros aspectos, como na avaliação de seus desempenhos por parte dos investidores e clientes. Os investidores e clientes podem considerar as projeções equivocadas como um sinal de falta de competência ou confiança na instituição financeira, o que pode afetar negativamente a reputação e a imagem da instituição. Isso pode levar a uma redução no número de investimentos e depósitos, o que irá afetar diretamente sua saúde financeira.
 
 Além disso, nos casos em que algum grupo se sentir lesado, as instituições financeiras podem enfrentar ações judiciais se suas projeções forem consideradas enganosas ou fraudulentas. Por exemplo, se uma instituição financeira fizer projeções excessivamente otimistas para incentivar os investidores a comprar seus títulos e, posteriormente, as projeções se mostrarem incorretas, ela pode ser acusada de fraude^[Art. 3º: Divulgar informação falsa ou prejudicialmente incompleta sobre instituição financeira. Pena: Reclusão, de 2 (dois) a 6 (seis) anos, e multa. Art. 4º: Gerir fraudulentamente instituição financeira. Pena: Reclusão, de 3 (três) a 12 (doze) anos, e multa [@brasil_lei_1986].] ou, ao menos, gestão temerária^[Art. 4º, parágrafo único: Se a gestão é temerária: Pena: Reclusão, de 2 (dois) a 8 (oito) anos, e multa [@brasil_lei_1986].] — ambos caracterizados como crime contra o Sistema Financeiro Nacional.
 
@@ -118,7 +118,7 @@ Em previsões de séries temporais, o objetivo na maioria dos casos é prever va
 
 O objetivo geral da dissertação é estudar o problema da reconciliação ótima de previsões pontuais a partir de métodos de *machine learning*.
 
-Como objetivos específicos, tenho:
+Os objetivos específicos são:
 
 1. Estudar métodos para estimação da matriz de reconciliação aplicando algoritmos e fluxos de trabalho de *machine learning*, como *tuning* e *resampling*;
 2. Identificar possíveis vantagens e limitações da abordagem por *machine learning* na reconciliação de previsões pontuais a partir de aplicação do métodos estudados na previsão de saldos de crédito do Banestes.
@@ -209,7 +209,7 @@ y_t &= y_{AA,t} + y_{AB,t} + y_{AC,t} + y_{BA,t} + y_{BC,t} + y_{CA,t}\label{eq:
 y_{A,t} &= y_{AA,t} + y_{AB,t} + y_{AC,t} \label{eq:haES}
 \end{align}
 
-Assim, o agregado nacional pode ser representado apenas pelos agregados dos estados, através da Equação \eqref{eq:ha}, ou como o agregado dos municípios \eqref{eq:ha_mun}. Já o agregado para o estado do Espírito Santo é representado por \eqref{eq:haES}.
+Assim, o agregado nacional pode ser representado apenas pelos agregados dos estados (Equação \eqref{eq:ha}) ou como o agregado dos municípios (Equação \eqref{eq:ha_mun}). Já o agregado para o estado do Espírito Santo é representado pela Equação \eqref{eq:haES}.
 
 Alternativamente, podemos descrever a estrutura completa de forma matricial:
 
@@ -226,7 +226,7 @@ $$
     y_{BB, t} \\
     y_{BC, t} \\
     y_{CA, t}
-\end{bmatrix}
+\end{bmatrix}_{n \times 1}
 =
 \begin{bmatrix}
     1 & 1 & 1 & 1 & 1 & 1 & 1 \\
@@ -240,7 +240,7 @@ $$
     0 & 0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 1 \\
-\end{bmatrix}
+\end{bmatrix}_{n \times m}
 \begin{bmatrix}
     y_{AA, t} \\
     y_{AB, t} \\
@@ -249,7 +249,7 @@ $$
     y_{BB, t} \\
     y_{BC, t} \\
     y_{CA, t}
-\end{bmatrix}
+\end{bmatrix}_{m \times 1}
 $$ {#eq-matriz_hierarquia}
 
 Por outro lado, o PIB pode ser também desagregado de forma cruzada de acordo com a atividade econômica --- agricultura, indústrias extrativas, indústria de transformação, eletricidade e gás, construção etc. Essa estrutura não pode ser desagregada naturalmente de uma única forma, como é a hierarquia de estados e municípios. Não pode ser aninhada por um atributo como a própria geografia. A esse tipo de estrutura dá-se o nome de séries agrupadas.
@@ -286,7 +286,7 @@ $$
     y_{CX, t} \\
     y_{CY, t} \\
     y_{CZ, t}
-\end{bmatrix}
+\end{bmatrix}_{n \times 1}
 =
 \begin{bmatrix}
     1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
@@ -305,7 +305,7 @@ $$
     0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}
+\end{bmatrix}_{n \times m}
 \begin{bmatrix}
     y_{AX, t} \\
     y_{AY, t} \\
@@ -316,7 +316,7 @@ $$
     y_{CX, t} \\
     y_{CY, t} \\
     y_{CZ, t}
-\end{bmatrix}
+\end{bmatrix}_{m \times 1}
 $$ {#eq-matriz_ha}
 
 ### Abordagens top-down, bottom-up e middle-out
@@ -346,7 +346,7 @@ $$
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
-\end{bmatrix}
+\end{bmatrix}_{m \times n}
 $$ {#eq-matriz_g}
 
 $\mathbfit{G}$ é uma matriz $m \times n$ que multiplica o vetor $\hat{\mathbfit{y}}_{T+h|T}$ que chamamos de *previsões base* --- as previsões individuais para todos os níveis de agregação. A equação para a abordagem *top-down* será, então:
@@ -370,9 +370,9 @@ $$
     \tilde{y}_{BB, t} \\
     \tilde{y}_{BC, t} \\
     \tilde{y}_{CA, t}
-\end{bmatrix}
+\end{bmatrix}_{n \times 1}
 =
-\mathbfit{S}
+\mathbfit{S}_{n \times m}
 \begin{bmatrix}
     p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
@@ -381,7 +381,7 @@ $$
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
-\end{bmatrix}
+\end{bmatrix}_{m \times n}
 \begin{bmatrix}
     \hat{y}_{T+h|T} \\
     \hat{y}_{A, T+h|T} \\
@@ -394,7 +394,7 @@ $$
     \hat{y}_{BB, T+h|T} \\
     \hat{y}_{BC, T+h|T} \\
     \hat{y}_{CA, T+h|T}
-\end{bmatrix}
+\end{bmatrix}_{n \times 1}
 $$ {#eq-matriz_topdown1}
 
 O que nos dá uma proporção do total para cada elemento no nível mais desagregado.
@@ -411,9 +411,9 @@ $$
     \tilde{y}_{BB, t} \\
     \tilde{y}_{BC, t} \\
     \tilde{y}_{CA, t}
-\end{bmatrix}
+\end{bmatrix}_{n \times 1}
 =
-\mathbfit{S}
+\mathbfit{S}_{n \times m}
 \begin{bmatrix}
     p_1\hat{y}_{T+h|T} \\
     p_2\hat{y}_{T+h|T} \\
@@ -422,8 +422,50 @@ $$
     p_5\hat{y}_{T+h|T} \\
     p_6\hat{y}_{T+h|T} \\
     p_7\hat{y}_{T+h|T}
-\end{bmatrix}
+\end{bmatrix}_{m \times 1}
 $$ {#eq-matriz_topdown2}
+
+Note que, por se tratar de um método *top-down*, é necessário apenas o primeiro elemento do vetor de previsões base, ou seja, a previsão do nível mais agregado (@eq-matriz_topdown2). Sendo essa exatamente uma das vantagens do método *top-down*, na prática, podemos anular os demais elementos de $\mathbfit{\hat{y}}$.
+
+$$
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{BC, t} \\
+    \tilde{y}_{CA, t}
+\end{bmatrix}_{n \times 1}
+=
+\mathbfit{S}_{n \times m}
+\begin{bmatrix}
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}_{m \times n}
+\begin{bmatrix}
+    \hat{y}_{T+h|T} \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0
+\end{bmatrix}_{n \times 1}
+$$ {#eq-matriz_topdown3}
 
 Substituindo a matriz $\mathbfit{S}$, temos as equações que definem cada previsão da estrutura em função de proporções da previsão do agregado.
 
@@ -440,7 +482,7 @@ $$
     \tilde{y}_{BB, t} \\
     \tilde{y}_{BC, t} \\
     \tilde{y}_{CA, t}
-\end{bmatrix}
+\end{bmatrix}_{n \times 1}
 =
 \begin{bmatrix}
     1 & 1 & 1 & 1 & 1 & 1 & 1 \\
@@ -454,7 +496,7 @@ $$
     0 & 0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}
+\end{bmatrix}_{n \times m}
 \begin{bmatrix}
     p_1\hat{y}_{T+h|T} \\
     p_2\hat{y}_{T+h|T} \\
@@ -463,7 +505,7 @@ $$
     p_5\hat{y}_{T+h|T} \\
     p_6\hat{y}_{T+h|T} \\
     p_7\hat{y}_{T+h|T}
-\end{bmatrix}
+\end{bmatrix}_{m \times 1}
 $$ {#eq-matriz_topdown3}
 
 Já a abordagem bottom-up parte do raciocínio inverso e define as previsões de cada elemento da estrutura a partir das previsões dos elementos mais desagregados. Para tanto, basta modificar a matriz $\mathbfit{G}$.
@@ -479,7 +521,7 @@ $$
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}
+\end{bmatrix}_{m \times n}
 $$ {#eq-matriz_gbu}
 
 O que resulta nas equações desejadas. Portanto, $\mathbfit{G}$ define a abordagem --- se *top-down* ou *bottom-up* ---, e $\mathbfit{S}$ define a maneira da qual as previsões são somadas para formar as equações de previsão para cada elemento da estrutura. Portanto, chamamos $\mathbfit{G}$ de matriz de reconciliação.
@@ -497,7 +539,7 @@ $$
     \tilde{y}_{BB, t} \\
     \tilde{y}_{BC, t} \\
     \tilde{y}_{CA, t}
-\end{bmatrix}
+\end{bmatrix}_{n \times 1}
 =
 \begin{bmatrix}
     1 & 1 & 1 & 1 & 1 & 1 & 1 \\
@@ -511,7 +553,7 @@ $$
     0 & 0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}
+\end{bmatrix}_{n \times m}
 \begin{bmatrix}
     \hat{y}_{AA, T+h|T} \\
     \hat{y}_{AB, T+h|T} \\
@@ -520,7 +562,7 @@ $$
     \hat{y}_{BB, T+h|T} \\
     \hat{y}_{BC, T+h|T} \\
     \hat{y}_{CA, T+h|T}
-\end{bmatrix}
+\end{bmatrix}_{m \times 1}
 $$ {#eq-matriz_bottomup}
 
 Quando $m$ — a quantidade de elementos do nível mais desagregado — é muito grande, tornando muito custoso obter $\mathbfit{\hat{y}_t}$, e não se deseja uma abordagem estritamente *top-down*, pode-se combinar as duas formas. Ainda na estrutura hierárquica descrita na @fig-h, obter de forma criteriosa modelos Arima, por exemplo, para cada um dos municípios é muito custoso em tempo. Por outro lado, pode-se realizar a previsão para os estados e então obter de maneira *top-down* as previsões para os municípios, enquanto o nível mais agregado é obtido de maneira *bottom-up*.
@@ -536,7 +578,7 @@ $$
     0 & 0 & p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     0 & 0 & p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     0 & 0 & 0 & p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0
-\end{bmatrix}
+\end{bmatrix}_{m \times n}
 $$ {#eq-matriz_gmo}
 
 Esse método é chamado de *middle-out*. Nele, o total é o somatório das proporções de um nível intermédiário escolhido, ao invés de proporções do total. Isso permite uma abordagem mais econômica, em termos de custo computacional e de tempo, ao mesmo tempo em que mantém em algum grau as características individuais das hierarquias.
@@ -554,7 +596,7 @@ $$
     \tilde{y}_{BB, t} \\
     \tilde{y}_{BC, t} \\
     \tilde{y}_{CA, t}
-\end{bmatrix}
+\end{bmatrix}_{n \times 1}
 =
 \begin{bmatrix}
     1 & 1 & 1 & 1 & 1 & 1 & 1 \\
@@ -568,7 +610,7 @@ $$
     0 & 0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}
+\end{bmatrix}_{n \times m}
 \begin{bmatrix}
     p_1\hat{y}_{A,T+h|T} \\
     p_2\hat{y}_{A,T+h|T} \\
@@ -577,7 +619,7 @@ $$
     p_5\hat{y}_{B,T+h|T} \\
     p_6\hat{y}_{B,T+h|T} \\
     p_7\hat{y}_{C,T+h|T}
-\end{bmatrix}
+\end{bmatrix}_{m \times 1}
 $$ {#eq-matriz_mo}
 
 ### Coerência e reconciliação
@@ -586,7 +628,7 @@ Seja somando as previsões do nível mais desagregado para formar os níveis sup
 
 Não fosse essa pré multiplicação, nada garantiria a coerência das previsões. Tomando a estrutura da @fig-h como exemplo, seria um acaso improvável que as previsões do agregado para o estado do Espírito Santo sejam exatamente a soma das previsões individuais de seus municípios. Isso porque não há qualquer razão para que cada série siga o mesmo processo (e.g., arima) com coeficientes idênticos.
 
-Os métodos de gerar previsões coerentes a partir de previsões base são chamados de métodos de *reconciliação*. Os métodos de reconciliação tradicionais apresentados, *top-down*, *bottom-up* e *middle-out*, utilizam informação limitada. No método *top-down*, utiliza-se apenas informações do nível mais agregado --- por isso, apenas a primeira coluna em (@eq-matriz_g) é diferente de zero. Já na abordagem *bottom-up*, utiliza-se apenas as informações dos níveis mais desagregados, o que resulta na submatriz identidade $m \times m$ em (@eq-matriz_gbu), enquanto as colunas que representam os níveis mais agregados são nulas. Por fim, a abordagem *middle-out* não utiliza a mesma, mas utiliza a mesma quantidade de informação que a *top-down* (@eq-matriz_gmo).
+Os métodos de gerar previsões coerentes ($\mathbfit{\tilde{y}_t}$) a partir de previsões base ($\mathbfit{\hat{y}_t}$) são chamados de métodos de *reconciliação*. Os métodos de reconciliação tradicionais apresentados, *top-down*, *bottom-up* e *middle-out*, utilizam informação limitada. No método *top-down*, utiliza-se apenas informações do nível mais agregado --- por isso, apenas a primeira coluna em (@eq-matriz_g) é diferente de zero. Já na abordagem *bottom-up*, utiliza-se apenas as informações dos níveis mais desagregados, o que resulta na submatriz identidade $m \times m$ em (@eq-matriz_gbu), enquanto as colunas que representam os níveis mais agregados são nulas. Por fim, a abordagem *middle-out* não utiliza a mesma, mas utiliza a mesma quantidade de informação que a *top-down* (@eq-matriz_gmo).
 
 Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham o menor erro o possível. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
 
