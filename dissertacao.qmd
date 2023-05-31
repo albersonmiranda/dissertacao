@@ -5,7 +5,7 @@ format:
     pdf:
         include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
         include-before-body: config/elementos/pre_textuais.tex
-        #include-after-body: config/elementos/pos_textuais.tex
+        include-after-body: config/elementos/pos_textuais.tex
         keep-tex: false
         cite-method: biblatex
         output-file: render/dissertacao.pdf
@@ -592,11 +592,11 @@ Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize
 
 ## Métodos analíticos de reconciliação ótima
 
-[Descrever o MinT]
+[Descrever as variações do MinT: OLS, WLS e shrink]
 
 ## Métodos de reconciliação ótima baseados em aprendizado de máquina
 
-[Descrever o algorítmo, os learners — GLMnet para Lasso e Ridge (incluindo as normas L1 e L2), XGBoost, SVM e rede neural —, o espaço de hyperparâmetros para cada e o processo de reamostragem]
+[Descrever o algorítmo, os learners — GLMnet para Lasso e Ridge, XGBoost, SVM e rede neural —, o espaço de hyperparâmetros para cada]
 
 ### O processo de ajuste e sobreajuste
 
@@ -634,7 +634,7 @@ Para dados *cross-section*, essa definição de validação cruzada $k$-*fold* �
 
 @bergmeir_note_2018 abordam esse problema teórica e empiricamente, conluindo que é possível o uso de validação cruzada $k$-*fold* quando a série não apresenta autocorrelação serial nos resíduos, o que pode ser facilmente detectado via teste de Ljung-Box ou Breusch-Godfrey, por exemplo. Entretanto, para os casos em que a ausência de autocorreçalação não pode ser alcançada ou na presença de hierarquias largas, como a de objeto deste estudo, em que testar e corrigir individualmente a autocorrelação serial de cada série pode ser indesejado, foram necessário desenvolver abordagens alternativas.
 
-Para contornar esse problema, foram desenvolvidas algumas abordagens de validação cruzada para séries temporais, como a validação cruzada $k$-*fold* com avanço de janelas e com avanço de origem.
+Para contornar esse problema, foram desenvolvidas algumas abordagens de validação cruzada para séries temporais, como a validação cruzada $k$-*fold* não-dependente e a validação cruzada $k$-*fold* com avanço de origem.
 
 # METODOLOGIA
 
