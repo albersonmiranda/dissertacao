@@ -4,44 +4,63 @@
 library(DiagrammeR)
 
 # séries hierárquicas
-nodes_h = tibble::tribble(
-    ~id, ~tipo, ~label,
-    1, "total", "Total",
-    2, "estado", "Espírito Santo (A)",
-    3, "município", "Vitória (AA)",
-    4, "município", "Vila Velha (AB)",
-    5, "município", "... (AC)",
-    6, "estado", "Rio de Janeiro (B)",
-    7, "município", "Rio de Janeiro (BA)",
-    8, "município", "Duque de Caxias (BB)",
-    9, "município", "... (BC)",
-    10, "estado", "... (C)",
-    11, "município", "... (CA)"
+node_chapters = create_node_df(
+    n = 3,
+    label = c(
+        "País",
+        "Estado",
+        "Município"
+    ),
+    rank = c(
+        "total",
+        "estado",
+        "município"
+    ),
+    type = "chapter",
+    group = "left"
 )
 
-nodes_h = within(nodes_h, {
+nodes_h = tibble::tribble(
+    ~type, ~label,
+    "total", "Total",
+    "estado", "A",
+    "município", "AA",
+    "município", "AB",
+    "estado", "B",
+    "município", "BA",
+    "município", "BB",
+    "estado", "C",
+    "município", "CA",
+    "município", "CB"
+)
+
+nodes = combine_ndfs(node_chapters, nodes_h) |>
+    transform(rank = ifelse(type != "chapter", type, rank))
+
+nodes = within(nodes, {
     shape = "rectangle"
     fontname = "Times New Roman"
-    fillcolor = "#003468"
-    fillcolor = ifelse(tipo == "estado", "#004B8D", fillcolor)
-    fillcolor = ifelse(tipo == "município", "white", fillcolor)
-    fontcolor = ifelse(tipo == "município", "#004B8D", "white")
-    color = ifelse(tipo == "município", "#004B8D", fillcolor)
+    fillcolor = ifelse(type == "chapter", "#56AF31", "#003468")
+    fillcolor = ifelse(type == "estado", "#004B8D", fillcolor)
+    fillcolor = ifelse(type == "município", "white", fillcolor)
+    fontcolor = ifelse(type == "município", "#004B8D", "white")
+    color = ifelse(type == "município", "#004B8D", fillcolor)
     width = 1.5
 })
 
 edges_h = tibble::tribble(
-    ~from, ~to,
-    1, 2,
-    1, 6,
-    1, 10,
-    2, 3,
-    2, 4,
-    2, 5,
-    6, 7,
-    6, 8,
-    6, 9,
-    10, 11
+    ~from, ~to, ~style,
+    1, 2, "invis",
+    2, 3, "invis",
+    4, 5, NA,
+    4, 8, NA,
+    4, 11, NA,
+    5, 6, NA,
+    5, 7, NA,
+    8, 9, NA,
+    8, 10, NA,
+    11, 12, NA,
+    11, 13, NA
 )
 
 edges_h = within(edges_h, {
@@ -51,7 +70,7 @@ edges_h = within(edges_h, {
 
 create_graph(attr_theme = "tb") |>
     add_nodes_from_table(
-        table = nodes_h,
+        table = nodes,
         label_col = label
     ) |>
     add_edges_from_table(
@@ -67,7 +86,7 @@ create_graph(attr_theme = "tb") |>
 
 # séries agrupadas
 nodes_a = tibble::tribble(
-    ~id, ~tipo, ~label,
+    ~id, ~type, ~label,
     1, "total", "Total",
     2, "setor", "Agricultura",
     3, "setor", "Ind. Extrativa",
@@ -81,7 +100,7 @@ nodes_a = within(nodes_a, {
     shape = "rectangle"
     fontname = "Times New Roman"
     fillcolor = "#003468"
-    fillcolor = ifelse(tipo == "setor", "#56AF31", fillcolor)
+    fillcolor = ifelse(type == "setor", "#56AF31", fillcolor)
     fontcolor = "white"
     color = fillcolor
     width = 1.5
@@ -119,58 +138,41 @@ create_graph(attr_theme = "tb") |>
         width = 1200)
 
 # séries hierárquicas e agrupadas
-# séries agrupadas
 nodes_ha = tibble::tribble(
-    ~id, ~tipo, ~label,
+    ~id, ~type, ~label,
     1, "total", "Total",
-    2, "setor", "Agricultura (X)",
-    3, "setor", "Indústria Extrativa (Y)",
-    4, "setor", "... (Z)",
-    5, "estado", "ES (AX)",
-    6, "estado", "RJ (BX)",
-    7, "estado", "... (CX)",
-    8, "estado", "ES (AY)",
-    9, "estado", "RJ (BY)",
-    10, "estado", "... (CY)",
-    11, "estado", "... (CZ)",
-    12, "municipio", "Vitória (AAY)",
-    13, "municipio", "Vila Velha (ABY)",
-    14, "municipio", "... (ACY)",
-    15, "municipio", "Rio de Janeiro (BAY)",
-    16, "municipio", "Duque de Caxias (BBY)",
-    17, "municipio", "... (BCY)"
+    2, "setor", "Agr. (X)",
+    3, "setor", "Ind. (Y)",
+    4, "estado", "A (XA)",
+    5, "estado", "B (XB)",
+    6, "estado", "C (XC)",
+    7, "estado", "A (YA)",
+    8, "estado", "B (YB)",
+    9, "estado", "C (YC)"
 )
 
 nodes_ha = within(nodes_ha, {
     shape = "rectangle"
     fontname = "Times New Roman"
     fillcolor = "#003468"
-    fillcolor = ifelse(tipo == "setor", "#56AF31", fillcolor)
-    fillcolor = ifelse(tipo == "estado", "#004B8D", fillcolor)
-    fillcolor = ifelse(tipo == "municipio", "white", fillcolor)
-    fontcolor = ifelse(tipo == "municipio", "#004B8D", "white")
-    color = ifelse(tipo == "municipio", "#004B8D", fillcolor)
-    width = ifelse(tipo %in% c("municipio", "setor"), 1.5, 1)
+    fillcolor = ifelse(type %in% c("setor", "chapter"), "#56AF31", fillcolor)
+    fillcolor = ifelse(type == "estado", "#004B8D", fillcolor)
+    fillcolor = ifelse(type == "municipio", "white", fillcolor)
+    fontcolor = ifelse(type == "municipio", "#004B8D", "white")
+    color = ifelse(type == "municipio", "#004B8D", fillcolor)
+    width = ifelse(type %in% c("municipio", "setor"), 1.5, 1)
 })
 
 edges_ha = tibble::tribble(
-    ~from, ~to,
-    1, 2,
-    1, 3,
-    1, 4,
-    2, 5,
-    2, 6,
-    2, 7,
-    3, 8,
-    3, 9,
-    3, 10,
-    4, 11,
-    8, 12,
-    8, 13,
-    8, 14,
-    9, 15,
-    9, 16,
-    9, 17
+    ~from, ~to, ~style,
+    1, 2, NA,
+    1, 3, NA,
+    2, 4, NA,
+    2, 5, NA,
+    2, 6, NA,
+    3, 7, NA,
+    3, 8, NA,
+    3, 9, NA
 )
 
 edges_ha = within(edges_ha, {
@@ -196,48 +198,42 @@ create_graph(attr_theme = "tb") |>
 
 # séries agrupadas em outra ordem
 nodes_ha = tibble::tribble(
-    ~id, ~tipo, ~label,
+    ~id, ~type, ~label,
     1, "total", "Total",
-    2, "setor", "Agr. (AX)",
-    3, "setor", "Ind. (AY)",
-    4, "setor", "... (AZ)",
-    5, "estado", "ES (A)",
-    6, "estado", "RJ (B)",
-    7, "estado", "... (C)",
-    8, "setor", "Agr. (BX)",
-    9, "setor", "Ind. (BY)",
-    10, "setor", "... (BZ)",
-    11, "setor", "Agr. (CX)",
-    12, "setor", "Ind. (CY)",
-    13, "setor", "... (CZ)",
+    2, "estado", "A",
+    3, "estado", "B",
+    4, "estado", "C",
+    5, "setor", "Agr. (AX)",
+    6, "setor", "Ind. (AY)",
+    7, "setor", "Agr. (BX)",
+    8, "setor", "Ind. (BY)",
+    9, "setor", "Agr. (CX)",
+    10, "setor", "Ind. (CY)"
 )
 
 nodes_ha = within(nodes_ha, {
     shape = "rectangle"
     fontname = "Times New Roman"
     fillcolor = "#003468"
-    fillcolor = ifelse(tipo == "setor", "#56AF31", fillcolor)
-    fillcolor = ifelse(tipo == "estado", "#004B8D", fillcolor)
-    fillcolor = ifelse(tipo == "municipio", "white", fillcolor)
-    fontcolor = ifelse(tipo == "municipio", "#004B8D", "white")
-    color = ifelse(tipo == "municipio", "#004B8D", fillcolor)
-    width = 1
+    fillcolor = ifelse(type %in% c("setor", "chapter"), "#56AF31", fillcolor)
+    fillcolor = ifelse(type == "estado", "#004B8D", fillcolor)
+    fillcolor = ifelse(type == "municipio", "white", fillcolor)
+    fontcolor = ifelse(type == "municipio", "#004B8D", "white")
+    color = ifelse(type == "municipio", "#004B8D", fillcolor)
+    width = ifelse(type %in% c("municipio", "setor"), 1.5, 1)
 })
 
 edges_ha = tibble::tribble(
-    ~from, ~to,
-    1, 5,
-    1, 6,
-    1, 7,
-    5, 2,
-    5, 3,
-    5, 4,
-    6, 8,
-    6, 9,
-    6, 10,
-    7, 11,
-    7, 12,
-    7, 13
+    ~from, ~to, ~style,
+    1, 2, NA,
+    1, 3, NA,
+    1, 4, NA,
+    2, 5, NA,
+    2, 6, NA,
+    3, 7, NA,
+    3, 8, NA,
+    4, 9, NA,
+    4, 10, NA
 )
 
 edges_ha = within(edges_ha, {

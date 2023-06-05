@@ -5,7 +5,7 @@ format:
     pdf:
         include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
         include-before-body: config/elementos/pre_textuais.tex
-        include-after-body: config/elementos/pos_textuais.tex
+        #include-after-body: config/elementos/pos_textuais.tex
         keep-tex: false
         cite-method: biblatex
         output-file: render/dissertacao.pdf
@@ -130,7 +130,7 @@ Os objetivos específicos são:
 1. Comparar a performance, em termos de funções de custo e tempo de processamento, das estratégias de reamostragem validação cruzada $k$*-fold* e *holdout* para o algoritmo *elastic-net*;
 1. Verificar se a aplicação de regressão regularizada resulta em algum padrão reconhecível na estrutura (e.g., se a regularização tende a favorecer os coeficientes de séries temporais que compartilham o mesmo nó pai ou, em outras palavras, se tende a zerar os coeficientes de séries temporais que não compartilham o mesmo nó pai na hierarquia);
 
-## *Outline* da dissertação
+## Outline da dissertação
 
 [Escrever *outline* da dissertação]
 
@@ -191,23 +191,21 @@ A estimação por esse método resulta numa reconciliação ótima que depende a
 
 @spiliotis_hierarchical_2021 propõem a utilização de *machine learning* para a reconciliação ótima de séries temporais, especificamente os algoritmos de árvore de decisão *Random Forest* e *XGBoost*. Os autores descrevem como vantagens desse método em relação aos anteriores a descrição de relacionamentos não lineares, performance preditiva e a desnecessidade da utilização de todos os elementos da hierarquia na combinação ótima. Para o conjunto de dados utilizados, os autores afirmam que os métodos de *machine learning*, especialmente o XGBoost, alcançaram, em média, melhor performance que as abordagens de nível único e o MinT. Além disso, concluíram que quanto maior é a diferença entre as séries, em todos os níveis hierárquicos, maior são os benefícios da abordagem por *machine learning*. Tomando como ponto de partida as conclusões de @spiliotis_hierarchical_2021, este trabalho busca continuar a exploração de métodos de *machine learning*, dispondo de algoritmos e métodos de reamostragem ainda não utilizados para a tarefa de reconciliação ótima, verificando se os resultados se mantêm ou são superados em um contexto de séries temporais financeiras.
 
-# MÉTODOS PARA RECONCILIAÇÃO DE SÉRIES TEMPORAIS
+# MÉTODOS PARA RECONCILIAÇÃO DE SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
 
-## Séries hierárquicas e séries agrupadas
+## Notação algébrica
 
-Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagregadas naturalmente em uma estrutura aninhada [@hyndman_forecasting_2021]. Para ilustrar, tome a série do PIB brasileiro. Ela pode ser desagregada por estado que, por sua vez, pode ser desagregada por município.
+Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagregadas naturalmente em uma estrutura aninhada [@hyndman_forecasting_2021]. Para ilustrar, tome a série do PIB de um país fictício com três estados, cada um com dois municípios. Essa série pode ser desagregada por estado que, por sua vez, pode ser desagregada por município (@fig-h).
 
 ![Séries Hierárquicas](img/hierarq.png){#fig-h}
 
-Essa estrutura pode ser representada por equações para qualquer nível de agregação.
+Essa estrutura pode ser representada através de equações para qualquer nível de agregação. Dessa forma, o agregado nacional pode ser descrito pelos agregados dos estados, Equação \eqref{eq:ha}, ou como o agregado dos municípios, Equação \eqref{eq:ha_mun}. Já o agregado para o estado A é representado pela Equação \eqref{eq:haES}.
 
 \begin{align}
 y_t &= y_{A,t} + y_{B,t} + y_{C,t} \label{eq:ha} \\
 y_t &= y_{AA,t} + y_{AB,t} + y_{AC,t} + y_{BA,t} + y_{BC,t} + y_{CA,t}\label{eq:ha_mun} \\
 y_{A,t} &= y_{AA,t} + y_{AB,t} + y_{AC,t} \label{eq:haES}
 \end{align}
-
-Assim, o agregado nacional pode ser representado apenas pelos agregados dos estados (Equação \eqref{eq:ha}) ou como o agregado dos municípios (Equação \eqref{eq:ha_mun}). Já o agregado para o estado do Espírito Santo é representado pela Equação \eqref{eq:haES}.
 
 Alternativamente, podemos descrever a estrutura completa de forma matricial:
 
@@ -250,21 +248,21 @@ $$
 \end{bmatrix}_{m \times 1}
 $$ {#eq-matriz_hierarquia}
 
-Por outro lado, o PIB pode ser também desagregado de forma cruzada de acordo com a atividade econômica --- agricultura, indústrias extrativas, indústria de transformação, eletricidade e gás, construção etc. Essa estrutura não pode ser desagregada naturalmente de uma única forma, como é a hierarquia de estados e municípios. Não pode ser aninhada por um atributo como a própria geografia. A esse tipo de estrutura dá-se o nome de séries agrupadas.
+Uma outra forma de desagregarmos o PIB é por atividade econômica --- agricultura, indústrias extrativas, indústria de transformação, eletricidade e gás, construção etc. Essa estrutura não pode ser desagregada naturalmente de uma única maneira, como é a hierarquia de estados e municípios. Não pode ser aninhada por um atributo como a própria geografia. A esse tipo de estrutura dá-se o nome de séries agrupadas.
 
 ![Séries Agrupadas](img/agrupadas.png){#fig-a}
 
-Combinando as duas, temos a estrutura de séries hierárquicas agrupadas. Ao contrário da estrutura hierárquica, que só pode ser agregada de uma forma --- como com os municípios abaixo dos estados ---, a adição da estrutura agrupada pode ocorrer tanto acima (@fig-ha1) quanto abaixo (@fig-ha2) da hierárquica.
+Combinando as duas, temos a estrutura de séries hierárquicas agrupadas. Ao contrário da estrutura hierárquica, que só pode ser agregada de uma forma, como com os municípios abaixo dos estados^[Essa estrutura é única no sentido que o somatório dos municípios totaliza o estado, mas não se pode somar estados para totalizar um município. Outro exemplo de estrutura hierárquica é a série de vendas de uma empresa: pode-se agregar as vendas de cada filial para obter o total, mas não o contrário.], a adição da estrutura agrupada pode ocorrer tanto acima (@fig-ha1) quanto abaixo (@fig-ha2) da hierárquica.
 
 ![Séries Hierárquicas Agrupadas (a)](img/hier_agrup.png){#fig-ha1}
 
 ![Séries Hierárquicas Agrupadas (b)](img/hier_agrup_2.png){#fig-ha2}
 
-Na notação matricial, a estrutura da @fig-ha2 é representada como abaixo. Formalmente, o primeiro membro da igualdade é composto pelo vetor $\mathbfit{y}_t$ $n$-dimensional com todas as observações no tempo $t$ para todos os níveis da hierarquia. O segundo membro é composto pela matriz de soma $\mathbfit{S}$ de dimensão $n \times m$ que define as equações para todo nível de agregação, e pela matriz $\mathbfit{b}_t$ composta pelas séries no nível mais desagregado.
+Na notação matricial, a estrutura da @fig-ha2 é representada como abaixo. Formalmente, o primeiro membro da igualdade é composto pelo vetor $\mathbfit{y}_t$ $n$-dimensional com todas as observações no tempo $t$ para todos os níveis da hierarquia. O segundo membro é composto pela matriz de soma $\mathbfit{S}$ de dimensão $n \times m$ que define as equações para todo nível de agregação, e pelo vetor $\mathbfit{b}_t$ composta pelas séries no nível mais desagregado.
 
 $$
 \mathbfit{y}_t=\mathbfit{Sb}_t
-$$
+$$ {#eq-vetor_b}
 
 $$
 \begin{bmatrix}
@@ -274,64 +272,53 @@ $$
     y_{C, t} \\
     y_{X, t} \\
     y_{Y, t} \\
-    y_{Z, t} \\
     y_{AX, t} \\
     y_{AY, t} \\
-    y_{AZ, t} \\
     y_{BX, t} \\
     y_{BY, t} \\
-    y_{BZ, t} \\
     y_{CX, t} \\
-    y_{CY, t} \\
-    y_{CZ, t}
+    y_{CY, t}
 \end{bmatrix}_{n \times 1}
 =
 \begin{bmatrix}
-    1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
-    1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 1 & 1 & 1 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 \\
-    1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
-    0 & 1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 \\
-    0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 1 \\
-    1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+    1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 1 \\
+    1 & 0 & 1 & 0 & 1 & 0 \\
+    0 & 1 & 0 & 1 & 0 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 \\
 \end{bmatrix}_{n \times m}
 \begin{bmatrix}
     y_{AX, t} \\
     y_{AY, t} \\
-    y_{AZ, t} \\
     y_{BX, t} \\
     y_{BY, t} \\
-    y_{BZ, t} \\
     y_{CX, t} \\
-    y_{CY, t} \\
-    y_{CZ, t}
+    y_{CY, t}
 \end{bmatrix}_{m \times 1}
 $$ {#eq-matriz_ha}
 
-### Abordagens top-down, bottom-up e middle-out
+## Abordagens top-down, bottom-up e middle-out
 
-Talvez as formas mais intuitivas de se pensar em previsões para esses tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a estrutura descrita na @fig-h, por exemplo. Podemos realizar a previsão para o horizonte de tempo $h$ do agregado do PIB brasileiro, representado no topo da hierarquia por *Total* (@eq-topdown_1), e então distribuir os valores previstos proporcionalmente entre os estados e municípios.
+Talvez as formas mais intuitivas de se pensar em previsões para esses tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a estrutura descrita na @fig-h, por exemplo. Podemos realizar a previsão para o horizonte de tempo $h$ do agregado do PIB, representado no topo da hierarquia por *Total* (@eq-topdown_1), e então distribuir os valores previstos proporcionalmente entre os estados e municípios.
 
 $$
 \mathbfit{\hat{y}}_{T+h | T} = E[\mathbfit{y}_{T+h} | \Omega_T]
 $$ {#eq-topdown_1}
 
-Essa é a abordagem top-down. Nela, a previsão para os níveis mais desagregados da hierarquia são determinadas por uma proporção $p_i$ do nível agregado. Por exemplo, as previsões para Vitória são dadas pela @eq-topdown_2.
+Essa é a abordagem top-down. Nela, a previsão para os níveis mais desagregados da hierarquia são determinadas por uma proporção $p_i$ do nível agregado. Por exemplo, as previsões para o município AA são dadas pela @eq-topdown_2.
 
 $$
 \mathbfit{\tilde{y}}_{AA, T+h | T} = p_{1}\mathbfit{\hat{y}}_{T+h | T}
 $$ {#eq-topdown_2}
 
-Para isso, temos de definir uma matriz com todos esses pesos, que, seguindo a formulação de @hyndman_forecasting_2021, vamos chamar de $\mathbfit{G}$:
+Para isso, temos de definir uma matriz com todos esses pesos, que, seguindo a formulação de @hyndman_forecasting_2021, chamamos de $\mathbfit{G}$:
 
 $$
 \mathbfit{G}
@@ -342,12 +329,11 @@ $$
     p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
 \end{bmatrix}_{m \times n}
 $$ {#eq-matriz_g}
 
-$\mathbfit{G}$ é uma matriz $m \times n$ que multiplica o vetor $\hat{\mathbfit{y}}_{T+h|T}$ que chamamos de *previsões base* --- as previsões individuais para todos os níveis de agregação. A equação para a abordagem *top-down* será, então:
+$\mathbfit{G}$ é uma matriz $m \times n$ que multiplica o vetor $\hat{\mathbfit{y}}_{T+h|T}$ que chamamos de *previsões base*, isto é, as previsões individuais para todos os níveis de agregação. A equação para a abordagem *top-down* será, então:
 
 $$
 \mathbfit{\tilde{y}}_{T+h | T} = \mathbfit{SG\hat{y}}_{T+h | T}
@@ -363,11 +349,10 @@ $$
     \tilde{y}_{C, t} \\
     \tilde{y}_{AA, t} \\
     \tilde{y}_{AB, t} \\
-    \tilde{y}_{AC, t} \\
     \tilde{y}_{BA, t} \\
     \tilde{y}_{BB, t} \\
-    \tilde{y}_{BC, t} \\
-    \tilde{y}_{CA, t}
+    \tilde{y}_{CA, t} \\
+    \tilde{y}_{CB, t}
 \end{bmatrix}_{n \times 1}
 =
 \mathbfit{S}_{n \times m}
@@ -377,8 +362,7 @@ $$
     p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
 \end{bmatrix}_{m \times n}
 \begin{bmatrix}
     \hat{y}_{T+h|T} \\
@@ -387,15 +371,14 @@ $$
     \hat{y}_{C, T+h|T} \\
     \hat{y}_{AA, T+h|T} \\
     \hat{y}_{AB, T+h|T} \\
-    \hat{y}_{AC, T+h|T} \\
     \hat{y}_{BA, T+h|T} \\
     \hat{y}_{BB, T+h|T} \\
-    \hat{y}_{BC, T+h|T} \\
-    \hat{y}_{CA, T+h|T}
+    \hat{y}_{CA, T+h|T} \\
+    \hat{y}_{CB, T+h|T}
 \end{bmatrix}_{n \times 1}
 $$ {#eq-matriz_topdown1}
 
-O que nos dá uma proporção do total para cada elemento no nível mais desagregado.
+Multiplicando as matrizes $\mathbfit{G}$ e $\mathbfit{\hat{y}}$ obtemos o vetor $\mathbfit{b}_t$^[Ver @eq-vetor_b.], que contém as previsões para os níveis mais desagregados, agora definidas como proporção do total.
 $$
 \begin{bmatrix}
     \tilde{y}_{t} \\
@@ -404,11 +387,10 @@ $$
     \tilde{y}_{C, t} \\
     \tilde{y}_{AA, t} \\
     \tilde{y}_{AB, t} \\
-    \tilde{y}_{AC, t} \\
     \tilde{y}_{BA, t} \\
     \tilde{y}_{BB, t} \\
-    \tilde{y}_{BC, t} \\
-    \tilde{y}_{CA, t}
+    \tilde{y}_{CA, t} \\
+    \tilde{y}_{CB, t}
 \end{bmatrix}_{n \times 1}
 =
 \mathbfit{S}_{n \times m}
@@ -418,8 +400,7 @@ $$
     p_3\hat{y}_{T+h|T} \\
     p_4\hat{y}_{T+h|T} \\
     p_5\hat{y}_{T+h|T} \\
-    p_6\hat{y}_{T+h|T} \\
-    p_7\hat{y}_{T+h|T}
+    p_6\hat{y}_{T+h|T}
 \end{bmatrix}_{m \times 1}
 $$ {#eq-matriz_topdown2}
 
@@ -433,11 +414,10 @@ $$
     \tilde{y}_{C, t} \\
     \tilde{y}_{AA, t} \\
     \tilde{y}_{AB, t} \\
-    \tilde{y}_{AC, t} \\
     \tilde{y}_{BA, t} \\
     \tilde{y}_{BB, t} \\
-    \tilde{y}_{BC, t} \\
-    \tilde{y}_{CA, t}
+    \tilde{y}_{CA, t} \\
+    \tilde{y}_{CB, t}
 \end{bmatrix}_{n \times 1}
 =
 \mathbfit{S}_{n \times m}
@@ -447,12 +427,10 @@ $$
     p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
 \end{bmatrix}_{m \times n}
 \begin{bmatrix}
     \hat{y}_{T+h|T} \\
-    0 \\
     0 \\
     0 \\
     0 \\
@@ -465,7 +443,7 @@ $$
 \end{bmatrix}_{n \times 1}
 $$ {#eq-matriz_topdown3}
 
-Substituindo a matriz $\mathbfit{S}$, temos as equações que definem cada previsão da estrutura em função de proporções da previsão do agregado.
+Substituindo a matriz $\mathbfit{S}$, temos as equações que definem as previsões reconciliadas.
 
 $$
 \begin{bmatrix}
@@ -475,25 +453,24 @@ $$
     \tilde{y}_{C, t} \\
     \tilde{y}_{AA, t} \\
     \tilde{y}_{AB, t} \\
-    \tilde{y}_{AC, t} \\
     \tilde{y}_{BA, t} \\
     \tilde{y}_{BB, t} \\
-    \tilde{y}_{BC, t} \\
-    \tilde{y}_{CA, t}
+    \tilde{y}_{CA, t} \\
+    \tilde{y}_{CB, t}
 \end{bmatrix}_{n \times 1}
 =
 \begin{bmatrix}
-    1 & 1 & 1 & 1 & 1 & 1 & 1 \\
-    1 & 1 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 1 & 1 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
-    1 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 1 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 1 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 1
+    1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 \\
+    0 & 0 & 0 & 0 & 0 & 0
 \end{bmatrix}_{n \times m}
 \begin{bmatrix}
     p_1\hat{y}_{T+h|T} \\
@@ -501,8 +478,7 @@ $$
     p_3\hat{y}_{T+h|T} \\
     p_4\hat{y}_{T+h|T} \\
     p_5\hat{y}_{T+h|T} \\
-    p_6\hat{y}_{T+h|T} \\
-    p_7\hat{y}_{T+h|T}
+    p_6\hat{y}_{T+h|T}
 \end{bmatrix}_{m \times 1}
 $$ {#eq-matriz_topdown3}
 
@@ -517,12 +493,11 @@ $$
     0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0
 \end{bmatrix}_{m \times n}
 $$ {#eq-matriz_gbu}
 
-O que resulta nas equações desejadas. Portanto, $\mathbfit{G}$ define a abordagem --- se *top-down* ou *bottom-up* ---, e $\mathbfit{S}$ define a maneira da qual as previsões são somadas para formar as equações de previsão para cada elemento da estrutura. Portanto, chamamos $\mathbfit{G}$ de matriz de reconciliação.
+Portanto, $\mathbfit{G}$ define a abordagem --- se *top-down* ou *bottom-up* ---, e $\mathbfit{S}$ define a maneira da qual as previsões são somadas para formar as equações de previsão para cada elemento da estrutura. Portanto, chamamos $\mathbfit{G}$ de matriz de reconciliação.
 
 $$
 \begin{bmatrix}
@@ -532,38 +507,35 @@ $$
     \tilde{y}_{C, t} \\
     \tilde{y}_{AA, t} \\
     \tilde{y}_{AB, t} \\
-    \tilde{y}_{AC, t} \\
     \tilde{y}_{BA, t} \\
     \tilde{y}_{BB, t} \\
-    \tilde{y}_{BC, t} \\
-    \tilde{y}_{CA, t}
+    \tilde{y}_{CA, t} \\
+    \tilde{y}_{CB, t}
 \end{bmatrix}_{n \times 1}
 =
 \begin{bmatrix}
-    1 & 1 & 1 & 1 & 1 & 1 & 1 \\
-    1 & 1 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 1 & 1 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
-    1 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 1 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 1 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 1
+    1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1
 \end{bmatrix}_{n \times m}
 \begin{bmatrix}
     \hat{y}_{AA, T+h|T} \\
     \hat{y}_{AB, T+h|T} \\
-    \hat{y}_{AC, T+h|T} \\
     \hat{y}_{BA, T+h|T} \\
     \hat{y}_{BB, T+h|T} \\
-    \hat{y}_{BC, T+h|T} \\
-    \hat{y}_{CA, T+h|T}
+    \hat{y}_{CA, T+h|T} \\
+    \hat{y}_{CB, T+h|T}
 \end{bmatrix}_{m \times 1}
 $$ {#eq-matriz_bottomup}
 
-Quando $m$ — a quantidade de elementos do nível mais desagregado — é muito grande, tornando muito custoso obter $\mathbfit{\hat{y}_t}$, e não se deseja uma abordagem estritamente *top-down*, pode-se combinar as duas formas. Ainda na estrutura hierárquica descrita na @fig-h, obter de forma criteriosa modelos Arima, por exemplo, para cada um dos municípios é muito custoso em tempo. Por outro lado, pode-se realizar a previsão para os estados e então obter de maneira *top-down* as previsões para os municípios, enquanto o nível mais agregado é obtido de maneira *bottom-up*.
+Quando $m$ — a quantidade de elementos do nível mais desagregado — é muito grande, tornando muito custoso obter $\mathbfit{\hat{y}_t}$, e não se deseja uma abordagem estritamente *top-down*, pode-se combinar as duas formas:
 
 $$
 \mathbfit{G}
@@ -571,15 +543,14 @@ $$
 \begin{bmatrix}
     0 & p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     0 & p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     0 & 0 & p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & p_7 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+    0 & 0 & 0 & p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0
 \end{bmatrix}_{m \times n}
 $$ {#eq-matriz_gmo}
 
-Esse método é chamado de *middle-out*. Nele, o total é o somatório das proporções de um nível intermédiário escolhido, ao invés de proporções do total. Isso permite uma abordagem mais econômica, em termos de custo computacional e de tempo, ao mesmo tempo em que mantém em algum grau as características individuais das hierarquias.
+Esse método é chamado de *middle-out*. Nele, o vetor $\mathbfit{b}_t$ é reescrito como proporções de algum nível intermédiário arbitrariamente escolhido, ao invés de proporções do total. Isso permite uma abordagem mais econômica, em termos de custo computacional e de tempo, ao mesmo tempo em que mantém em algum grau as características individuais das hierarquias.
 
 $$
 \begin{bmatrix}
@@ -589,25 +560,23 @@ $$
     \tilde{y}_{C, t} \\
     \tilde{y}_{AA, t} \\
     \tilde{y}_{AB, t} \\
-    \tilde{y}_{AC, t} \\
     \tilde{y}_{BA, t} \\
     \tilde{y}_{BB, t} \\
-    \tilde{y}_{BC, t} \\
-    \tilde{y}_{CA, t}
+    \tilde{y}_{CA, t} \\
+    \tilde{y}_{CB, t}
 \end{bmatrix}_{n \times 1}
 =
 \begin{bmatrix}
-    1 & 1 & 1 & 1 & 1 & 1 & 1 \\
-    1 & 1 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 1 & 1 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
-    1 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 1 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 1 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 1
+    1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1
 \end{bmatrix}_{n \times m}
 \begin{bmatrix}
     p_1\hat{y}_{A,T+h|T} \\
@@ -615,16 +584,15 @@ $$
     p_3\hat{y}_{A,T+h|T} \\
     p_4\hat{y}_{B,T+h|T} \\
     p_5\hat{y}_{B,T+h|T} \\
-    p_6\hat{y}_{B,T+h|T} \\
-    p_7\hat{y}_{C,T+h|T}
+    p_6\hat{y}_{B,T+h|T}
 \end{bmatrix}_{m \times 1}
 $$ {#eq-matriz_mo}
 
-### Coerência e reconciliação
+## Coerência e reconciliação
 
 Seja somando as previsões do nível mais desagregado para formar os níveis superiores da hierarquia (*bottom-up*) ou distribuindo proporcionalmente as previsões do nível mais agregado (*top-down*), o vetor $\mathbfit{\tilde{y}}_t$ representa as previsões *coerentes*. Isso significa que as previsões são totalizadas corretamente --- as previsões de cada elemento agregado corresponde ao somatório das previsões dos níveis inferiores da hierarquia. Isso é garantido pela multiplicação das matrizes $\mathbfit{SG}$.
 
-Não fosse essa pré multiplicação, nada garantiria a coerência das previsões. Tomando a estrutura da @fig-h como exemplo, seria um acaso improvável que as previsões do agregado para o estado do Espírito Santo sejam exatamente a soma das previsões individuais de seus municípios. Isso porque não há qualquer razão para que cada série siga o mesmo processo (e.g., arima) com coeficientes idênticos.
+Não fosse essa pré multiplicação, nada garantiria a coerência das previsões. Tomando a estrutura da @fig-h como exemplo, seria um acaso improvável que as previsões do agregado para o estado do Espírito Santo sejam exatamente a soma das previsões individuais de seus municípios. Isso porque não há qualquer razão para que cada série siga o mesmo processo estocástico.
 
 Os métodos de gerar previsões coerentes ($\mathbfit{\tilde{y}_t}$) a partir de previsões base ($\mathbfit{\hat{y}_t}$) são chamados de métodos de *reconciliação*. Os métodos de reconciliação tradicionais apresentados, *top-down*, *bottom-up* e *middle-out*, utilizam informação limitada. No método *top-down*, utiliza-se apenas informações do nível mais agregado --- por isso, apenas a primeira coluna em (@eq-matriz_g) é diferente de zero. Já na abordagem *bottom-up*, utiliza-se apenas as informações dos níveis mais desagregados, o que resulta na submatriz identidade $m \times m$ na @eq-matriz_gbu, enquanto as colunas que representam os níveis mais agregados são nulas. Por fim, a abordagem *middle-out* não utiliza a mesma, mas utiliza a mesma quantidade de informação que a *top-down* (@eq-matriz_gmo).
 
@@ -692,11 +660,11 @@ Neste capítulo estão contidas explicações sobre os dados e variáveis, sobre
 
 Os dados usados nesse trabalho são dados terciários obtidos do *datalake* público Base dos Dados [@dahis_data_2022]. A fonte primária são os bancos comerciais e múltiplos com carteira comercial que disponibilizam mensalmente os saldos dos principais verbetes do balancete via documento 4500^[Esses documentos são relatórios eletrônicos obrigatórios demandados pelo Bacen às instituições financeiras que permitem ao regulador o conhecimento minucioso dos bancos e de seus clientes.] ao Banco Central do Brasil, que os compila e publica, agrupados por agência bancária e por município, no relatório ESTBAN — Estatística Bancária Mensal e por Município^[https://www4.bcb.gov.br/fis/cosif/estban.asp?frame=1].
 
-O que compõe os verbetes de crédito, ou seja, os valores das séries temporais a serem trabalhadas, são os saldos de crédito ativo (empréstimos e financiamentos), que são compostos pelo principal mais os juros calculados até 59 dias de atraso. Não são consideradas crédito ativo as operações de crédito liquidadas ou que tenham sido transferidas para prejuízo^[São transferidas para prejuízo as operações de crédito em atraso há mais 6 meses após sua classificação de risco em H, que é a mínima [@conselho_monetario_nacional_resolucao_1999].].
+O que compõe os verbetes de crédito, ou seja, os valores das séries temporais a serem trabalhadas, são os saldos de crédito ativo (empréstimos e financiamentos), que são compostos pelo principal mais os juros calculados até 59 dias de atraso\footnote{Não são consideradas crédito ativo as operações de crédito liquidadas ou que tenham sido transferidas para prejuízo.}\footnote{São transferidas para prejuízo as operações de crédito em atraso há mais 6 meses após sua classificação de risco em H, que é a mínima \citep{conselho_monetario_nacional_resolucao_1999}.}.
 
 Além das estatísticas bancárias, foram obtidos informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
 
-Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram mantidos apenas os verbetes relacionados a crédito e mantidas apenas as agências em atividade durante todo o período. Quanto ao período, há dados disponíveis desde 1988. Entretanto, escolhi manter apenas os dados a partir de 2010 pois, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta.
+Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram mantidos apenas os verbetes relacionados a crédito e mantidas apenas as agências em atividade durante todo o período. Quanto ao período, há dados disponíveis desde 1988. Entretanto, utilizaremos os dados a partir de 2010 pois, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta.
 
 Por fim, as variáveis mantidas no *dataset* foram:
 
