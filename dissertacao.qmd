@@ -125,9 +125,10 @@ O objetivo geral da dissertação é estudar o problema da reconciliação ótim
 Os objetivos específicos são:
 
 1. Aplicar o algoritmo *elastic-net* para reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas e atestar sua validade em dados de alta dimensionalidade;
-2. Comparar a performance, em termos de funções de custo e tempo de processamento, do algoritmo *elastic-net* nas configurações $\alpha=1$ (LASSO), $\alpha=0$ (Ridge) e uma combinação de ambos obtida via reamostragem;
+1. Comparar a performance, em termos de funções de custo e tempo de processamento, do algoritmo *elastic-net* nas configurações $\alpha=1$ (LASSO), $\alpha=0$ (Ridge) e uma combinação de ambos obtida via reamostragem;
 1. Comparar a performance, em termos de funções de custo e tempo de processamento, do algoritmo *elastic-net* com os métodos analíticos *bottom-up*, *top-down* e *MinT Shrink*;
-2. Comparar a performance, em termos de funções de custo e tempo de processamento, das estratégias de reamostragem validação cruzada $k$*-fold* e *holdout* para o algoritmo *elastic-net*;
+1. Comparar a performance, em termos de funções de custo e tempo de processamento, das estratégias de reamostragem validação cruzada $k$*-fold* e *holdout* para o algoritmo *elastic-net*;
+1. Verificar se a aplicação de regressão regularizada resulta em algum padrão reconhecível na estrutura (e.g., se a regularização tende a favorecer os coeficientes de séries temporais que compartilham o mesmo nó pai ou, em outras palavras, se tende a zerar os coeficientes de séries temporais que não compartilham o mesmo nó pai na hierarquia);
 
 ## *Outline* da dissertação
 
@@ -137,11 +138,11 @@ Os objetivos específicos são:
 
 ## Previsão de saldos de crédito de instituições financeiras
 
-A nível macroeconômico, a previsão do agregado de crédito das instituições financeiras é uma preocupação de bancos centrais ao redor do mundo. No Brasil, @bader_modelo_2014 aprimoram o método FAVAR com uma etapa de análise de correlação canônica para identificar as melhores, em termos de correlação com as variáveis de crédito do SFN, combinações lineares de componentes principais. Esse método, que chamaram de FAVAR canônico, alcançou resultado superior aos FAVAR em 1 e 2 estágios na previsão das variáveis de crédito utilizadas, que foram: a concessão de crédito total com recursos livres, o saldo da carteira de crédito total com recursos livres, o saldo da carteira de crédito total com recursos direcionados, a taxa de inadimplência da carteira de crédito total com recursos livres e a taxa média de juros das operações de crédito total com recursos Livre. O trabalho abordou apenas o nível mais agregado, no total do SFN.
+A nível macroeconômico, a previsão do agregado de crédito das instituições financeiras é uma preocupação de bancos centrais ao redor do mundo. No Brasil, @bader_modelo_2014 aprimoram o método FAVAR (*Factor Augmented Vector Autoregression*) com uma etapa de análise de correlação canônica para identificar as melhores, em termos de correlação com as variáveis de crédito do SFN, combinações lineares de componentes principais. Esse método, que chamaram de FAVAR canônico, alcançou resultado superior aos FAVAR em 1 e 2 estágios na previsão das variáveis de crédito utilizadas, que foram: a concessão de crédito total com recursos livres, o saldo da carteira de crédito total com recursos livres, o saldo da carteira de crédito total com recursos direcionados, a taxa de inadimplência da carteira de crédito total com recursos livres e a taxa média de juros das operações de crédito total com recursos Livre. O trabalho abordou apenas o nível mais agregado, no total do SFN.
 
 @colak_tcmb_2019 produzem uma série de indicadores para monitoramento dos períodos de expansão e desaceleração moderada ou excessiva de crédito no setor bancário turco. Os autores utilizam séries filtradas do agregados de crédito, crédito comercial, crédito direto ao consumidor, crédito imobiliário e fincanciamento de veículos, além de diversos setores da economia, como agricultura, manufatura, construção, comércio, dentre outros, para prever os ciclos de crédito no sistema bancário turco. Os autores concluem que os indicadores com maior poder de explicação para as variáveis macroeconômicas são a taxa de crescimento real do crédito e a taxa de resposta ao impulso do crédito.
 
-Já para niveis abaixo do agregado de crédito, poucos trabalhos foram encontrados. Tangenciando o tema da previsão de saldos de crédito, outros tópicos da economia bancária foram objeto de estudo para previsão de séries temporais. @sezer_financial_2019 produziram revisão de literatura de trabalhos publicados entre 2005 e 2019 que realizaram previsão de séries temporais financeiras utilizando *deep learning* e os agruparam em preços de ações individuais, índices (e.g., IBovespa, Dow Jones), preços de commodities, tendência e volatilidade de ativos, preços de títulos, câmbio e preços de criptomoedas. Apesar da extensa revisão de literatura realizada pelos autores, nenhum dos trabalhos citados combinaram estruturas hierárquicas com *machine learning*.
+Já para níveis abaixo do agregado de crédito (i.e. o total de crédito da economia), poucos trabalhos foram encontrados. Tangenciando o tema da previsão de saldos de crédito, outros tópicos da economia bancária foram objeto de estudo para previsão de séries temporais. @sezer_financial_2019 produziram revisão de literatura de trabalhos publicados entre 2005 e 2019 que realizaram previsão de séries temporais financeiras utilizando *deep learning* e os agruparam em preços de ações individuais, índices (e.g., IBovespa, Dow Jones), preços de commodities, tendência e volatilidade de ativos, preços de títulos, câmbio e preços de criptomoedas. Apesar da extensa revisão de literatura realizada pelos autores, nenhum dos trabalhos citados combinaram estruturas hierárquicas com *machine learning*.
 
 @gorodetskaya_machine_2021 propõem o que chamaram de "uma metodologia universal" para aplicação automática de *machine learning* na previsão de séries temporais do setor bancário, que poderia ser aplicada em qualquer tipo de problema. A metodologia consiste em obter preditores a partir da própria variável defasada, das estatísticas básicas da variável (máximo, mínimo, média, variância etc.), e de anomalias periódicas detectadas, e selecioná-las pela medida de importância. Realizaram uma revisão de literatura recente sobre o assunto e apresentaram sua abordagem para o problema da previsão da demanda por moeda em caixas eletrônicos.
 
@@ -155,32 +156,32 @@ Uma abordagem de nível único é uma abordagem em que as previsões são realiz
 
 Enquanto há apenas uma única forma de se agregar níveis na hierarquia (*bottom-up*), a desagregação (*top-down*) pode ser realizada de, ao menos, duas dezenas de maneiras [@gross_disaggregation_1990]. Dois dos métodos mais intuitivos são a média das proporções históricas e a proporção das médias históricas.
 
-Na média das proporções históricas, cada proporção $p_j$, com $j = {1,...,m}$, consiste em tomar a média das proporções da série desagregada $y_{j,t}$ em relação ao agregado $y_t$:
+Na média das proporções históricas, cada proporção $p_j$, com $j = {1,...,m}$, consiste em tomar a média das proporções da série desagregada $y_{j,t}$ em relação ao agregado $y_{1,t}$:
 
 $$
-p_j = \frac{1}{T} \sum^{T}_{t=1} \frac{y_{j,t}}{y_t}
+p_j = \frac{1}{T} \sum^{T}_{t=1} \frac{y_{j,t}}{y_{1,t}}
 $$ {#eq-td_1}
 
-Já a proporção das médias históricas consiste em tomar a proporção das médias das séries desagregadas em relação à média do agregado^[Isso é equivalente a tomar a proporção direta entre os somatórios das séries. Note que, pelas propriedades do operador de somatório, $\sum^{T}_{t=1} \frac{y_{t}}{T} = \frac{y_1}{T}+...+\frac{y_T}{T} = \frac{y_1+...+y_T}{T} = \frac{\sum^{T}_{t=1} y_t}{T}$. Então, a equação @eq-td_2 pode ser simplificada para $p_j = \frac{\sum^{T}_{t=1} y_{j,t}}{\sum^{T}_{t=1} y_t}$.].
+Já a proporção das médias históricas consiste em tomar a proporção das médias das séries desagregadas em relação à média do agregado^[Isso é equivalente a tomar a proporção direta entre os somatórios das séries. Note que, pelas propriedades do operador de somatório, $\sum^{T}_{t=1} \frac{y_{t}}{T} = \frac{y_1}{T}+...+\frac{y_T}{T} = \frac{y_1+...+y_T}{T} = \frac{\sum^{T}_{t=1} y_t}{T}$. Então, a equação @eq-td_2 pode ser simplificada para $p_j = \frac{\sum^{T}_{t=1} y_{j,t}}{\sum^{T}_{t=1} y_{1,t}}$.].
 
 $$
-p_j = \frac{\sum^{T}_{t=1} \frac{y_{j,t}}{T}}{\sum^{T}_{t=1} \frac{y_{t}}{T}}
+p_j = \frac{\sum^{T}_{t=1} \frac{y_{j,t}}{T}}{\sum^{T}_{t=1} \frac{y_{1,t}}{T}}
 $$ {#eq-td_2}
 
 @athanasopoulos_hierarchical_2009 desenvolvem o método proporções de previsão, que consiste em um método *top-down* em que os pesos são calculados a partir das proporções das previsões base ao invés do passado. A vantagem do método é que os pesos estarão os mais próximos das características mais recentes da série, ao invés de serem baseados em dados históricos. A desvantagem é que se deve realizar previsões para toda a hierarquia, perdendo o ganho de agilidade dos demais métodos *top-down*.
 $$
-p_j = \prod^{K-1}_{i=0}\frac{\hat{Y}^{(i)}_{j,n}(h)}{\sum(\hat{Y}^{(i+1)}_{j,n}(h))}
+p_j = \prod^{K-1}_{i=0}\frac{\hat{Y}^{i}_{j,t+h}}{\sum\hat{Y}^{(i+1)}_{j,t+h}}
 $$
 
-@li_hierarchical_2016 compararam dois algoritmos de *machine learning* para previsão da produção de energia solar no estado da Flórida/EUA: ANN e SVR. Argumentando que tradicionalmente as previsões nesse problema são realizadas com os dados de produção total da planta, eles propõem uma abordagem hierárquica *bottom-up*, com previsões base de cada inversor solar. Os autores concluem que a abordagem hierárquica *bottom-up* é mais precisa do que a previsão do agregado, ao menos na previsão um passo a frente. Embora os autores utilizem algoritmos de *machine learning* para as previsões base, eles não utilizam esses algoritmos para a reconciliação ótima, caracterizando a abordagem do trabalho ainda como nível único.
+@li_hierarchical_2016 compararam dois algoritmos de *machine learning* para previsão da produção de energia solar no estado da Flórida/EUA: ANN (*Artificial Neural Network*) e SVR (*Support Vector Regression*). Argumentando que tradicionalmente as previsões nesse problema são realizadas com os dados de produção total da planta, eles propõem uma abordagem hierárquica *bottom-up*, com previsões base a partir de cada inversor solar. Os autores concluem que a abordagem hierárquica *bottom-up* é mais precisa do que a previsão do agregado, ao menos na previsão um passo a frente. Embora os autores utilizem algoritmos de *machine learning* para as previsões base, eles não utilizam esses algoritmos para a reconciliação ótima, caracterizando a abordagem do trabalho ainda como nível único.
 
-### Métodos analíticos para reconciliação ótima
+### Reconciliação ótima de séries temporais hierárquicas
 
 Previsões pontuais de séries temporais hierárquicas não é um assunto novo. Ao menos desde a década de 70, pesquisas foram publicadas acerca de abordagens *bottom-up* e *top-down*, suas vantagens e desvantagens, e tentativas de se definir qual é o melhor método^[Uma revisão dessa literatura pode ser encontrada em @athanasopoulos_hierarchical_2009.]. Entretanto, é apenas em @hyndman_optimal_2011 que é formalizada uma abordagem prática que utiliza toda a informação disponível, (i.e. as previsões de todos elementos de todos os níveis da hierarquia) a partir da estimação da matriz $\mathbfit{G}$ via regressão linear por mínimos quadrados generalizados (MQG).
 
 Entretanto, para ser capaz de estimar o modelo por MQG, é necessária a matriz de variância-covariância dos erros. @hyndman_optimal_2011 usam a matriz de erros de coerência, ou seja, a diferença entre as previsões reconciliadas e as previsões base, que tem posto incompleto e não identificada e, portanto, não pode ser estimada. Os autores contornam esse problema adotando no lugar da matriz de variância-covariância dos erros uma matriz diagonal constante, ou seja, assumem variância constante dos erros de reconciliação, e estimam a matriz $\mathbfit{G}$ por mínimos quadrados ordinários (MQO).
 
-A estimação por esse método resulta numa reconciliação ótima que depende apenas da matriz $\mathbfit{S}$, ou seja, da estrutura hierárquica, e independe da variância e covariância das previsões base $\mathbfit{\hat{y}_{T+h}}$ --- o que não é uma conclusão satisfatória.
+A estimação por esse método resulta numa reconciliação ótima que depende apenas da matriz $\mathbfit{S}$, ou seja, da estrutura hierárquica, e independe da variância e covariância das previsões base $\mathbfit{\hat{y}_{T+h}}$ --- o que não é uma conclusão satisfatória, uma vez que é impossível que uma série hierárquica seja descorrelatada, pois um nível superior é o agregado do inferior.
 
 @hyndman_fast_2016 tentam aperfeiçoar o método usando as variâncias das previsões base estimadas (dentro da amostra) como estimativa para a matriz de variância-covariância dos erros de reconciliação, de forma a as utilizar como pesos e realizar a reconciliação ótima por mínimos quadrados ponderados (MQP). Assim, previsões base mais acuradas têm peso maior do que as mais ruidosas. Entretanto, não fornecem justificativa teórica para usar a diagonal da matriz de variância-covariância de $\mathbfit{\hat{e}_{t}}$.
 
@@ -188,18 +189,7 @@ A estimação por esse método resulta numa reconciliação ótima que depende a
 
 @panagiotelis_forecast_2021 reinterpreta a literatura de coerência e reconciliação de previsões pontuais a partir de uma abordagem geométrica, trazendo provas alternativas para conclusões anteriores ao mesmo tempo em que fornece novos teoremas. Além disso, os autores estendem essa interpretação geométrica para o contexto probabilístico, fornecendo métodos paramétricos e não paramétricos (via *bootstrapping*) para reconciliação de previsões probabilísticas, ou seja, para reconciliar previsões $\hat{y}_t$ obtidas a partir de toda a distribuição, e não apenas a média.
 
-### Métodos de *machine learning* para reconciliação ótima
-
-@spiliotis_hierarchical_2021 propõem a utilização de *machine learning* para a reconciliação ótima de séries temporais, especificamente os algoritmos de árvore de decisão *Random Forest* e *XGBoost*. Os autores descrevem como vantagens desse método em relação aos anteriores a descrição de relacionamentos não lineares, performance preditiva e a desnecessidade da utilização de todos os elementos da hierarquia na combinação ótima. A abordagem utilizada foi:
-
-1. dividir a amostra em treino e teste;
-1. treinar um modelo de previsão na amostra treino e obter previsões um passo a frente para a amostra teste;
-1. treinar um modelo de *machine learning* para cada série do menor nível da hierarquia, em que os parâmetros são as previsões obtidas no passo 2 e a variável explicada são os valores observados. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos;
-1. obter as previsões base $\hat{y}_t$;
-1. passar as previsões base ao modelo treinado no passo 3 para se obter as previsões reconciliadas para o menor nível da hierarquia;
-1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
-
-Para o conjunto de dados utilizados, @spiliotis_hierarchical_2021 afirmam que os métodos de *machine learning*, especialmente o XGBoost, alcançaram, em média, melhor performance que as abordagens de nível único e o MinT. Além disso, concluíram que quanto maior é a diferença entre as séries, em todos os níveis hierárquicos, maior são os benefícios da abordagem por *machine learning*.
+@spiliotis_hierarchical_2021 propõem a utilização de *machine learning* para a reconciliação ótima de séries temporais, especificamente os algoritmos de árvore de decisão *Random Forest* e *XGBoost*. Os autores descrevem como vantagens desse método em relação aos anteriores a descrição de relacionamentos não lineares, performance preditiva e a desnecessidade da utilização de todos os elementos da hierarquia na combinação ótima. Para o conjunto de dados utilizados, os autores afirmam que os métodos de *machine learning*, especialmente o XGBoost, alcançaram, em média, melhor performance que as abordagens de nível único e o MinT. Além disso, concluíram que quanto maior é a diferença entre as séries, em todos os níveis hierárquicos, maior são os benefícios da abordagem por *machine learning*. Tomando como ponto de partida as conclusões de @spiliotis_hierarchical_2021, este trabalho busca continuar a exploração de métodos de *machine learning*, dispondo de algoritmos e métodos de reamostragem ainda não utilizados para a tarefa de reconciliação ótima, verificando se os resultados se mantêm ou são superados em um contexto de séries temporais financeiras.
 
 # MÉTODOS PARA RECONCILIAÇÃO DE SÉRIES TEMPORAIS
 
@@ -936,6 +926,17 @@ estban_aggr |>
             strip.text = element_text(size = 6)
         )
 ```
+
+## *Design* do experimento
+
+O *benchmarking* da performance dos métodos de reconciliação seguirá @spiliotis_hierarchical_2021:
+
+1. dividir a amostra em treino e teste;
+1. treinar um modelo de previsão na amostra treino e obter previsões um passo a frente para a amostra teste;
+1. treinar um modelo de *machine learning* para cada série do menor nível da hierarquia, em que os parâmetros são as previsões obtidas no passo 2 e a variável explicada são os valores observados. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos;
+1. obter as previsões base $\hat{y}_t$;
+1. passar as previsões base ao modelo treinado no passo 3 para se obter as previsões reconciliadas para o menor nível da hierarquia;
+1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
 
 # RESULTADOS
 
