@@ -1,26 +1,52 @@
 ---
-title: ""
+author: ALBERSON DA SILVA MIRANDA
+date: "2023"
 format:
     pdf:
-        include-in-header: config/preamble.tex
+        include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
         keep-tex: false
-        output-file: render/projeto.pdf
-cite-method: biblatex
-fontsize: 12pt
-geometry: margin=1in
+        cite-method: biblatex
+        output-file: render/dissertacao.pdf
+        documentclass: abntex2
+        classoption: [12pt, oneside, a4paper, chapter=TITLE, section=TITLE, brazil]
 number-sections: true
 crossref:
-  fig-prefix: "Figura"
-  tab-prefix: "Tabela"
-  eq-prefix: ""
+  fig-prefix: Figura
+  tbl-prefix: Tabela
+  eq-prefix: Equação
+  lof-title: LISTA DE FIGURAS
+  lot-title: LISTA DE TABELAS
 ---
+
+```{=latex}
+% elementos pré-textuais 
+
+% título do sumário
+\ifdefined\contentsname
+  \renewcommand*\contentsname{SUMÁRIO}
+\else
+  \newcommand\contentsname{SUMÁRIO}
+\fi
+
+% capa 
+\imprimircapa
+
+% resumo 
+
+\setlength{\absparsep}{18pt}
+\begin{resumo}
+  A pesquisa visa aplicar o método de estimação por regressão quantílica no problema da reconciliação ótima de previsões de séries temporais hierárquicas ou agrupadas. Além disso, busco evidenciar as vantagens e problemas do método pela comparação com as abordagens por mínimos quadrados ordinários, mínimos quadrados ponderados e minimum trace, adotando tanto a mediana quanto quantis extremos. O experimento será realizado nas séries temporais de saldo de crédito do Banco do Estado do Espírito Santo, organizadas hierarquicamente por superintendências regionais e agências, e agrupadas por modalidades de crédito selecionadas
+
+  \textbf{Palavras-chave}: palavra-chave1. palavra-chave2. palavra-chave3.
+\end{resumo}
+```
 
 ```{r config}
 #| include = FALSE
 
 # opções
 knitr::opts_chunk$set(
-    out.width = "70%",
+    out.width = "90%",
     echo = FALSE
 )
 
@@ -29,68 +55,53 @@ set.seed(1)
 
 # pacotes
 pacman::p_load(
-    kableExtra
+    kableExtra,
+    ggplot2,
+    tsibble,
+    fable,
+    fabletools
 )
+
+# tema ggplot
+tema = theme_classic() +
+    theme(
+        text = element_text(family = "serif")
+    )
 
 # gerar bibliografia de pacotes
 knitr::write_bib(
-    x = c(
-        .packages(),
-        "tsibble",
-        "fable",
-        "fabletools",
-        "feasts",
-        "quantreg",
-        "bees"
-    ),
-    file = "config/packages.bib"
+    c(.packages(), "basedosdados")
+    , file = "config/elementos/packages.bib"
 )
 
 # scripts
 source("scripts/hierarq.R")
+
+# dados
+estban = readRDS("data/estban.rds")
+
+# filtrando dados
+estban = subset(estban,
+    ref >= "2010-01-01",
+    select = c(
+        ref,
+        nome_mesorregiao,
+        nome_microrregiao,
+        nome,
+        cnpj_agencia,
+        verbete,
+        valor
+    )
+) |>
+(\(x) x[order(
+    x$ref,
+    x$nome_mesorregiao,
+    x$nome_microrregiao,
+    x$nome,
+    x$cnpj_agencia,
+    x$verbete
+), ])()
 ```
-
-<!-- capa -->
-
-\thispagestyle{empty}
-\begin{center}
-{\Large \MakeUppercase{\universidade\\ \campus\\ \curso}}
-\end{center}
-\vspace{1cm}
-\begin{center}
-{\Large \MakeUppercase{\nome\>\sobrenome}}
-\end{center}
-\vspace{4cm}
-\begin{center}
-\Large \MakeUppercase{\textbf{\titulo}}
-\end{center}
-\vspace{7cm}
-
-\begin{center}
-\uppercase{\cidade}\\ \ano
-\end{center}
-
-<!-- resumo -->
-
-\newpage
-\thispagestyle{empty}
-\setcounter{page}{1}
-\begin{singlespace}
-
-\vspace{1pc}
-\begin{center}
-\textbf{RESUMO}
-\end{center}
-\vspace{1pc}
-
-\noindent
-A pesquisa visa aplicar o método de estimação por regressão quantílica no problema da reconciliação ótima de previsões de séries temporais hierárquicas ou agrupadas. Além disso, busco evidenciar as vantagens e problemas do método pela comparação com as abordagens por mínimos quadrados ordinários, mínimos quadrados ponderados e \textit{minimum trace}, adotando tanto a mediana quanto quantis extremos. O experimento será realizado nas séries temporais de saldo de crédito do Banco do Estado do Espírito Santo, organizadas hierarquicamente por superintendências regionais e agências, e agrupadas por modalidades de crédito selecionadas.
-
-\vspace{2pc}
-\noindent
-{\textbf{Palavras-chave}:}  Séries temporais hierárquicas; Previsão; Reconciliação; Regressão quantílica.
-
-\end{singlespace}
 
 <!-- elementos textuais -->
 
