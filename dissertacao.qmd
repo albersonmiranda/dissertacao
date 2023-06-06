@@ -751,7 +751,7 @@ estban |>
 
 ```{r}
 #| label: tbl-microrregioes
-#| tbl-cap: "Microrregiões do ES incluídas nos dados"
+#| tbl-cap: "Microrregiões por mesorregião"
   
 aggregate(
         nome_microrregiao ~ nome_mesorregiao,
@@ -770,14 +770,20 @@ aggregate(
 
 ```{r}
 #| label: tbl-municipios
-#| tbl-cap: "Municípios por microrregião do ES incluídos nos dados"
+#| tbl-cap: "Municípios por microrregião"
   
 aggregate(
         nome ~ nome_microrregiao,
         data = estban,
         FUN = unique
     ) |>
-    kbl(booktabs = TRUE, row.names = FALSE) |>
+    kbl(
+        booktabs = TRUE,
+        row.names = FALSE,
+        col.names = c(
+            "Microrregiões",
+            "Municípios"
+        )) |>
     kable_styling(latex_options = c("striped"), font_size = 10) |>
     column_spec(2, width = "10cm")
 ```
@@ -795,7 +801,7 @@ temp = lapply(
 lengths()
 
 temp |>
-kbl(booktabs = TRUE, col.names = "unique_n") |>
+kbl(booktabs = TRUE, col.names = "Únicos") |>
 kable_styling(latex_options = c("striped"))
 ```
 
@@ -935,7 +941,13 @@ estban_aggr |>
 
 ## *Design* do experimento
 
-O *benchmarking* da performance dos métodos de reconciliação seguirá @spiliotis_hierarchical_2021:
+### Métodos analíticos de reconciliação ótima
+
+[Descrever procedimentos com o {fable}]
+
+### Métodos de reconciliação ótima baseados em aprendizado de máquina
+
+A metodologia para obtenção das previsões reconciliadas por métodos baseados em *machine-learning* será semelhante ao de @spiliotis_hierarchical_2021:
 
 1. dividir a amostra em treino e teste;
 1. treinar um modelo de previsão na amostra treino e obter previsões um passo a frente para a amostra teste;
@@ -943,6 +955,12 @@ O *benchmarking* da performance dos métodos de reconciliação seguirá @spilio
 1. obter as previsões base $\hat{y}_t$;
 1. passar as previsões base ao modelo treinado no passo 3 para se obter as previsões reconciliadas para o menor nível da hierarquia;
 1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
+
+Esse procedimento será realizado três vezes, uma para cada configuração do algoritmo elastic-net, com $\alpha=1$ (LASSO), $\alpha=0$ (Ridge) e uma combinação de ambos obtida via reamostragem (Elastic-Net).
+
+### Benchmarking
+
+O *benchmarking* da performance dos métodos de reconciliação
 
 # RESULTADOS
 
