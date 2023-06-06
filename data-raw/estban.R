@@ -22,28 +22,46 @@ WHERE sigla_uf = 'ES'
 
 # estban
 estban = basedosdados::read_sql("
+WITH estban AS (
+  SELECT
+    CAST(ano AS STRING) AS ano
+    , CAST(mes AS STRING) AS mes
+    , id_municipio
+    , cnpj_agencia
+    , CASE
+          WHEN id_verbete = '160' THEN 'operações de crédito'
+          WHEN id_verbete = '161' THEN 'empréstimos e títulos descontados'
+          WHEN id_verbete = '162' THEN 'financiamentos'
+          WHEN id_verbete IN ('163', '164', '165', '166') THEN 'financiamentos rurais'
+          WHEN id_verbete IN ('167') THEN 'financiamentos agroindustriais'
+          WHEN id_verbete = '169' THEN 'financiamentos imobiliários'
+          WHEN id_verbete IN ('171', '172', '176') THEN 'outros créditos'
+          WHEN id_verbete = '174' THEN 'provisão para operações de crédito'
+          ELSE 'outros'
+      END AS verbete
+    , valor
+
+  FROM `basedosdados.br_bcb_estban.agencia`
+
+  WHERE
+    cnpj_basico = '28127603'
+    AND id_verbete BETWEEN '161' AND '166'
+)
+
 SELECT
-  CAST(ano AS STRING) AS ano
-  , CAST(mes AS STRING) AS mes
+  ano
+  , mes
   , id_municipio
   , cnpj_agencia
-  , CASE
-        WHEN id_verbete = '160' THEN 'operações de crédito'
-        WHEN id_verbete = '161' THEN 'empréstimos e títulos descontados'
-        WHEN id_verbete = '162' THEN 'financiamentos'
-        WHEN id_verbete = '163' THEN 'financiamentos rurais'
-        WHEN id_verbete = '169' THEN 'financiamentos imobiliários'
-        WHEN id_verbete = '172' THEN 'outros créditos'
-        WHEN id_verbete = '174' THEN 'provisão para operações de crédito'
-        ELSE 'outros'
-    END AS verbete
-  , valor
-
-FROM `basedosdados.br_bcb_estban.agencia`
-
-WHERE
-  cnpj_basico = '28127603'
-  AND id_verbete IN ('161', '162', '163', '169')
+  , verbete
+  , SUM(valor) AS valor
+FROM estban
+GROUP BY
+  ano
+  , mes
+  , id_municipio
+  , cnpj_agencia
+  , verbete
 ")
 
 # formatando datas
