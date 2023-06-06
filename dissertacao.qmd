@@ -5,7 +5,7 @@ format:
     pdf:
         include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
         include-before-body: config/elementos/pre_textuais.tex
-        include-after-body: config/elementos/pos_textuais.tex
+        #include-after-body: config/elementos/pos_textuais.tex
         keep-tex: false
         cite-method: biblatex
         output-file: render/dissertacao.pdf
@@ -125,7 +125,7 @@ O objetivo geral da dissertação é estudar o problema da reconciliação ótim
 Os objetivos específicos são:
 
 1. Aplicar o algoritmo *elastic-net* para reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas e atestar sua validade em dados de alta dimensionalidade;
-1. Comparar a performance, em termos de funções de custo e tempo de processamento, do algoritmo *elastic-net* nas configurações $\alpha=1$ (LASSO), $\alpha=0$ (Ridge) e uma combinação de ambos obtida via reamostragem;
+1. Comparar a performance, em termos de funções de custo e tempo de processamento, do algoritmo *elastic-net* nas configurações $\alpha=0$ (LASSO), $\alpha=1$ (Ridge) e uma combinação de ambos obtida via reamostragem;
 1. Comparar a performance, em termos de funções de custo e tempo de processamento, do algoritmo *elastic-net* com os métodos analíticos *bottom-up*, *top-down* e *MinT Shrink*;
 1. Comparar a performance, em termos de funções de custo e tempo de processamento, das estratégias de reamostragem validação cruzada $k$*-fold* e *holdout* para o algoritmo *elastic-net*;
 1. Verificar se a aplicação de regressão regularizada resulta em algum padrão reconhecível na estrutura (e.g., se a regularização tende a favorecer os coeficientes de séries temporais que compartilham o mesmo nó pai ou, em outras palavras, se tende a zerar os coeficientes de séries temporais que não compartilham o mesmo nó pai na hierarquia);
@@ -604,7 +604,14 @@ Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize
 
 ## Métodos de reconciliação ótima baseados em aprendizado de máquina
 
-[Descrever o algorítmo, os learners — GLMnet para Lasso e Ridge, XGBoost, SVM e rede neural —, o espaço de hyperparâmetros para cada]
+[Descrever o algorítmo, os learners — GLMnet para Lasso e Ridge, XGBoost, SVM e rede neural]
+
+### Elastic Net
+
+O *elastic net* [@zou_regularization_2005] é um método de regressão regularizada que combina as normas $L_1$ e $L_2$, ou seja, penalidades do *lasso* e do *ridge*. A função objetivo a ser minimizada é dada por
+$$
+L(\lambda_1, \lambda_2, \mathbfit{\beta}) = |\mathbf{y} - \mathbf{X}\mathbfit{\beta}|^2 + \lambda_2|\mathbfit{\beta}|^2 + \lambda_1|\mathbfit{\beta}|_1
+$$ {#eq-elastic_net}
 
 ### O processo de ajuste e sobreajuste
 
@@ -956,11 +963,15 @@ A metodologia para obtenção das previsões reconciliadas por métodos baseados
 1. passar as previsões base ao modelo treinado no passo 3 para se obter as previsões reconciliadas para o menor nível da hierarquia;
 1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
 
-Esse procedimento será realizado três vezes, uma para cada configuração do algoritmo elastic-net, com $\alpha=1$ (LASSO), $\alpha=0$ (Ridge) e uma combinação de ambos obtida via reamostragem (Elastic-Net).
+Esse procedimento será realizado três vezes, uma para cada configuração do algoritmo elastic-net, com $\alpha=0$ (LASSO), $\alpha=1$ (Ridge) e uma combinação de ambos obtida via reamostragem (Elastic-Net).
+
+### Espaço de busca dos hiperparâmetros
+
+[Descrever o espaço de hyperparâmetros]
 
 ### Benchmarking
 
-O *benchmarking* da performance dos métodos de reconciliação
+[O *benchmarking* da performance dos métodos de reconciliação]
 
 # RESULTADOS
 
