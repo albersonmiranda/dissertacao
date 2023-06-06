@@ -5,7 +5,7 @@ format:
     pdf:
         include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
         include-before-body: config/elementos/pre_textuais.tex
-        #include-after-body: config/elementos/pos_textuais.tex
+        include-after-body: config/elementos/pos_textuais.tex
         keep-tex: false
         cite-method: biblatex
         output-file: render/dissertacao.pdf
@@ -660,48 +660,62 @@ Neste capítulo estão contidas explicações sobre os dados e variáveis, sobre
 
 Os dados usados nesse trabalho são dados terciários obtidos do *datalake* público Base dos Dados [@dahis_data_2022]. A fonte primária são os bancos comerciais e múltiplos com carteira comercial que disponibilizam mensalmente os saldos dos principais verbetes do balancete via documento 4500^[Esses documentos são relatórios eletrônicos obrigatórios demandados pelo Bacen às instituições financeiras que permitem ao regulador o conhecimento minucioso dos bancos e de seus clientes.] ao Banco Central do Brasil, que os compila e publica, agrupados por agência bancária e por município, no relatório ESTBAN — Estatística Bancária Mensal e por Município^[https://www4.bcb.gov.br/fis/cosif/estban.asp?frame=1].
 
-O que compõe os verbetes de crédito, ou seja, os valores das séries temporais a serem trabalhadas, são os saldos de crédito ativo (empréstimos e financiamentos), que são compostos pelo principal mais os juros calculados até 59 dias de atraso\footnote{Não são consideradas crédito ativo as operações de crédito liquidadas ou que tenham sido transferidas para prejuízo.}\footnote{São transferidas para prejuízo as operações de crédito em atraso há mais 6 meses após sua classificação de risco em H, que é a mínima \citep{conselho_monetario_nacional_resolucao_1999}.}.
+O que compõe os verbetes de crédito, ou seja, os valores das séries temporais a serem trabalhadas, são os saldos de crédito ativo (empréstimos e financiamentos), que são correspondem ao principal mais os juros calculados até 59 dias de atraso^[Não são consideradas crédito ativo as operações de crédito liquidadas ou que tenham sido transferidas para prejuízo. São transferidas para prejuízo as operações de crédito em atraso há mais 6 meses após sua classificação de risco em H, que é a mínima [@conselho_monetario_nacional_resolucao_1999].].
 
-Além das estatísticas bancárias, foram obtidos informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
+Além das estatísticas bancárias, foram obtidas informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
 
-Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram mantidos apenas os verbetes relacionados a crédito e mantidas apenas as agências em atividade durante todo o período. Quanto ao período, há dados disponíveis desde 1988. Entretanto, utilizaremos os dados a partir de 2010 pois, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta.
+Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram mantidos apenas os verbetes relacionados a crédito e mantidas apenas as agências atualmente em atividade. Quanto ao período, há dados disponíveis desde 1988. Entretanto, utilizaremos os dados a partir de 2010 pois, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta.
 
-Por fim, as variáveis mantidas no *dataset* foram:
+Por fim, as variáveis mantidas no *dataset* foram as descritas no Quadro \ref{qdr-variaveis}. Dessa forma, temos séries mensais de saldos de créditos de `r length(unique(estban$cnpj_agencia))` agências bancárias, distribuídas por `r length(unique(estban$nome))` municípios, a partir de `r format(min(estban$ref), "%B de %Y")`, totalizando `r scales::number(nrow(estban), big.mark = ".", decimal.mark = ",")` observações.
 
-1. ref: data de referência do relatório ESTBAN
-2. nome_mesorregiao: nome da mesorregião do ES:
-    - Central Espírito-Santense
-    - Litoral Norte Espírito-Santense
-    - Noroeste Espírito-Santense
-    - Sul Espírito-Santense
-3. nome_microrregião: nome da microrregião do ES:
-    - Afonso Cláudio
-    - Guarapari
-    - Santa Teresa
-    - Vitória
-    - Linhares
-    - Montanha
-    - São Mateus
-    - Barra de São Francisco
-    - Colatina
-    - Nova Venécia
-    - Alegre
-    - Cachoeiro de Itapemirim
-    - Itapemirim
-3. verbete:
-    - empréstimos e títulos descontados
-    - financiamentos
-    - financiamentos imobiliários
-    - financiamentos rurais
-4. nome: nome do município
-5. cnpj_agencia
-6. valor: saldo do verbete no município
+```{r}
+#| tbl-cap: "Variáveis do dataset"
+#| label: qdr-variaveis
+#| include: false
 
-Os dados foram organizados de forma hierárquica, do mais agregado para o mais desagregado, por estado, mesorregião, microrregião, município e agência bancária; e de forma agrupada, por verbete.
+tibble::tribble(
+    ~Variável, ~Descrição,
+    "ref", "Data de referência do relatório ESTBAN",
+    "nome_mesorregiao", "Nome da mesorregião do ES",
+    "nome_microrregiao", "Nome da microrregião do ES",
+    "verbete", "Descrição da rubrica do balancete",
+    "nome", "Nome do município",
+    "cnpj_agencia", "CNPJ da agência bancária",
+    "valor", "Saldo do verbete"
+) |>
+    kbl(booktabs = TRUE, row.names = FALSE) |>
+    kable_styling(latex_options = c("striped"), font_size = 12) |>
+    column_spec(2, width = "10cm")
+```
+
+```{=latex}
+\begin{quadro}
+    \caption{Variáveis do dataset}\tabularnewline
+    \label{qdr-variaveis}
+
+    \centering\begingroup\fontsize{11}{12}\selectfont
+
+    \begin{tabular}[t]{l>{\raggedright\arraybackslash}p{10cm}}
+    \toprule
+    Variável & Descrição\\
+    \midrule
+    \cellcolor{gray!6}{ref} & \cellcolor{gray!6}{Data de referência do relatório    ESTBAN}\\
+    nome\_mesorregiao & Nome da mesorregião do ES\\
+    \cellcolor{gray!6}{nome\_microrregiao} & \cellcolor{gray!6}{Nome da     microrregião do ES}\\
+    verbete & Descrição da rubrica do balancete\\
+    \cellcolor{gray!6}{nome} & \cellcolor{gray!6}{Nome do município}\\
+    \addlinespace
+    cnpj\_agencia & CNPJ da agência bancária\\
+    \cellcolor{gray!6}{valor} & \cellcolor{gray!6}{Saldo do verbete}\\
+    \bottomrule
+    \end{tabular}
+    \endgroup{}
+\end{quadro}
+```
+
+Os dados foram organizados de forma hierárquica por estado, mesorregião, microrregião, município e agência bancária; e de forma agrupada, por verbete.
 
 O detalhamento da construção do *dataset* se encontra no Anexo \ref{anexo_a}.
-
-![Modelo de dados](img/data_model.png){#fig-data_model height=25%}
 
 ## Análise exploratória dos dados
 
@@ -712,9 +726,26 @@ Após limpeza, o *dataset* adquiriu a estrutura apresentada na @tbl-dataset. As 
 #| tbl-cap: "Estrutura do dataset"
   
 estban |>
+    transform(
+        valor = scales::number(
+            valor,
+            big.mark = ".", decimal.mark = ","
+        )
+    ) |>
     subset(nome == "Vitória") |>
     tail() |>
-    kbl(booktabs = TRUE, row.names = FALSE) |>
+    kbl(
+        booktabs = TRUE,
+        row.names = FALSE,
+        col.names = c(
+            "Data de referência",
+            "Mesorregião",
+            "Microrregião",
+            "Município",
+            "Agência",
+            "Verbete",
+            "Saldo"
+        )) |>
     kable_styling(latex_options = c("striped", "scale_down"))
 ```
 
@@ -727,7 +758,13 @@ aggregate(
         data = estban,
         FUN = unique
     ) |>
-    kbl(booktabs = TRUE, row.names = FALSE) |>
+    kbl(
+        booktabs = TRUE,
+        row.names = FALSE,
+        col.names = c(
+            "Mesorregião",
+            "Microrregiões"
+        )) |>
     kable_styling(latex_options = c("striped"))
 ```
 
@@ -794,7 +831,8 @@ estban_aggr |>
         tema
 ```
 
-A concentração na mesorregião Central Espírito-santense, @fig-meso, indica que os elementos das demais regiões 
+A concentração na mesorregião Central Espírito-santense, @fig-meso, pode ser um indicativo de que os elementos das demais regiões tenham menor peso na reconciliação.
+
 ```{r}
 #| label: fig-meso
 #| fig-cap: "Série temporal do agregado de crédito do Banestes por mesorregião do ES"
