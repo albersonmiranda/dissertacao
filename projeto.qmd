@@ -6,7 +6,7 @@ format:
         include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
         keep-tex: false
         cite-method: biblatex
-        output-file: render/dissertacao.pdf
+        output-file: render/projeto.pdf
         documentclass: abntex2
         classoption: [12pt, oneside, a4paper, chapter=TITLE, section=TITLE, brazil]
 number-sections: true
@@ -17,29 +17,6 @@ crossref:
   lof-title: LISTA DE FIGURAS
   lot-title: LISTA DE TABELAS
 ---
-
-```{=latex}
-% elementos pré-textuais 
-
-% título do sumário
-\ifdefined\contentsname
-  \renewcommand*\contentsname{SUMÁRIO}
-\else
-  \newcommand\contentsname{SUMÁRIO}
-\fi
-
-% capa 
-\imprimircapa
-
-% resumo 
-
-\setlength{\absparsep}{18pt}
-\begin{resumo}
-  A pesquisa visa aplicar o método de estimação por regressão quantílica no problema da reconciliação ótima de previsões de séries temporais hierárquicas ou agrupadas. Além disso, busco evidenciar as vantagens e problemas do método pela comparação com as abordagens por mínimos quadrados ordinários, mínimos quadrados ponderados e minimum trace, adotando tanto a mediana quanto quantis extremos. O experimento será realizado nas séries temporais de saldo de crédito do Banco do Estado do Espírito Santo, organizadas hierarquicamente por superintendências regionais e agências, e agrupadas por modalidades de crédito selecionadas
-
-  \textbf{Palavras-chave}: palavra-chave1. palavra-chave2. palavra-chave3.
-\end{resumo}
-```
 
 ```{r config}
 #| include = FALSE
@@ -103,131 +80,923 @@ estban = subset(estban,
 ), ])()
 ```
 
-<!-- elementos textuais -->
+```{=latex}
+% elementos pré-textuais 
+
+% título do sumário
+\ifdefined\contentsname
+  \renewcommand*\contentsname{SUMÁRIO}
+\else
+  \newcommand\contentsname{SUMÁRIO}
+\fi
+
+% capa 
+\imprimircapa
+
+% resumo 
+
+\setlength{\absparsep}{18pt}
+\begin{resumo}
+  A pesquisa visa aplicar o método de regressão regularizada \textit{elastic net}, nas configurações \textit{lasso}, \textit{ridge} e combinada, no problema da reconciliação ótima de previsões de séries temporais hierárquicas ou agrupadas. Além disso, busca evidenciar as vantagens e possíveis problemas na aplicação do método em dados de alta dimensionalidade, realizando \textit{benchmark} com os métodos analíticos, especificamente o \textit{MinT}, nas configurações MQO, MQP e \textit{Shrink}, além das abordagens de nível único \textit{top-down} e \textit{bottom-up}. O experimento será realizado nas séries temporais de saldo de crédito do Banco do Estado do Espírito Santo, organizadas hierarquicamente por mesorregião, microrregião e agências, e agrupadas pelas modalidades de crédito empréstimos, financiamentos e financiamentos rurais.
+
+  \textbf{Palavras-chave}: Séries temporais hierárquicas. Previsão. Reconciliação ótima. Regressão regularizada. Elastic net.
+\end{resumo}
+
+% sumário 
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+
+\textual
+```
 
 # INTRODUÇÃO
 
-O objetivo do meu trabalho é abordar o problema da reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas através de regressão quantílica. Após o desenvolvimento teórico, espero evidenciar *que vantagens e limitações a abordagem de reconciliação ótima por regressão quantílica proporciona*, aplicando o método no dados de crédito do Banco do Estado do Espirito Santo (Banestes).
+## Previsão de saldos de crédito de instituições financeiras
 
-## CONTEXTUALIZAÇÃO DA PESQUISA
+Embora no séc. XX ainda houvesse espaço para uma gestão guiada apenas por instinto [@wallander_budgeting_1999], atualmente é impensável um banco não realizar previsões de seus resultados e comunicar suas expectativas ao mercado. Nesse documento, ou *guidance*, a projeção da carteira de crédito — o total de empréstimos e financiamentos, dentre outros itens — é frequentemente a primeira informação fornecida, uma vez que é um dos principais elementos para o planejamento dos bancos comerciais. Juntamente com as projeções de depósitos, provisões para créditos de liquidação duvidosa, eficiência operacional, entre outros indicadores-chave, essas projeções determinam a temperatura das expectativas da instituição em relação a elementos cruciais como rentabilidade, dividendos e posição no mercado (*market-share*), e isso é essencial para os acionistas e investidores. Essas projeções precisam ser tão precisas quanto possível, para que se possa calcular o risco de transacionar com a instituição financeira, seja como investidor ou cliente.
 
-Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagregadas naturalmente em uma estrutura aninhada [@hyndman2021]. Para ilustrar, tome a série do PIB brasileiro. Ela pode ser desagregada por estado que, por sua vez, pode ser desagregada por município.
+Ainda que não existam penalidades específicas para instituições financeiras que erram (por uma boa margem) em suas projeções, elas podem sofrer consequências negativas em outros aspectos, como na avaliação de seus desempenhos por parte dos investidores e clientes. Os investidores e clientes podem considerar as projeções equivocadas como um sinal de falta de competência ou confiança na instituição financeira, o que pode afetar negativamente a reputação e a imagem da instituição. Isso pode levar a uma redução no número de investimentos e depósitos, o que irá afetar diretamente sua saúde financeira.
 
-![Séries Hierárquicas](img/hierarq.png){#fig-h}
+Além disso, nos casos em que algum grupo se sentir lesado, as instituições financeiras podem enfrentar ações judiciais se suas projeções forem consideradas enganosas ou fraudulentas. Por exemplo, se uma instituição financeira fizer projeções excessivamente otimistas para incentivar os investidores a comprar seus títulos e, posteriormente, as projeções se mostrarem incorretas, ela pode ser acusada de fraude^[Art. 3º: Divulgar informação falsa ou prejudicialmente incompleta sobre instituição financeira. Pena: Reclusão, de 2 (dois) a 6 (seis) anos, e multa. Art. 4º: Gerir fraudulentamente instituição financeira. Pena: Reclusão, de 3 (três) a 12 (doze) anos, e multa [@brasil_lei_1986].] ou, ao menos, gestão temerária^[Art. 4º, parágrafo único: Se a gestão é temerária: Pena: Reclusão, de 2 (dois) a 8 (oito) anos, e multa [@brasil_lei_1986].] — ambos caracterizados como crime contra o Sistema Financeiro Nacional.
 
-Essa estrutura pode ser representada por equações para qualquer nível de agregação.
+Não são raros os casos em que bancos manipulam seus demonstrativos para se apresentarem mais saudáveis do que realmente o são para atrair clientes e investidores. Em 2001, o Banco Santos era classificado como o oitavo maior banco brasileiro. Em 2004 se encontrava sob intervenção do Bacen: ao mesmo tempo em que continuava a expandir seus negócios, o banco escondia um rombo de cerca de R$ 2,2 bi em créditos que já haviam sido liquidado mas eram mantidos no balanço [@moura_alise_2007]. De forma semelhante, em 2009, o Banco PanAmericano publicou em suas demonstrações contábeis carteira de crédito de R$ 9,9 bi. Entretanto, cerca de 25% já havia sido liquidado e era mantido no balanço artificialmente como objetivo de evitar a redução da atratividade do banco no mercado [@coelho_responsabilidade_2015].
 
-\begin{align}
-y_t &= y_{A,t} + y_{B,t} + y_{C,t} \label{eq:ha} \\
-y_t &= y_{AA,t} + y_{AB,t} + y_{AC,t} + y_{BA,t} + y_{BC,t} + y_{CA,t}\label{eq:ha_mun} \\
-y_{A,t} &= y_{AA,t} + y_{AB,t} + y_{AC,t} \label{eq:haES}
-\end{align}
+Por isso, é importante que as instituições financeiras sejam transparentes e precisas em suas projeções, fornecendo informações confiáveis e atualizadas para seus clientes e investidores. No entanto, há também motivações estratégicas para essa atividade. @beccalli_earnings_2015 mostraram que, em uma amostra de 55 bancos europeus, a utilização de *guidance* está associada a um aumento de 15% na probabilidade do banco atingir ou superar as expectativas de mercado. Isso, por sua vez, está associado a um incremento de até 5% no retorno por ação em relação aos bancos que não alcançaram ou superaram as expectativas.
 
-Assim, o agregado nacional pode ser representado apenas pelos agregados dos estados, através de \eqref{eq:ha}, ou como o agregado dos municípios \eqref{eq:ha_mun}. Já o agregado para o estado do Espírito Santo é representado por \eqref{eq:haES}.
+## Previsão de séries temporais hierárquicas
 
-Por outro lado, o PIB também pode ser desagregado de forma cruzada de acordo com a atividade econômica --- lavoura, rebanho, indústria de transformação, extrativa, bens de capital, bens intermediários, comércio de vestuário, automotivos, serviços etc. Essa estrutura não pode ser desagregada naturalmente de uma única forma, como é a hierarquia de estados e municípios. Não pode ser aninhada por um atributo como a própria geografia. A esse tipo de estrutura dá-se o nome de séries agrupadas.
+No que concerne a elaboração dessas previsões, os bancos, assim como em diversas outras indústrias, se enquadram em uma categoria de negócio que requerem previsões de múltiplas séries temporais correlacionadas que são resultados de agregação. Por exemplo, o total de empréstimos de uma instituição financeira corresponde ao agregado dos empréstimos de cada uma de suas agências; o total de vendas de uma rede nacional de farmácias corresponde ao agregado de vendas de suas unidades em cada estado; o total da produção de uma petrolífica multinacional corresponde ao total produzido em cada país por cada uma de suas plataformas. A essas estruturas naturais de agregação dá-se o nome de *séries temporais hierárquicas*.
 
-![Séries Agrupadas](img/agrupadas.png){#fig-a}
+Pode-se realizar previsões individualmente para todos todos os níveis da estrutura. No caso de uma insituição financeira, isso significa realizar previsões, por exemplo, para cada agência, para o agregado de cada região (ou superintendência regional) e para o agregado da instituição. Infelizmente, não há qualquer razão, exceto para métodos de previsão muito simples, para que essas previsões sejam *coerentes* (i.e. que a soma das previsões individuais seja igual à previsão do agregado). Além disso, realizar as previsões individualmente ignoraria os relacionamentos existentes entre as séries temporais na estrutura. Para fazer com que essas previsões se tornem coerentes entre si é que foram desenvolvidos os chamados métodos de *reconciliação*, sendo os mais simples o *top-down*, *bottom-up* e uma combinação das duas, a *middle-out*.
 
-Combinando as duas, temos a estrutura de séries hierárquicas agrupadas. Ao contrário da estrutura hierárquica, que só pode ser agregada de uma forma --- como com os municípios abaixo dos estados ---, a adição da estrutura agrupada pode ocorrer tanto acima quanto abaixo da hierárquica.
+A prática usual em *budgeting*^[O orçamento é um documento no qual é definido o planejamento financeiro de um empresa, geralmente para o ano seguinte, estabelecendo metas e objetivos. Nele são projetadas as expectativas da empresa e é base de comparação para saber como os resultados estão se desviando da performance esperada.], principalmente para empresas com muitas filiais, é a *top-down*, ou seja, realizar previsões para o total agregado e então distribuí-las para cada unidade seguindo alguma lógica proporcional. No caso dos bancos de varejo, com muitas agências espalhadas pelo território, especialmente em um país grande como o Brasil, esse método pode ser muito prático.
 
-Na notação matricial, essas estruturas são representadas pelo vetor $\mathbfit{y}_t$ $n$-dimensional com todas as observações no tempo $t$ para todos os níveis da hierarquia, pela matriz de soma $\mathbfit{S}$ de dimensão $n \times m$ que define as equações para todo nível de agregação e pela matriz $\mathbfit{b}_t$ composta pelas séries no nível mais desagregado.
+Esse é o caso do Banestes. Com 96 agências distribuídas pelos 78 municípios capixabas, realizar o *budgeting* para R$ 5,5 bi de faturamento^[Conforme demonstrativos publicados referentes ao exercício de 2022 [@banco_do_estado_do_espirito_santo_demonstracoes_2022].] não é uma tarefa trivial. Além de uma estrutura hierárquica de alta dimensionalidade por conta da quantidade de agências, se tratando de um banco múltiplo^[Para ser classificado como banco múltiplo, a instituição financeira deve operar com, no mínimo, duas carteiras dentre: comercial; investimento ou desenvolvimento; crédito imobiliário; de crédito, financiamento e investimento, e; arrendamento mercantil [@conselho_monetario_nacional_resolucao_1994].] que opera com diversas carteiras, as $n$ modalidades de crédito^[Crédito consignado, rural, imobiliário, pessoal, capital de giro, desconto de títulos etc.] expandem a estrutura para um total de $n \times 96$ séries temporais a serem estimadas.
 
-$$
-\mathbfit{y}_t=\mathbfit{Sb}_t
-$$ {#eq-geral}
+Dada tal complexidade, a abordagem *top-down* se coloca como uma opção viável em termos de tempo de processamento e análise. No entanto, conforme descemos na hierarquia, menos precisa ela se torna e, além disso, as características individuais das séries temporais do menor nível hierárquicos são ignoradas. Isso significa que, se no agregado a previsão para uma carteira de crédito for de crescimento de 10%, todas as 96 agências devem seguir a mesma estimativa, divergindo apenas na proporção de participação de cada uma no total.
 
-Talvez as formas mais intuitivas de se pensar em previsões para esses tipos de estrutura sejam as abordagens *top-down* e *bottom-up*. Na abordagem *top-down*, a previsão para os níveis mais desagregados da hierarquia são determinadas por uma proporção $p_i$ do nível agregado. Para isso, temos de definir uma matriz com todos esses pesos, que, seguindo a formulação de @hyndman2021, chamo de $\mathbfit{G}$. Já a abordagem *bottom-up* parte do raciocínio inverso e define as previsões de cada elemento da estrutura a partir das previsões dos elementos mais desagregados $\mathbfit{\hat{y}}_t$. Para tanto, basta modificar a matriz $\mathbfit{G}$. Então, $\mathbfit{G}$ define a abordagem --- se *top-down* ou *bottom-up* ---, e $\mathbfit{S}$ define a maneira da qual as previsões são somadas para formar as equações de previsão para cada elemento da estrutura.
+Tomando o caminho inverso, a abordagem *bottom-up* consiste em realizar previsões para cada série temporal individualmente e, então, agregá-las para obter a previsão para o total. Essa abordagem pode ser mais precisa, pois leva em consideração as características individuais de cada série temporal do nível mais desagregado. No entanto, ela é mais custosa em termos de tempo de processamento e análise. Nesse sentido, cabe ao analista avaliar o *trade-off* entre os ganhos de precisão percebidos com a geração de previsões individuais e a economia de tempo e processamento em realizar o contrário [@gross_disaggregation_1990].
 
-Seja somando as previsões do nível mais desagregado para formar os níveis superiores da hierarquia (*bottom-up*) ou distribuindo proporcionalmente as previsões do nível mais agregado (*top-down*), o vetor $\mathbfit{\tilde{y}}_t$ representa as previsões *coerentes*. Isso significa que as previsões "batem", ou seja, são totalizadas corretamente --- as previsões de cada elemento agregado corresponde ao somatório das previsões dos níveis inferiores da hierarquia. Isso é garantido pela multiplicação das matrizes $\mathbfit{SG}$.
+Além disso, ambas são abordagens de nível único, isto é, são realizadas as previsões para um único nível e então os demais níveis são obtidos agregando ou desagregando. O problema com esses tipos de abordagem é que elas utilizam informação incompleta [@hyndman_forecasting_2021]. Por exemplo, suponha-se que se escolha estimar modelos para cada uma das 96 agências e agregá-las (*bottom-up*). Nesse caso, ignora-se a influência que os níveis mais agregados — aqui a carteira de crédito da região ou de todo o estado — pode ter na estimação do saldo de crédito de cada agência. Por outro lado, se escolher estimar modelos para os níveis mais agregados (*top-down*), ignora-se a informação individual de cada agência.
 
-Não fosse essa pré multiplicação, nada garantiria a coerência das previsões. Tomando a estrutura da @fig-h como exemplo, seria um acaso improvável que as previsões do agregado para o estado do Espírito Santo sejam exatamente a soma das previsões individuais de seus municípios. Isso porque cada série pode seguir um processo diferente (e.g., arima) com erros e variâncias distintas.
+Uma terceira possibilidade é a *reconciliação ótima*. Ela é uma abordagem que busca resolver esse problema e consiste em realizar previsões para todos os níveis hierárquicos e, então, estimar um modelo para reescrever as previsões do nível mais desagregado como uma combinação linear de todos os elementos da hierarquia. Obtidas as novas previsões no menor nível, ela são então agregadas, gerando previsões coerentes nos níveis superiores. Dessa forma, a informação de todos os níveis é utilizada na estimação dos modelos e na geração das previsões, ao mesmo tempo em que a variância do erro de previsão é minimizado [@hyndman_optimal_2011].
 
-Os métodos de gerar previsões coerentes a partir de previsões base são chamados de métodos de *reconciliação*. Os métodos de reconciliação tradicionais apresentados, *top-down* e *bottom-up*, utilizam informação limitada. No método *top-down*, utiliza-se apenas informações do nível mais agregado, enquanto na abordagem *bottom-up* utiliza-se apenas as informações dos níveis mais desagregados.
+Atualmente, os métodos analíticos baseados na minimização do traço da matriz da variância-covariância dos erros, desenvolvidos em  @wickramasuriya_optimal_2019, são os mais populares na literatura da reconciliação ótima. Esses métodos divergem apenas na forma da qual se dá o relacionamento entre os diferentes elementos da hierarquia: se os erros de previsão são descorrelacionados e equivariantes ao longo de toda estrutura (MQO), o que é impossível em séries temporais hierárquicas; se os erros são descorrelacionados e equivariantes apenas dentro do mesmo nível hierárquico (MQP estrutural); se os erros são descorrelacionados mas ponderados pela variância da série (MQP); ou se são correlacionados e variantes ao longo de toda a estrutura (estimadores *MinT Sample* e *MinT Shrink*).
 
-Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham a menor diferença o possível em relação às previsões base. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
-
-## JUSTIFICATIVA
-
-O estado da arte em reconciliação ótima de previsões pontuais se encontra no método de *Minimun Trace* (MinT). Esse método, assim como toda estimação de média de parâmetros, está sujeita à interferência de *outliers* extremos que, no caso de previsão de séries hierárquicas, se apresentam na forma de elementos da hierarquia muito maiores que os demais. Isso pode significar em menor peso atribuído à elementos menores da hierarquia e, talvez, a estimação pela mediana possua alguma vantagem em determinadas situações. Além disso, pode ser do interesse do pesquisador a estimação em eventos extremos, o que exigiria usar quantis muito altos ou muito baixos. Nesse sentido, a estimação por regressão quantílica pode ser uma adição à literatura do tema.
+Entretanto, tais métodos são sujeitos a uma série de restrições, como as do MCLR, e têm sua capacidade preditiva reduzida quando suas hipóteses são violadas. Em previsões de séries temporais, o objetivo na maioria dos casos é prever valores futuros com a maior acurácia possível. Em vista disso, métodos de *machine learning* são mais gerais, no sentido de permitir parâmetros não lineares e poderem aproximar virtualmente qualquer função. Além disso, são focados na capacidade preditiva, muitas vezes em detrimento da explicativa. Espera-se, portanto, que esses métodos alcancem melhor performance no problema da reconciliação ótima, justificando a pesquisa e atenção ao tema. Nesse sentido, trabalhos como @spiliotis_hierarchical_2021 desenvolvem métodos de reconciliação ótima de séries temporais utilizando algoritmos de *machine learning*, especificamente o *XGBoost* e *Random Forest*, obtendo resultados superiores aos métodos analíticos tradicionais, especialmente quando as séries não possuem características semelhantes.
 
 # OBJETIVOS
 
-O objetivo geral da dissertação é estudar o problema da reconciliação ótima de previsões pontuais a partir de regressões quantílicas.
+O objetivo geral da dissertação é estudar o problema da reconciliação ótima de previsões pontuais a partir de métodos de *machine learning*.
 
-Como objetivos específicos, tenho:
+Os objetivos específicos são:
 
-1. Estudar métodos para estimação da matriz $\mathbfit{G}$ para qualquer quantil desejado, e não apenas a média;
-2. Identificar possíveis vantagens e limitações da abordagem quantílica na reconciliação de previsões pontuais a partir de aplicação do método estudado na previsão de saldos de crédito do Banestes.
-
-Não está no escopo do estudo os métodos de se obter previsões probabilísticas, ou seja, a estimação da matriz $\hat{y}_{T+h}$ para além de previsões pontuais.
+1. Aplicar o método *elastic net* para reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas e atestar sua validade em dados de alta dimensionalidade;
+1. Comparar a performance, em termos de funções de custo e tempo de processamento, do mpetodo *elastic net* nas configurações $\alpha=0$ (*lasso*), $\alpha=1$ (*ridge*) e uma combinação de ambos obtida via reamostragem;
+1. Comparar a performance, em termos de funções de custo e tempo de processamento, do método *elastic net* com os métodos analíticos *bottom-up*, *top-down* e *MinT Shrink*;
+1. Comparar a performance, em termos de funções de custo e tempo de processamento, das estratégias de reamostragem validação cruzada $k$*-fold* e *holdout* para o método *elastic net*;
+1. Verificar se a aplicação de regressão regularizada resulta em algum padrão reconhecível na estrutura (e.g., se a regularização tende a favorecer os coeficientes de séries temporais que compartilham o mesmo nó pai ou, em outras palavras, se tende a zerar os coeficientes de séries temporais que não compartilham o mesmo nó pai na hierarquia);
 
 # REVISÃO DA LITERATURA
 
-Previsões pontuais de séries temporais hierárquicas não é um assunto novo. Ao menos desde a década de 70, pesquisas foram publicadas acerca de abordagens *bottom-up* e *top-down*, suas vantagens e desvantagens, e tentativas de se definir qual é o melhor método^[Uma revisão dessa literatura pode ser encontrada em @athanasopoulos2009.]. Entretanto, é apenas em @hyndman2011 que é formalizada uma abordagem prática que utiliza toda a informação disponível, (i.e. as previsões de todos elementos de todos os níveis da hierarquia) a partir da estimação da matriz $\mathbfit{G}$ via regressão linear por mínimos quadrados generalizados (MQG).
+## Previsão de saldos de crédito de instituições financeiras
 
-Entretanto, para ser capaz de estimar o modelo por MQG, é necessária a matriz de variância-covariância dos erros. @hyndman2011 usam a matriz de erros de coerência, ou seja, a diferença entre as previsões reconciliadas e as previsões base, que tem posto incompleto e não identificada e, portanto, não pode ser estimada. Os autores contornam esse problema adotando no lugar da matriz de variância-covariância dos erros uma matriz diagonal constante, ou seja, assumem variância constante dos erros de reconciliação, e estimam a matriz $\mathbfit{G}$ por mínimos quadrados ordinários (MQO).
+A nível macroeconômico, a previsão do agregado de crédito das instituições financeiras é uma preocupação de bancos centrais ao redor do mundo. No Brasil, @bader_modelo_2014 aprimoram o método FAVAR (*Factor Augmented Vector Autoregression*) com uma etapa de análise de correlação canônica para identificar as melhores, em termos de correlação com as variáveis de crédito do SFN, combinações lineares de componentes principais. Esse método, que chamaram de FAVAR canônico, alcançou resultado superior aos FAVAR em 1 e 2 estágios na previsão das variáveis de crédito utilizadas, que foram: a concessão de crédito total com recursos livres, o saldo da carteira de crédito total com recursos livres, o saldo da carteira de crédito total com recursos direcionados, a taxa de inadimplência da carteira de crédito total com recursos livres e a taxa média de juros das operações de crédito total com recursos Livre. O trabalho abordou apenas o nível mais agregado, no total do SFN.
 
-A estimação por esse método resulta numa reconciliação ótima que depende apenas da matriz $\mathbfit{S}$, ou seja, da estrutura hierárquica, e independe da variância e covariância das previsões base $\mathbfit{\hat{y}_{T+h}}$ --- o que não é uma conclusão satisfatória.
+@colak_tcmb_2019 produzem uma série de indicadores para monitoramento dos períodos de expansão e desaceleração moderada ou excessiva de crédito no setor bancário turco. Os autores utilizam séries filtradas do agregados de crédito, crédito comercial, crédito direto ao consumidor, crédito imobiliário e fincanciamento de veículos, além de diversos setores da economia, como agricultura, manufatura, construção, comércio, dentre outros, para prever os ciclos de crédito no sistema bancário turco. Os autores concluem que os indicadores com maior poder de explicação para as variáveis macroeconômicas são a taxa de crescimento real do crédito e a taxa de resposta ao impulso do crédito.
 
-@hyndman2016 tentam aperfeiçoar o método usando as variâncias das previsões base estimadas (dentro da amostra) como estimativa para a matriz de variância-covariância dos erros de reconciliação, de forma a as utilizar como pesos e realizar a reconciliação ótima por mínimos quadrados ponderados (MQP). Assim, previsões base mais acuradas têm peso maior do que as mais ruidosas. Entretanto, não fornecem justificativa teórica para usar a diagonal da matriz de variância-covariância de $\mathbfit{\hat{e}_{t}}$.
+Já para níveis abaixo do agregado de crédito (i.e. o total de crédito da economia), poucos trabalhos foram encontrados. Tangenciando o tema da previsão de saldos de crédito, outros tópicos da economia bancária foram objeto de estudo para previsão de séries temporais. @sezer_financial_2019 produziram revisão de literatura de trabalhos publicados entre 2005 e 2019 que realizaram previsão de séries temporais financeiras utilizando *deep learning* e os agruparam em preços de ações individuais, índices (e.g., IBovespa, Dow Jones), preços de commodities, tendência e volatilidade de ativos, preços de títulos, câmbio e preços de criptomoedas. Apesar da extensa revisão de literatura realizada pelos autores, nenhum dos trabalhos citados combinaram estruturas hierárquicas com *machine learning*.
 
-@wickramasuriya2019 argumentam que o que de fato interessa é que as previsões reconciliadas tenham o menor erro. Então, corrigem a abordagem de reconciliação ótima para o objetivo de minimização dos erros das previsões reconciliadas $\mathbfit{\tilde{y}_{t+h}}$, ao invés dos erros das previsões base $\mathbfit{\hat{y}_{t+h}}$. Dado que isso implica na minimização da variância de $\mathbfit{\tilde{e}_{t+h}}$, ou seja, na minimização do somatório da diagonal, o traço, da matriz de variância-covariância de $\mathbfit{\tilde{e}_{t+h}}$, eles chamaram esse método de Menor Traço (MinT, na sigla em inglês). Paralelamente, usam desigualdade triangular para demonstrar que as previsões reconciliadas obtidas por esse método são ao menos tão boas quanto as previsões base.
+@gorodetskaya_machine_2021 propõem o que chamaram de "uma metodologia universal" para aplicação automática de *machine learning* na previsão de séries temporais do setor bancário, que poderia ser aplicada em qualquer tipo de problema. A metodologia consiste em obter preditores a partir da própria variável defasada, das estatísticas básicas da variável (máximo, mínimo, média, variância etc.), e de anomalias periódicas detectadas, e selecioná-las pela medida de importância. Realizaram uma revisão de literatura recente sobre o assunto e apresentaram sua abordagem para o problema da previsão da demanda por moeda em caixas eletrônicos.
 
-@panagiotelis2021 reinterpreta a literatura de coerência e reconciliação de previsões pontuais a partir de uma abordagem geométrica, trazendo provas alternativas para conclusões anteriores ao mesmo tempo em que fornece novos teoremas. Além disso, @panagiotelis2021 estende essa interpretação geométrica para o contexto probabilístico, fornecendo métodos paramétricos e não paramétricos (via *bootstrapping*) para reconciliação de previsões probabilísticas, ou seja, para reconciliar previsões $\hat{y}_t$ obtidas a partir de toda a distribuição, e não apenas a média.
+No que diz respeito à previsão de séries temporais em largas hierarquias, @prayoga_top-down_2017 trabalharam na previsão do fluxo de caixa do Banco da Indonésia, utilizando uma hierarquia de 3 níveis — 40 agências no nível mais desagregado, as 6 grandes ilhas do país como nível intermediário e o total no nível mais agregado. Os autores realizaram um *benchmark* de 5 modelos para previsão da série no nível mais agregado e utilizando o método *top-down* para obter as previsões no nível mais desagregado, concluindo pela efetividade do método *top-down* por proporções históricas. Entretanto, os autores não incluíram reconciliação ótima, a estimativa *bottom-up* ou mesmo outros métodos *top-down* para efeito de comparação, o que limita o alcance do trabalho.
+
+## Previsão de séries temporais hierárquicas e agrupadas
+
+### Abordagens de nível único
+
+Uma abordagem de nível único é uma abordagem em que as previsões são realizadas para um único nível da hierarquia. A partir dessas previsões, os demais níveis são obtidos, ou desagregando (no caso dos níveis inferiores), ou agregando (no caso dos níveis superiores) essas informações [@hyndman_forecasting_2021]. Os métodos *top-down*, *bottom-up* e *middle-out* são abordagens de nível único.
+
+Enquanto há apenas uma única forma de se agregar níveis na hierarquia (*bottom-up*), a desagregação (*top-down*) pode ser realizada de, ao menos, duas dezenas de maneiras [@gross_disaggregation_1990]. Dois dos métodos mais intuitivos são a média das proporções históricas e a proporção das médias históricas.
+
+Na média das proporções históricas, cada proporção $p_j$, com $j = {1,...,m}$, consiste em tomar a média das proporções da série desagregada $y_{j,t}$ em relação ao agregado $y_{1,t}$:
+
+$$
+p_j = \frac{1}{T} \sum^{T}_{t=1} \frac{y_{j,t}}{y_{1,t}}
+$$ {#eq-td_1}
+
+Já a proporção das médias históricas consiste em tomar a proporção das médias das séries desagregadas em relação à média do agregado^[Isso é equivalente a tomar a proporção direta entre os somatórios das séries. Note que, pelas propriedades do operador de somatório, $\sum^{T}_{t=1} \frac{y_{t}}{T} = \frac{y_1}{T}+...+\frac{y_T}{T} = \frac{y_1+...+y_T}{T} = \frac{\sum^{T}_{t=1} y_t}{T}$. Então, a equação @eq-td_2 pode ser simplificada para $p_j = \frac{\sum^{T}_{t=1} y_{j,t}}{\sum^{T}_{t=1} y_{1,t}}$.].
+
+$$
+p_j = \frac{\sum^{T}_{t=1} \frac{y_{j,t}}{T}}{\sum^{T}_{t=1} \frac{y_{1,t}}{T}}
+$$ {#eq-td_2}
+
+@athanasopoulos_hierarchical_2009 desenvolvem o método proporções de previsão, que consiste em um método *top-down* em que os pesos são calculados a partir das proporções das previsões base ao invés do passado. A vantagem do método é que os pesos estarão os mais próximos das características mais recentes da série, ao invés de serem baseados em dados históricos. A desvantagem é que se deve realizar previsões para toda a hierarquia, perdendo o ganho de agilidade dos demais métodos *top-down*.
+$$
+p_j = \prod^{K-1}_{i=0}\frac{\hat{Y}^{i}_{j,t+h}}{\sum\hat{Y}^{(i+1)}_{j,t+h}}
+$$
+
+@li_hierarchical_2016 compararam dois algoritmos de *machine learning* para previsão da produção de energia solar no estado da Flórida/EUA: ANN (*Artificial Neural Network*) e SVR (*Support Vector Regression*). Argumentando que tradicionalmente as previsões nesse problema são realizadas com os dados de produção total da planta, eles propõem uma abordagem hierárquica *bottom-up*, com previsões base a partir de cada inversor solar. Os autores concluem que a abordagem hierárquica *bottom-up* é mais precisa do que a previsão do agregado, ao menos na previsão um passo a frente. Embora os autores utilizem algoritmos de *machine learning* para as previsões base, eles não utilizam esses algoritmos para a reconciliação ótima, caracterizando a abordagem do trabalho ainda como nível único.
+
+### Reconciliação ótima de séries temporais hierárquicas
+
+Previsões pontuais de séries temporais hierárquicas não é um assunto novo. Ao menos desde a década de 70, pesquisas foram publicadas acerca de abordagens *bottom-up* e *top-down*, suas vantagens e desvantagens, e tentativas de se definir qual é o melhor método^[Uma revisão dessa literatura pode ser encontrada em @athanasopoulos_hierarchical_2009.]. Entretanto, é apenas em @hyndman_optimal_2011 que é formalizada uma abordagem prática que utiliza toda a informação disponível, (i.e. as previsões de todos elementos de todos os níveis da hierarquia) a partir da estimação da matriz $\mathbfit{G}$ via regressão linear por mínimos quadrados generalizados (MQG).
+
+Entretanto, para ser capaz de estimar o modelo por MQG, é necessária a matriz de variância-covariância dos erros. @hyndman_optimal_2011 usam a matriz de erros de coerência, ou seja, a diferença entre as previsões reconciliadas e as previsões base, que tem posto incompleto e não identificada e, portanto, não pode ser estimada. Os autores contornam esse problema adotando no lugar da matriz de variância-covariância dos erros uma matriz diagonal constante, ou seja, assumem variância constante dos erros de reconciliação, e estimam a matriz $\mathbfit{G}$ por mínimos quadrados ordinários (MQO).
+
+A estimação por esse método resulta numa reconciliação ótima que depende apenas da matriz $\mathbfit{S}$, ou seja, da estrutura hierárquica, e independe da variância e covariância das previsões base $\mathbfit{\hat{y}_{T+h}}$ --- o que não é uma conclusão satisfatória, uma vez que é impossível que uma série hierárquica seja descorrelatada, pois um nível superior é o agregado do inferior.
+
+@hyndman_fast_2016 tentam aperfeiçoar o método usando as variâncias das previsões base estimadas (dentro da amostra) como estimativa para a matriz de variância-covariância dos erros de reconciliação, de forma a as utilizar como pesos e realizar a reconciliação ótima por mínimos quadrados ponderados (MQP). Assim, previsões base mais acuradas têm peso maior do que as mais ruidosas. Entretanto, não fornecem justificativa teórica para usar a diagonal da matriz de variância-covariância de $\mathbfit{\hat{e}_{t}}$.
+
+@wickramasuriya_optimal_2019 argumentam que o que de fato interessa é que as previsões reconciliadas tenham o menor erro. Então, corrigem a abordagem de reconciliação ótima para o objetivo de minimização dos erros das previsões reconciliadas $\mathbfit{\tilde{y}_{t+h}}$, ao invés dos erros das previsões base $\mathbfit{\hat{y}_{t+h}}$. Dado que isso implica na minimização da variância de $\mathbfit{\tilde{e}_{t+h}}$, ou seja, na minimização do somatório da diagonal, o traço, da matriz de variância-covariância de $\mathbfit{\tilde{e}_{t+h}}$, eles chamaram esse método de Traço Mínimo (MinT, na sigla em inglês). Paralelamente, usam desigualdade triangular para demonstrar que as previsões reconciliadas obtidas por esse método são ao menos tão boas quanto as previsões base.
+
+@panagiotelis_forecast_2021 reinterpreta a literatura de coerência e reconciliação de previsões pontuais a partir de uma abordagem geométrica, trazendo provas alternativas para conclusões anteriores ao mesmo tempo em que fornece novos teoremas. Além disso, os autores estendem essa interpretação geométrica para o contexto probabilístico, fornecendo métodos paramétricos e não paramétricos (via *bootstrapping*) para reconciliação de previsões probabilísticas, ou seja, para reconciliar previsões $\hat{y}_t$ obtidas a partir de toda a distribuição, e não apenas a média.
+
+@spiliotis_hierarchical_2021 propõem a utilização de *machine learning* para a reconciliação ótima de séries temporais, especificamente os algoritmos de árvore de decisão *Random Forest* e *XGBoost*. Os autores descrevem como vantagens desse método em relação aos anteriores a descrição de relacionamentos não lineares, performance preditiva e a desnecessidade da utilização de todos os elementos da hierarquia na combinação ótima. Para o conjunto de dados utilizados, os autores afirmam que os métodos de *machine learning*, especialmente o XGBoost, alcançaram, em média, melhor performance que as abordagens de nível único e o MinT. Além disso, concluíram que quanto maior é a diferença entre as séries, em todos os níveis hierárquicos, maior são os benefícios da abordagem por *machine learning*. Tomando como ponto de partida as conclusões de @spiliotis_hierarchical_2021, este trabalho busca continuar a exploração de métodos de *machine learning*, dispondo de algoritmos e métodos de reamostragem ainda não utilizados para a tarefa de reconciliação ótima, verificando se os resultados se mantêm ou são superados em um contexto de séries temporais financeiras.
 
 # METODOLOGIA
 
-Para atingir os objetivos, a primeira etapa da pesquisa consistirá na pesquisa bibliográfica relacionada à reconciliação ótima de previsões de séries temporais hierárquicas e agrupadas e à regressão quantílica.
+## Notação algébrica
 
-Realizei uma pesquisa bibliométrica na base de dados do Google Acadêmico, pesquisando pelas palavras-chave "*hierarchical forecast reconciliation*" para qualquer lugar no corpo do texto, encontrando 27.600 resultados. Utilizando um script para ordenar os resultados pelo número de citações^[https://github.com/WittmannF/sort-google-scholar], verifiquei que o trabalho mais citado é @hyndman2021.
+Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagregadas naturalmente em uma estrutura aninhada [@hyndman_forecasting_2021]. Para ilustrar, tome a série do PIB de um país fictício com três estados, cada um com dois municípios. Essa série pode ser desagregada por estado que, por sua vez, pode ser desagregada por município (@fig-h).
 
-```{r citacoes}
-#| tbl-cap: Trabalhos mais citados com os termos "hierarquical forecast reconciliation"
+![Séries Hierárquicas](img/hierarq.png){#fig-h}
 
-readxl::read_excel("docs/academico.xlsx") |>
-    subset(select = c(-Publisher, -Venue, -Título)) |>
-    kbl(booktabs = TRUE, escape = TRUE) |>
-    kable_styling(latex_options = "striped", font_size = 10)
+Essa estrutura pode ser representada através de equações para qualquer nível de agregação. Dessa forma, o agregado nacional pode ser descrito pelos agregados dos estados, Equação \eqref{eq:ha}, ou como o agregado dos municípios, Equação \eqref{eq:ha_mun}. Já o agregado para o estado A é representado pela Equação \eqref{eq:haES}.
+
+\begin{align}
+y_t &= y_{A,t} + y_{B,t} + y_{C,t} \label{eq:ha} \\
+y_t &= y_{AA,t} + y_{AB,t} + y_{BA,t} + y_{BB,t} + y_{CA,t} + y_{CB,t}\label{eq:ha_mun} \\
+y_{A,t} &= y_{AA,t} + y_{AB,t}\label{eq:haES}
+\end{align}
+
+Alternativamente, podemos descrever a estrutura completa de forma matricial:
+
+$$
+\begin{bmatrix}
+    y_{t} \\
+    y_{A, t} \\
+    y_{B, t} \\
+    y_{C, t} \\
+    y_{AA, t} \\
+    y_{AB, t} \\
+    y_{BA, t} \\
+    y_{BB, t} \\
+    y_{CA, t} \\
+    y_{CB, t}
+\end{bmatrix}_{n \times 1}
+=
+\begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}_{n \times m}
+\begin{bmatrix}
+    y_{AA, t} \\
+    y_{AB, t} \\
+    y_{BA, t} \\
+    y_{BB, t} \\
+    y_{CA, t} \\
+    y_{CB, t}
+\end{bmatrix}_{m \times 1}
+$$ {#eq-matriz_hierarquia}
+
+Uma outra forma de desagregarmos o PIB é por atividade econômica --- agricultura, indústrias extrativas, indústria de transformação, eletricidade e gás, construção etc. Essa estrutura não pode ser desagregada naturalmente de uma única maneira, como é a hierarquia de estados e municípios. Não pode ser aninhada por um atributo como a própria geografia. A esse tipo de estrutura dá-se o nome de séries agrupadas.
+
+![Séries Agrupadas](img/agrupadas.png){#fig-a}
+
+Combinando as duas, temos a estrutura de séries hierárquicas agrupadas. Ao contrário da estrutura hierárquica, que só pode ser agregada de uma forma, como com os municípios abaixo dos estados^[Essa estrutura é única no sentido que o somatório dos municípios totaliza o estado, mas não se pode somar estados para totalizar um município. Outro exemplo de estrutura hierárquica é a série de vendas de uma empresa: pode-se agregar as vendas de cada filial para obter o total, mas não o contrário.], a adição da estrutura agrupada pode ocorrer tanto acima (@fig-ha1) quanto abaixo (@fig-ha2) da hierárquica.
+
+![Séries Hierárquicas Agrupadas (a)](img/hier_agrup.png){#fig-ha1}
+
+![Séries Hierárquicas Agrupadas (b)](img/hier_agrup_2.png){#fig-ha2}
+
+Na notação matricial, a estrutura da @fig-ha2 é representada como abaixo. Formalmente, o primeiro membro da igualdade é composto pelo vetor $\mathbfit{y}_t$ $n$-dimensional com todas as observações no tempo $t$ para todos os níveis da hierarquia. O segundo membro é composto pela matriz de soma $\mathbfit{S}$ de dimensão $n \times m$ que define as equações para todo nível de agregação, e pelo vetor $\mathbfit{b}_t$ composta pelas séries no nível mais desagregado.
+
+$$
+\mathbfit{y}_t=\mathbfit{Sb}_t
+$$ {#eq-vetor_b}
+
+$$
+\begin{bmatrix}
+    y_{t} \\
+    y_{A, t} \\
+    y_{B, t} \\
+    y_{C, t} \\
+    y_{X, t} \\
+    y_{Y, t} \\
+    y_{AX, t} \\
+    y_{AY, t} \\
+    y_{BX, t} \\
+    y_{BY, t} \\
+    y_{CX, t} \\
+    y_{CY, t}
+\end{bmatrix}_{n \times 1}
+=
+\begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 1 \\
+    1 & 0 & 1 & 0 & 1 & 0 \\
+    0 & 1 & 0 & 1 & 0 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 \\
+\end{bmatrix}_{n \times m}
+\begin{bmatrix}
+    y_{AX, t} \\
+    y_{AY, t} \\
+    y_{BX, t} \\
+    y_{BY, t} \\
+    y_{CX, t} \\
+    y_{CY, t}
+\end{bmatrix}_{m \times 1}
+$$ {#eq-matriz_ha}
+
+## Abordagens top-down, bottom-up e middle-out
+
+Talvez as formas mais intuitivas de se pensar em previsões para esses tipos de estrutura sejam as abordagens top-down e bottom-up. Tome a estrutura descrita na @fig-h, por exemplo. Podemos realizar a previsão para o horizonte de tempo $h$ do agregado do PIB, representado no topo da hierarquia por *Total* (@eq-topdown_1), e então distribuir os valores previstos proporcionalmente entre os estados e municípios.
+
+$$
+\mathbfit{\hat{y}}_{T+h | T} = E[\mathbfit{y}_{T+h} | \Omega_T]
+$$ {#eq-topdown_1}
+
+Essa é a abordagem top-down. Nela, a previsão para os níveis mais desagregados da hierarquia são determinadas por uma proporção $p_i$ do nível agregado. Por exemplo, as previsões para o município AA são dadas pela @eq-topdown_2.
+
+$$
+\mathbfit{\tilde{y}}_{AA, T+h | T} = p_{1}\mathbfit{\hat{y}}_{T+h | T}
+$$ {#eq-topdown_2}
+
+Para isso, temos de definir uma matriz com todos esses pesos, que, seguindo a formulação de @hyndman_forecasting_2021, chamamos de $\mathbfit{G}$:
+
+$$
+\mathbfit{G}
+=
+\begin{bmatrix}
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}_{m \times n}
+$$ {#eq-matriz_g}
+
+$\mathbfit{G}$ é uma matriz $m \times n$ que multiplica o vetor $\hat{\mathbfit{y}}_{T+h|T}$ que chamamos de *previsões base*, isto é, as previsões individuais para todos os níveis de agregação. A equação para a abordagem *top-down* será, então:
+
+$$
+\mathbfit{\tilde{y}}_{T+h | T} = \mathbfit{SG\hat{y}}_{T+h | T}
+$$ {#eq-topdown_3}
+
+Na notação matricial para a estrutura da @fig-h, temos:
+
+$$
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{CA, t} \\
+    \tilde{y}_{CB, t}
+\end{bmatrix}_{n \times 1}
+=
+\mathbfit{S}_{n \times m}
+\begin{bmatrix}
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}_{m \times n}
+\begin{bmatrix}
+    \hat{y}_{T+h|T} \\
+    \hat{y}_{A, T+h|T} \\
+    \hat{y}_{B, T+h|T} \\
+    \hat{y}_{C, T+h|T} \\
+    \hat{y}_{AA, T+h|T} \\
+    \hat{y}_{AB, T+h|T} \\
+    \hat{y}_{BA, T+h|T} \\
+    \hat{y}_{BB, T+h|T} \\
+    \hat{y}_{CA, T+h|T} \\
+    \hat{y}_{CB, T+h|T}
+\end{bmatrix}_{n \times 1}
+$$ {#eq-matriz_topdown1}
+
+Multiplicando as matrizes $\mathbfit{G}$ e $\mathbfit{\hat{y}}$ obtemos o vetor $\mathbfit{b}_t$^[Ver @eq-vetor_b.], que contém as previsões para os níveis mais desagregados, agora definidas como proporção do total.
+$$
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{CA, t} \\
+    \tilde{y}_{CB, t}
+\end{bmatrix}_{n \times 1}
+=
+\mathbfit{S}_{n \times m}
+\begin{bmatrix}
+    p_1\hat{y}_{T+h|T} \\
+    p_2\hat{y}_{T+h|T} \\
+    p_3\hat{y}_{T+h|T} \\
+    p_4\hat{y}_{T+h|T} \\
+    p_5\hat{y}_{T+h|T} \\
+    p_6\hat{y}_{T+h|T}
+\end{bmatrix}_{m \times 1}
+$$ {#eq-matriz_topdown2}
+
+Note que, por se tratar de um método *top-down*, é necessário apenas o primeiro elemento do vetor de previsões base, ou seja, a previsão do nível mais agregado (@eq-matriz_topdown2). Sendo essa exatamente uma das vantagens do método *top-down*, na prática, podemos anular os demais elementos de $\mathbfit{\hat{y}}$.
+
+$$
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{CA, t} \\
+    \tilde{y}_{CB, t}
+\end{bmatrix}_{n \times 1}
+=
+\mathbfit{S}_{n \times m}
+\begin{bmatrix}
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}_{m \times n}
+\begin{bmatrix}
+    \hat{y}_{T+h|T} \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0
+\end{bmatrix}_{n \times 1}
+$$ {#eq-matriz_topdown3}
+
+Substituindo a matriz $\mathbfit{S}$, temos as equações que definem as previsões reconciliadas.
+
+$$
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{CA, t} \\
+    \tilde{y}_{CB, t}
+\end{bmatrix}_{n \times 1}
+=
+\begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}_{n \times m}
+\begin{bmatrix}
+    p_1\hat{y}_{T+h|T} \\
+    p_2\hat{y}_{T+h|T} \\
+    p_3\hat{y}_{T+h|T} \\
+    p_4\hat{y}_{T+h|T} \\
+    p_5\hat{y}_{T+h|T} \\
+    p_6\hat{y}_{T+h|T}
+\end{bmatrix}_{m \times 1}
+$$ {#eq-matriz_topdown3}
+
+Já a abordagem bottom-up parte do raciocínio inverso e define as previsões de cada elemento da estrutura a partir das previsões dos elementos mais desagregados. Para tanto, basta modificar a matriz $\mathbfit{G}$.
+
+$$
+\mathbfit{G}
+=
+\begin{bmatrix}
+    0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}_{m \times n}
+$$ {#eq-matriz_gbu}
+
+Portanto, $\mathbfit{G}$ define a abordagem --- se *top-down* ou *bottom-up* ---, e $\mathbfit{S}$ define a maneira da qual as previsões são somadas para formar as equações de previsão para cada elemento da estrutura. Portanto, chamamos $\mathbfit{G}$ de matriz de reconciliação.
+
+$$
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{CA, t} \\
+    \tilde{y}_{CB, t}
+\end{bmatrix}_{n \times 1}
+=
+\begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}_{n \times m}
+\begin{bmatrix}
+    \hat{y}_{AA, T+h|T} \\
+    \hat{y}_{AB, T+h|T} \\
+    \hat{y}_{BA, T+h|T} \\
+    \hat{y}_{BB, T+h|T} \\
+    \hat{y}_{CA, T+h|T} \\
+    \hat{y}_{CB, T+h|T}
+\end{bmatrix}_{m \times 1}
+$$ {#eq-matriz_bottomup}
+
+Quando $m$ — a quantidade de elementos do nível mais desagregado — é muito grande, tornando muito custoso obter $\mathbfit{\hat{y}_t}$, e não se deseja uma abordagem estritamente *top-down*, pode-se combinar as duas formas:
+
+$$
+\mathbfit{G}
+=
+\begin{bmatrix}
+    0 & p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & p_5 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & p_6 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}_{m \times n}
+$$ {#eq-matriz_gmo}
+
+Esse método é chamado de *middle-out*. Nele, o vetor $\mathbfit{b}_t$ é reescrito como proporções de algum nível intermédiário arbitrariamente escolhido, ao invés de proporções do total. Isso permite uma abordagem mais econômica, em termos de custo computacional e de tempo, ao mesmo tempo em que mantém em algum grau as características individuais das hierarquias.
+
+$$
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{C, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t} \\
+    \tilde{y}_{CA, t} \\
+    \tilde{y}_{CB, t}
+\end{bmatrix}_{n \times 1}
+=
+\begin{bmatrix}
+    1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}_{n \times m}
+\begin{bmatrix}
+    p_1\hat{y}_{A,T+h|T} \\
+    p_2\hat{y}_{A,T+h|T} \\
+    p_3\hat{y}_{A,T+h|T} \\
+    p_4\hat{y}_{B,T+h|T} \\
+    p_5\hat{y}_{B,T+h|T} \\
+    p_6\hat{y}_{B,T+h|T}
+\end{bmatrix}_{m \times 1}
+$$ {#eq-matriz_mo}
+
+## Coerência e reconciliação
+
+Seja somando as previsões do nível mais desagregado para formar os níveis superiores da hierarquia (*bottom-up*) ou distribuindo proporcionalmente as previsões do nível mais agregado (*top-down*), o vetor $\mathbfit{\tilde{y}}_t$ representa as previsões *coerentes*. Isso significa que as previsões são totalizadas corretamente --- as previsões de cada elemento agregado corresponde ao somatório das previsões dos níveis inferiores da hierarquia. Isso é garantido pela multiplicação das matrizes $\mathbfit{SG}$.
+
+Não fosse essa pré multiplicação, nada garantiria a coerência das previsões. Tomando a estrutura da @fig-h como exemplo, seria um acaso improvável que as previsões do agregado para o estado do Espírito Santo sejam exatamente a soma das previsões individuais de seus municípios. Isso porque não há qualquer razão para que cada série siga o mesmo processo estocástico.
+
+Os métodos de gerar previsões coerentes ($\mathbfit{\tilde{y}_t}$) a partir de previsões base ($\mathbfit{\hat{y}_t}$) são chamados de métodos de *reconciliação*. Os métodos de reconciliação tradicionais apresentados, *top-down*, *bottom-up* e *middle-out*, utilizam informação limitada. No método *top-down*, utiliza-se apenas informações do nível mais agregado --- por isso, apenas a primeira coluna em (@eq-matriz_g) é diferente de zero. Já na abordagem *bottom-up*, utiliza-se apenas as informações dos níveis mais desagregados, o que resulta na submatriz identidade $m \times m$ na @eq-matriz_gbu, enquanto as colunas que representam os níveis mais agregados são nulas. Por fim, a abordagem *middle-out* não utiliza a mesma, mas utiliza a mesma quantidade de informação que a *top-down* (@eq-matriz_gmo).
+
+Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham o menor erro o possível. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
+
+## O método elastic net
+
+O *elastic net* [@zou_regularization_2005] é um método de regressão regularizada que combina as normas $L_1$ e $L_2$, as penalidades do *lasso* e do *ridge*, respectivamente. A função objetivo a ser minimizada é dada por
+
+$$
+L(\lambda_1, \lambda_2, \mathbfit{\beta}) = |\mathbf{y} - \mathbf{X}\mathbfit{\beta}|^2 + \lambda_2|\mathbfit{\beta}|^2 + \lambda_1|\mathbfit{\beta}|_1
+$$ {#eq-elastic_net}
+
+\noindent em que $\lambda_1$ e $\lambda_2$ são os parâmetros de regularização e $\mathbfit{\beta}$ é o vetor de coeficientes a serem estimados. A solução para essa função objetivo é dada por^[Sob o valor otimizado ainda é aplicada correção de escala na forma $(1+\lambda_2)\mathbfit{\hat{\beta}}$. Ver @zou_regularization_2005.]
+
+$$
+\mathbfit{\hat{\beta}} = \arg \min_{\mathbfit{\beta}} |\mathbf{y}-\mathbf{X}\mathbfit{\beta}|^2 \text{, sujeito a } (1-\alpha)|\mathbfit{\beta}|_1 + \alpha|\mathbfit{\beta}|^2 \leq t
+$$ {#eq-elastic_net_solution}
+
+\noindent com $\alpha = \frac{\lambda_2}{\lambda_1 + \lambda_2}$ e $t \in \mathbb{R}^+$.
+
+A função $(1-\alpha)|\mathbfit{\beta}|_1 + \alpha|\mathbfit{\beta}|^2$ é a penalidade *elastic net*, uma combinação das penalidades *lasso* e *ridge*. O parâmetro $\alpha$ controla a mistura das duas penalidades, incluindo os casos extremos. Note que $\alpha = 0 \implies \lambda_2 = 0$, resultando em uma penalidade exclusivamente *lasso*, enquanto $\alpha = 1 \implies \lambda_1 = 0$, e a penalidade é apenas do tipo *ridge*.
+
+Portanto o *elastic net* é um método de *shrinkage*, uma vez que a penalidade *ridge* reduz o tamanho dos coeficientes, e de *seleção de variáveis*, uma vez que a penalidade *lasso* tende a anular os coeficientes de variáveis irrelevantes. Essas propriedades são desejáveis para a reconciliação de séries temporais, uma vez que a estrutura hierárquica pode conter séries insignificantes para a previsão de outras séries.
+
+Diferentemente dos métodos analíticos estudados, o *elastic net* não possui uma solução fechada. Portanto, é necessário utilizar métodos iterativos para encontrar o valor ótimo de $\mathbfit{\hat{\beta}}$ e [@zou_regularization_2005] utilizam validação cruzada $k$-fold para encontrar quais os valores de $\lambda_1$ e $\lambda_2$ que minimizam o resíduo. Nesse sentido, dado a metodologia de processo iterativo envolvendo calibragem de hiperparâmetros e reamostragem, podemos classificar o *elastic net* como um método de *machine learning*.
+
+## O processo de ajuste e sobreajuste
+
+Dada uma função de ajuste $f$, um conjunto de pontos $D = {d_1, ..., d_n}$ com $d_i = (\mathbf{x}_i \; \mathbf{y}_i)'$, variáveis de decisão ou parâmetros $\mathbf{x}_i \in \mathbb{R}^m$ e imagem $\mathbf{y}_i = f(\mathbf{x}_i) \in \mathbb{R}$. Diferentemente da abordagem do modelo clássico de regressão linear em que, cumpridas certas hipóteses, há um modelo teórico de coeficientes estimados por mínimos quadrados ordinários (MQO) que é garantido pelo teorema de Gauss-Markov ser o melhor estimador linear não viesado (BLUE), em *machine learning* o objetivo é encontrar, de forma iterativa, um modelo que melhor aproxima a função $f$ usando a informação contida em $D$, ou seja, queremos ajustar uma função de regressão $\hat{f}_D$ aos nossos dados $D$ de forma que $\hat{\mathbf{y}} = \hat{f}_D(\mathbf{x}, \varepsilon)$ tenha o menor erro de aproximação $\varepsilon$ [@bischl_resampling_2012].
+
+Para verificar o quão bem o modelo $\hat{f}_D$ se aproxima da função real $f$, é necessário uma função de perda $L(\mathbf{y}, \hat{f}(\mathbf{x}))$ que, no caso de regressão, será a perda quadrática $(\mathbf{y} - \hat{f}(\mathbf{x}))^2$ ou a perda absoluta $|\mathbf{\mathbf{x}} - \hat{f}(\mathbf{x})|$. Esses valores são agregados pela média para formar as funções de custo erro médio quadrático (MSE) e erro médio absoluto (MAE).
+
+Calculando o custo sobre a amostra $D$ usada para ajustar o modelo, teremos o chamado erro de resubstituição (@eq-ge-resub). Nesse caso, estaríamos usando o mesmo conjunto de dados tanto para treinar o preditor quanto para estimar o erro, o que nos levaria a uma estimativa enviesada do erro de generalização. Caso usássemos essa estimativa para seleção de modelos, esse viés favoreceria modelos mais adaptados à amostra.
+
+$$
+\widehat{GE}(\hat{f}_{D}, D) = \sum_{(x \; y)' \in D} \frac{L(y, \hat{f}_{D}(x))}{|D|}
+$$ {#eq-ge-resub}
+
+Dadas suficientes iterações, o erro de resubstituição tende a zero. Isso acontece porque conforme o preditor se adapta cada vez mais aos dados de treinamento ele irá memorizar a relação entre o conjunto de pontos $D$ e a imagem $f(\mathbf{x}_i)$, ou seja, irá se ajustar perfeitamente ao formato da função a ser modelada. E não necessariamente um modelo perfeitamente ajustado se traduz na capacidade de predição de dados futuros (fora da amostra). De forma geral, espera-se que o preditor reduza seu viés durante o treino apenas o suficiente para que seja capaz de generalizar sua predição para fora da amostra em um nível ótimo de acurácia. A partir desse ponto, a redução no viés é penalizada com o aumento da variância, ou seja, com a redução de sua capacidade de prever dados futuros. A esse processo se dá o nome de *overfitting* ou sobreajuste. Isso quer dizer que não podemos considerar a performance do preditor em $D$ se desejamos estimar honestamente a performance real do modelo [@bischl_resampling_2012].
+
+## Reamostragem
+
+Uma forma de se corrigir esse problema é dividindo a amostra em um conjunto para treino $D^\phi$ e outro conjunto para teste $D^\theta$ de forma que $D^\phi \cup D^\theta = D$ e $D^\phi \cap D^\theta = \varnothing$. Assim, pode-se treinar um meta-modelo em $D^\phi$ para se obter $\hat{f}_{D^\phi}$ e calcular seu erro de generalização usando os dados de $D^\theta$. Essa abordagem é chamada de *hold-out* e ela é de simples implementação e utilização, uma vez que as observações do conjunto teste são completamente independentes das observações com as quais o modelo foi treinado. Então, podemos estimar o erro de generalização do modelo, que consiste no cômputo do custo de $\hat{f}_D^\phi$ aplicada à amostra de teste $D^\theta$.
+
+$$
+\widehat{GE}(\hat{f}_{D^\phi}, D^\theta) = \sum_{(x \; y)' \in D^\theta} \frac{L(y, \hat{f}_{D^\phi}(x))}{|D^\theta|}
+$$ {#eq-ge}
+
+Como esse método mais simples pode não ser suficiente para detectar a variância e instabilidade de modelos mais complexos, foram desenvolvidas diferentes técnicas de reamostragem ao longo do tempo. Uma das mais populares é a validação cruzada [@stone_cross-validation_1974], que consiste em gerar repetidamente $i$ subconjuntos de treino $D_i^\phi$ e teste $D_i^\theta$ com o conjunto de dados disponível, ajustar um meta-modelo com cada conjunto de treino e atestar sua qualidade no conjunto de teste correspondente. A estimativa do erro de generalização então se torna:
+
+$$
+\widehat{GE} = \frac{1}{k}\sum_{i=1}^{k}\widehat{GE}(\hat{f}_{D_i^\phi}, D_i^\theta)
+$$ {#eq-ge-cv}
+
+Dividindo a amostra em $k$ subconjuntos, utilizando $k-1$ para ajustar um meta-modelo e validando a performance no subconjunto restante — e repetindo esse procedimento para todas as possibilidades de subconjuntos —, temos a validação cruzada $k$-*fold*. Esta é uma técnica de reamostragem que permite estimar o erro de generalização de um modelo de forma mais robusta e confiável que o *hold-out* simples. Isso porque, ao contrário do *hold-out*, a validação cruzada permite que todos os dados sejam usados tanto para treino quanto para teste, o que reduz a variância da estimativa do erro de generalização.
+
+## Validação cruzada $k$-fold em séries temporais
+
+Para dados *cross-section*, essa definição de validação cruzada $k$-*fold* é suficiente para qualquer caso. Entretanto, no caso de séries temporais, o analista deve tomar alguns cuidados na escolha da abordagem de validação cruzada. Isso porque, ao contrário de dados *cross-section*, os dados de séries temporais são dependentes no tempo. Isso traz dois aparentes problemas: primeiramente, ao dividir a amostra em $k$ subconjuntos aleatórios, o meta-modelo será treinado em períodos descontínuos e com dados futuros aos dados de teste em, ao menos, $k-1$ subconjuntos. Em segundo lugar, realizando o *split* treino-teste em $y_t$, com $y_{t-1}$ na amostra treino, significa que os subconjuntos de treino e teste são dependentes (@fig-cv-aleatoria).
+
+![Validação $k$-fold aleatória](img/cv-aleatorio.png){#fig-cv-aleatoria width=70%}
+
+Para contornar esse problema, outros métodos de validação cruzada foram desenvolvidos pensando em séries temporais. Tomando o conjunto de validação com dados exclusivamente posteriores aos dados de treino, temos o método conhecido como validação cruzada com origem móvel (@fig-cv-blocked).
+
+![Validação $k$-fold com origem móvel](img/cv-blocked.png){#fig-cv-blocked width=70%}
+
+Já quando excluímos as defasagens dependentes do subconjunto de treino (em relação ao conjunto de validação), temos a validação cruzada não dependente (@fig-cv-n-dep). Para ilustrar esse caso, tome um processo AR(3). Excluir as defasagens dependentes significa que, se o conjunto de validação começa em $y_t$, então o conjunto de treino pode apenas ir até $y_{t-4}$. O problema evidente dessa abordagem é que, dependendo do tamanho da estrutura de autocorrelação da série, muitas defasagens são excluídas, podendo inviabilizar o processo de validação.
+
+![Validação $k$-fold não-dependente](img/cv-n-dep.png){#fig-cv-n-dep width=70%}
+
+Entretanto, esses problemas são apenas aparentes. @bergmeir_use_2012 comparam uma série de métodos de validação em séries temporais e concluem que, considerando séries estacionárias, os problemas teóricos relacionados à dependência não produzem impactos empíricos. @bergmeir_note_2018 vão além e abordam esse problema teórica e empiricamente, concluindo que não apenas é possível o uso de validação cruzada $k$-*fold* quando a série não apresenta autocorrelação serial nos resíduos, mas também é uma melhor escolha do que a validação fora da amostra^[*Out-of-sample evaluation* é o método padrão na literatura de séries temporais e consiste na separação da porção final da série — geralmente entre 20% e 30% — para validação.].
+
+## Dados e variáveis
+
+Os dados usados nesse trabalho são dados terciários obtidos do *datalake* público Base dos Dados [@dahis_data_2022]. A fonte primária são os bancos comerciais e múltiplos com carteira comercial que disponibilizam mensalmente os saldos dos principais verbetes do balancete via documento 4500^[Esses documentos são relatórios eletrônicos obrigatórios demandados pelo Bacen às instituições financeiras que permitem ao regulador o conhecimento minucioso dos bancos e de seus clientes.] ao Banco Central do Brasil, que os compila e publica, agrupados por agência bancária e por município, no relatório ESTBAN — Estatística Bancária Mensal e por Município^[https://www4.bcb.gov.br/fis/cosif/estban.asp?frame=1].
+
+O que compõe os verbetes de crédito, ou seja, os valores das séries temporais a serem trabalhadas, são os saldos de crédito ativo (empréstimos e financiamentos), que são correspondem ao principal mais os juros calculados até 59 dias de atraso^[Não são consideradas crédito ativo as operações de crédito liquidadas ou que tenham sido transferidas para prejuízo. São transferidas para prejuízo as operações de crédito em atraso há mais 6 meses após sua classificação de risco em H, que é a mínima [@conselho_monetario_nacional_resolucao_1999].].
+
+Além das estatísticas bancárias, foram obtidas informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
+
+Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram mantidos apenas os verbetes relacionados a crédito e mantidas apenas as agências atualmente em atividade. Quanto ao período, há dados disponíveis desde 1988. Entretanto, utilizaremos os dados a partir de 2010 pois, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta.
+
+Por fim, as variáveis mantidas no *dataset* foram as descritas no Quadro \ref{qdr-variaveis}. Dessa forma, temos séries mensais de saldos de créditos de `r length(unique(estban$cnpj_agencia))` agências bancárias, distribuídas por `r length(unique(estban$nome))` municípios, a partir de `r format(min(estban$ref), "%B de %Y")`, totalizando `r scales::number(nrow(estban), big.mark = ".", decimal.mark = ",")` observações.
+
+```{r}
+#| tbl-cap: "Variáveis do dataset"
+#| label: qdr-variaveis
+#| include: false
+
+tibble::tribble(
+    ~Variável, ~Descrição,
+    "ref", "Data de referência do relatório ESTBAN",
+    "nome_mesorregiao", "Nome da mesorregião do ES",
+    "nome_microrregiao", "Nome da microrregião do ES",
+    "verbete", "Descrição da rubrica do balancete",
+    "nome", "Nome do município",
+    "cnpj_agencia", "CNPJ da agência bancária",
+    "valor", "Saldo do verbete"
+) |>
+    kbl(booktabs = TRUE, row.names = FALSE) |>
+    kable_styling(latex_options = c("striped"), font_size = 12) |>
+    column_spec(2, width = "10cm")
 ```
 
-Utilizando essa obra como texto base, obtive os textos referenciados no capítulo 11 "*Forecasting Hierarquical and Grouped Time-Series*", subcapítulo 3 "*Forecast Reconciliation*", além de @hyndman2016, onde o método por MPQ foi desenvolvido porém não está citado nas referências do capítulo.
+```{=latex}
+\begin{quadro}
+    \caption{Variáveis do dataset}\tabularnewline
+    \label{qdr-variaveis}
 
-```{r citacoes fpp3}
-#| tbl-cap: Artigos de referência em Hyndman e Athanasopoulos (2021)
+    \centering\begingroup\fontsize{11}{12}\selectfont
 
-readxl::read_excel("docs/academico.xlsx", sheet = "fpp3") |>
-    subset(select = c(-Título)) |>
-    kbl(booktabs = TRUE, escape = TRUE) |>
-    kable_styling(latex_options = "striped", font_size = 10)
+    \begin{tabular}[t]{l>{\raggedright\arraybackslash}p{10cm}}
+    \toprule
+    Variável & Descrição\\
+    \midrule
+    \cellcolor{gray!6}{ref} & \cellcolor{gray!6}{Data de referência do relatório    ESTBAN}\\
+    nome\_mesorregiao & Nome da mesorregião do ES\\
+    \cellcolor{gray!6}{nome\_microrregiao} & \cellcolor{gray!6}{Nome da     microrregião do ES}\\
+    verbete & Descrição da rubrica do balancete\\
+    \cellcolor{gray!6}{nome} & \cellcolor{gray!6}{Nome do município}\\
+    \addlinespace
+    cnpj\_agencia & CNPJ da agência bancária\\
+    \cellcolor{gray!6}{valor} & \cellcolor{gray!6}{Saldo do verbete}\\
+    \bottomrule
+    \end{tabular}
+    \endgroup{}
+\end{quadro}
 ```
 
-Adicionando o termo "*quantile*" e refinando a pesquisa para encontrar as palavras chave no título dos trabalhos, nenhum resultado foi encontrado. Modificando os termos para encontrar palavras semelhantes, a busca por "*allintitle: hierarchical OR hierarchically probabilistic OR quantile reconciliation OR reconciled*" retornou 5 títulos, dentre os quais dois são artigos de acesso livre e, portanto, foram adicionadas à pesquisa bibliográfica a ser realizada. \nocite{han2021, roach2019}
+Os dados foram organizados de forma hierárquica por estado, mesorregião, microrregião, município e agência bancária; e de forma agrupada, por verbete.
 
-```{r citacoes probablisticas}
-#| tbl-cap: Trabalhados encontrados na busca estendida
+O detalhamento da construção do *dataset* se encontra no Anexo \ref{anexo_a}.
 
-readxl::read_excel("docs/academico.xlsx", sheet = "probabilistica") |>
-    subset(select = c(-Título)) |>
-    kbl(booktabs = TRUE, escape = TRUE) |>
-    kable_styling(latex_options = "striped", font_size = 10)
+## Análise exploratória dos dados
+
+Após limpeza, o *dataset* adquiriu a estrutura apresentada na @tbl-dataset. As microrregiões que compõem cada mesorregião são apresentadas na @tbl-microrregioes e os municípios que compõem cada microrregião são apresentados na @tbl-municipios.
+
+```{r}
+#| label: tbl-dataset
+#| tbl-cap: "Estrutura do dataset"
+  
+estban |>
+    transform(
+        valor = scales::number(
+            valor,
+            big.mark = ".", decimal.mark = ","
+        )
+    ) |>
+    subset(nome == "Vitória") |>
+    tail() |>
+    kbl(
+        booktabs = TRUE,
+        row.names = FALSE,
+        col.names = c(
+            "Data de referência",
+            "Mesorregião",
+            "Microrregião",
+            "Município",
+            "Agência",
+            "Verbete",
+            "Saldo"
+        )) |>
+    kable_styling(latex_options = c("striped", "scale_down"))
 ```
 
-A segunda etapa do trabalho consistirá na aplicação e avaliação dos métodos estimados nas séries de saldo de empréstimos e financiamentos do Banestes. A coleta dos dados para aplicação do método será realizada diretamente do sistema de planejamento orçamentário do Banestes. A importação, limpeza e tratamento dos dados será realizado utilizando o *software* R [@R-base] e o pacote {bees} [@R-bees], que é um pacote privado que desenvolvi para esses fins. A disponibilização em repositório aberto^[https://github.com/albersonmiranda/dissertacao] para fins de reprodutibilidade será proposta à instituição, tanto da base de dados quanto do pacote para importação e tratamento deles.
+```{r}
+#| label: tbl-microrregioes
+#| tbl-cap: "Microrregiões por mesorregião"
+  
+aggregate(
+        nome_microrregiao ~ nome_mesorregiao,
+        data = estban,
+        FUN = unique
+    ) |>
+    kbl(
+        booktabs = TRUE,
+        row.names = FALSE,
+        col.names = c(
+            "Mesorregião",
+            "Microrregiões"
+        )) |>
+    kable_styling(latex_options = c("striped"))
+```
 
-Para a comparação com os métodos MQO, MQP e MinT, os dados serão organizados na estrutura hierárquica agrupada utilizando o pacote {tsibble} [@R-tsibble], as previsões base realizadas com o pacote {fable} [@R-fable] e as reconciliações via MQO, MQP e MinT para comparação dos resultados serão realizadas com o pacote {fabletools} [@R-fabletools]. Já a reconciliação via regressão quantílica será realizada com o pacote {quantreg} [@R-quantreg]. Inicialmente, a métrica para avaliação será a raíz do erro quadrático médio, *RMSE* na sigla em inglês, para os erros de previsão das séries reconciliadas.
+```{r}
+#| label: tbl-municipios
+#| tbl-cap: "Municípios por microrregião"
+  
+aggregate(
+        nome ~ nome_microrregiao,
+        data = estban,
+        FUN = unique
+    ) |>
+    kbl(
+        booktabs = TRUE,
+        row.names = FALSE,
+        col.names = c(
+            "Microrregiões",
+            "Municípios"
+        )) |>
+    kable_styling(latex_options = c("striped"), font_size = 10) |>
+    column_spec(2, width = "10cm")
+```
 
-A estrutura hierárquica terá 3 níveis --- total, superintendências regionais (norte, sul, centro e empresarial) e agências ---, e a estrutura agrupada será formada por modalidades de crédito selecionadas, sendo algumas mais ruidosas que outras^[Por exemplo, espera-se que a série de crédito imobiliário seja menos ruidosa que a série de crédito pessoal.] de forma a evidenciar vantagens e desvantagens em cada caso.
+O tamanho de uma estrutura hierárquica, em termos de observações, é determinada por seu nível mais desagregado. Assim, sendo `r length(unique(estban$ref))` meses e `r length(unique(estban$cnpj_agencia))` agências, a estrutura hierárquica deve contar com `r length(unique(estban$ref))`\times`r length(unique(estban$cnpj_agencia))` $=$ `r scales::number(length(unique(estban$ref)) * length(unique(estban$cnpj_agencia)), big.mark = ".", decimal.mark = ",")` observações. Sendo também uma estrutura agrupada por `r length(unique(estban$verbete))` verbetes, a quantidade de observações é multiplicada pela quantidade de níveis transversais, totalizando `r scales::number(length(unique(estban$ref)) * length(unique(estban$cnpj_agencia)) * length(unique(estban$verbete)), big.mark = ".", decimal.mark = ",")` observações. Como há apenas, `r scales::number(nrow(estban), big.mark = ".", decimal.mark = ",")` observações, podemos concluir que há dados faltantes, originados de agências que foram criadas no período e, portanto, não possuem a série completa desde 2010. Para permitir a estimação, esses dados serão imputados com zero.
+
+```{r skim}
+#| label: tbl-estban
+#| tbl-cap: "Contagem de únicos no dataset ESTBAN"
+
+temp = lapply(
+    estban[sapply(estban, function(x) !is.numeric(x))],
+    unique
+) |>
+lengths()
+
+temp |>
+kbl(booktabs = TRUE, col.names = "Únicos") |>
+kable_styling(latex_options = c("striped"))
+```
+
+A série temporal do agregado de crédito no Banestes no Espírito Santo é apresentada na @fig-agregado. Podemos observar tendência de crescimento a partir de 2020, indicando que a série seja não estacionária e que talvez seja interessante adicionar um regressor externo para o período da pandemia, quando foram implementados programas de crédito emergenciais no país.
+
+```{r}
+#| label: fig-agregado
+#| fig-cap: "Série temporal do agregado de crédito do Banestes no ES"
+
+# adicionando estrutura hierárquica e agrupada
+estban_aggr = tsibble::tsibble(
+  estban,
+  index = ref,
+  key = c("nome", "cnpj_agencia", "verbete", "nome_mesorregiao", "nome_microrregiao")
+)
+
+estban_aggr = estban_aggr |>
+  fabletools::aggregate_key((nome_mesorregiao / nome_microrregiao / nome / cnpj_agencia) * verbete, valor = sum(valor))
+
+# plot agregado
+estban_aggr |>
+    dplyr::filter(
+        is_aggregated(nome),
+        is_aggregated(cnpj_agencia),
+        is_aggregated(nome_mesorregiao),
+        is_aggregated(nome_microrregiao),
+        is_aggregated(verbete)
+    ) |>
+    ggplot(aes(x = ref, y = valor)) +
+        geom_line() +
+        scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
+        labs(x = "", y = "Valor (em R$ bi)") +
+        tema
+```
+
+A concentração na mesorregião Central Espírito-santense, @fig-meso, pode ser um indicativo de que os elementos das demais regiões tenham menor peso na reconciliação.
+
+```{r}
+#| label: fig-meso
+#| fig-cap: "Série temporal do agregado de crédito do Banestes por mesorregião do ES"
+
+# plot agregado
+estban_aggr |>
+    dplyr::filter(
+        is_aggregated(nome),
+        is_aggregated(cnpj_agencia),
+        !is_aggregated(nome_mesorregiao),
+        is_aggregated(nome_microrregiao),
+        is_aggregated(verbete)
+    ) |>
+    ggplot(aes(x = ref, y = valor)) +
+        geom_line() +
+        scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
+        facet_wrap(~factor(nome_mesorregiao), scales = "free_y") +
+        labs(x = "", y = "Valor (em R$ bi)") +
+        tema +
+        theme(
+            legend.text = element_text(size = 6),
+            legend.title = element_text(size = 6),
+            strip.text = element_text(size = 6)
+        )
+```
+
+```{r}
+#| label: fig-micro
+#| fig-cap: "Série temporal do agregado de crédito do Banestes por microrregião do ES"
+
+# plot agregado
+estban_aggr |>
+    dplyr::filter(
+        is_aggregated(nome),
+        is_aggregated(cnpj_agencia),
+        !is_aggregated(nome_mesorregiao),
+        !is_aggregated(nome_microrregiao),
+        is_aggregated(verbete)
+    ) |>
+    ggplot(aes(x = ref, y = valor, color = factor(nome_microrregiao))) +
+        geom_line() +
+        scale_y_continuous(labels = scales::number_format(scale = 1 / 1e6)) +
+        facet_wrap(~factor(nome_mesorregiao), scales = "free_y") +
+        labs(x = "", y = "Valor (em R$ mi)", color = "mesorregião") +
+        tema +
+        theme(
+            legend.text = element_text(size = 6),
+            legend.title = element_text(size = 6),
+            strip.text = element_text(size = 6)
+        )
+```
+
+Analisando o agregado por verbetes, a @fig-verbetes indica que o crescimento é liderado pelas alíneas empréstimos e títulos descontados.
+
+```{r}
+#| label: fig-verbetes
+#| fig-cap: "Verbetes no agregado do ES"
+
+# plot por verbetes
+estban_aggr |>
+    dplyr::filter(
+        is_aggregated(nome),
+        is_aggregated(cnpj_agencia),
+        is_aggregated(nome_mesorregiao),
+        is_aggregated(nome_microrregiao),
+        !is_aggregated(verbete)
+    ) |>
+    ggplot(aes(x = ref, y = valor, color = factor(verbete))) +
+        geom_line() +
+        scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
+        labs(x = "", y = "Valor (em R$ bi)", color = "Verbete") +
+        tema
+```
+
+```{r}
+#| label: fig-verbete_meso
+#| fig-cap: "Verbete por mesorregião do ES"
+
+# plot por mesorregião
+estban_aggr |>
+    dplyr::filter(
+        is_aggregated(nome),
+        is_aggregated(cnpj_agencia),
+        !is_aggregated(nome_mesorregiao),
+        is_aggregated(nome_microrregiao),
+        !is_aggregated(verbete)
+    ) |>
+    ggplot(aes(x = ref, y = valor, color = factor(verbete))) +
+        geom_line() +
+        facet_wrap(~factor(nome_mesorregiao), scales = "free_y") +
+        scale_y_continuous(labels = scales::number_format(scale = 1 / 1000000)) +
+        labs(x = "", y = "Valor (em R$ mi)", color = "Verbete") +
+        tema +
+        theme(
+            legend.text = element_text(size = 6),
+            legend.title = element_text(size = 6),
+            strip.text = element_text(size = 6)
+        )
+```
+
+## Previsões base
+
+Uma vez que o foco deste trabalho é no ganho proporcionado pela reconciliação ótima, as previsões base serão obtidas por meio do métodos básicos para previsão de séries temporais, como algum tipo de suavimento exponencial ou pelo algoritmo de Hyndman-Khandakar [@hyndman_forecasting_2021]. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
+
+## *Design* do experimento
+
+Os métodos analíticos de reconciliação utilizados no *benchmark* serão os de nível único *bottom-up* e o *top-down*; os de reconciliação ótima *MinT-OLS*, *MinT-WLS* e *MinT-shrink*. Essa escolha se justifica para que seja possível comparar os métodos de reconciliação ótima com os métodos de nível único, principalmente em relação ao tempo de processamento, que pode revelar um *trade-off* a ser analisado pelo pesquisador.
+
+Já a metodologia para obtenção das previsões reconciliadas por métodos baseados em *machine-learning* será semelhante ao de @spiliotis_hierarchical_2021:
+
+1. dividir a amostra em treino e teste;
+1. treinar um modelo de previsão na amostra treino e obter previsões um passo a frente para a amostra teste;
+1. treinar um modelo de *machine learning* para cada série do menor nível da hierarquia, em que os parâmetros são as previsões obtidas no passo 2 e a variável explicada são os valores observados. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos;
+1. obter as previsões base $\hat{y}_t$;
+1. passar as previsões base ao modelo treinado no passo 3 para se obter as previsões reconciliadas para o menor nível da hierarquia;
+1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
+
+Esse procedimento será realizado três vezes, uma para cada configuração do algoritmo elastic net, com $\alpha=0$ (*lasso*), $\alpha=1$ (*ridge*) e uma combinação de ambos obtida via reamostragem.
 
 # PLANO DE TRABALHO
 
-Para a introdução, o planejado é detalhar os conceitos de séries temporais hierárquicas e agrupadas, coerência e reconciliação ótima na notação matricial. Além disso, devo introduzir o conceito envolvendo a matriz $\mathbfit{G}$ e as abordagens de reconciliação clássicas (*bottom-up* e *top-down*), também na notação matricial. Paralelamente, já iniciarei a escolha das séries a serem trabalhadas e a formalização do uso e publicação da base de dados.
+Para a introdução, tratarei da justificativa e relevância do problema de pesquisa, e no segundo capítulo trarei a revisão de literatura.
 
-No primeiro capítulo, devo detalhar as abordagens de reconciliação ótima para previsões pontuais nos três métodos MQO, MQP e MinT, demonstrando a estimação, hipóteses, vantagens e limitações.
+Para o terceiro capítulo, o planejado é detalhar os conceitos de séries temporais hierárquicas e agrupadas, coerência e reconciliação ótima na notação matricial. Além disso, devo introduzir o conceito envolvendo a matriz $\mathbfit{G}$ e as abordagens de nível único (*bottom-up* e *top-down*), também na notação matricial. A seguir, devo detalhar o método analítico de reconciliação ótima para previsões pontuais nas configurações MQO, MQP e *shrink*, e o método de *machine learning* escolhido, o *elastic net*.
 
-No segundo capítulo, vou trazer os conceitos da regressão quantílica e aplicá-los ao problema da reconciliação ótima, que é o objetivo principal do trabalho. Trabalharei tanto com a mediana quanto com quantis extremos.
+No quarto capítulo, será detalhada a metodologia da pesquisa quantitativa, detalhando os dados e o *design* do *benchmark* a ser produzido.
 
-No capítulo 3, aplicarei os métodos estudados aos dados de crédito do Banestes, comparando as performances entre eles enquanto analiso onde a reconciliação quantílica se mostra mais ou menos vantajosa.
+Por fim, o quinto capítulo trará o resultado do *benchmark* e a discussão dos resultados.
 
 ```{r cronograma}
 #| tbl-cap: Cronograma das atividades
@@ -238,5 +1007,3 @@ readxl::read_excel("docs/academico.xlsx", sheet = "cronograma") |>
     kable_styling(latex_options = "striped", font_size = 10)|>
     column_spec(1, width = "15em")
 ```
-
-# REFERÊNCIAS {-}
