@@ -5,7 +5,7 @@ format:
     pdf:
         include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
         include-before-body: config/elementos/pre_textuais.tex
-        #include-after-body: config/elementos/pos_textuais.tex
+        include-after-body: config/elementos/pos_textuais.tex
         keep-tex: false
         cite-method: biblatex
         output-file: render/dissertacao.pdf
@@ -114,7 +114,7 @@ Além disso, ambas são abordagens de nível único, isto é, são realizadas as
 
 Uma terceira possibilidade é a *reconciliação ótima*. Ela é uma abordagem que busca resolver esse problema e consiste em realizar previsões para todos os níveis hierárquicos e, então, estimar um modelo para reescrever as previsões do nível mais desagregado como uma combinação linear de todos os elementos da hierarquia. Obtidas as novas previsões no menor nível, ela são então agregadas, gerando previsões coerentes nos níveis superiores. Dessa forma, a informação de todos os níveis é utilizada na estimação dos modelos e na geração das previsões, ao mesmo tempo em que a variância do erro de previsão é minimizado [@hyndman_optimal_2011].
 
-Atualmente, os métodos analíticos baseados na minimização do traço da matriz da variância-covariância dos erros, desenvolvidos em  @wickramasuriya_optimal_2019, são os mais populares na literatura da reconciliação ótima. Esses métodos divergem apenas na forma da qual se dá o relacionamento entre os diferentes elementos da hierarquia: se os erros de previsão são descorrelacionados e equivariantes ao longo de toda estrutura (MQO) — o que é impossível em séries temporais hierárquicas —; se os erros são descorrelacionados e equivariantes apenas dentro do mesmo nível hierárquico (MQP estrutural); se os erros são descorrelacionados mas ponderados pela variância da série (MQP); ou se são correlacionados e variantes ao longo de toda a estrutura (estimadores *MinT Sample* e *MinT Shrink*).
+Atualmente, os métodos analíticos baseados na minimização do traço da matriz da variância-covariância dos erros, desenvolvidos em  @wickramasuriya_optimal_2019, são os mais populares na literatura da reconciliação ótima. Esses métodos divergem apenas na forma da qual se dá o relacionamento entre os diferentes elementos da hierarquia: se os erros de previsão são descorrelacionados e equivariantes ao longo de toda estrutura (MQO), o que é impossível em séries temporais hierárquicas; se os erros são descorrelacionados e equivariantes apenas dentro do mesmo nível hierárquico (MQP estrutural); se os erros são descorrelacionados mas ponderados pela variância da série (MQP); ou se são correlacionados e variantes ao longo de toda a estrutura (estimadores *MinT Sample* e *MinT Shrink*).
 
 Entretanto, tais métodos são sujeitos a uma série de restrições, como as do MCLR, e têm sua capacidade preditiva reduzida quando suas hipóteses são violadas. Em previsões de séries temporais, o objetivo na maioria dos casos é prever valores futuros com a maior acurácia possível. Em vista disso, métodos de *machine learning* são mais gerais, no sentido de permitir parâmetros não lineares e poderem aproximar virtualmente qualquer função. Além disso, são focados na capacidade preditiva, muitas vezes em detrimento da explicativa. Espera-se, portanto, que esses métodos alcancem melhor performance no problema da reconciliação ótima, justificando a pesquisa e atenção ao tema. Nesse sentido, trabalhos como @spiliotis_hierarchical_2021 desenvolvem métodos de reconciliação ótima de séries temporais utilizando algoritmos de *machine learning*, especificamente o *XGBoost* e *Random Forest*, obtendo resultados superiores aos métodos analíticos tradicionais, especialmente quando as séries não possuem características semelhantes.
 
@@ -124,10 +124,10 @@ O objetivo geral da dissertação é estudar o problema da reconciliação ótim
 
 Os objetivos específicos são:
 
-1. Aplicar o algoritmo *elastic-net* para reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas e atestar sua validade em dados de alta dimensionalidade;
-1. Comparar a performance, em termos de funções de custo e tempo de processamento, do algoritmo *elastic-net* nas configurações $\alpha=0$ (LASSO), $\alpha=1$ (Ridge) e uma combinação de ambos obtida via reamostragem;
-1. Comparar a performance, em termos de funções de custo e tempo de processamento, do algoritmo *elastic-net* com os métodos analíticos *bottom-up*, *top-down* e *MinT Shrink*;
-1. Comparar a performance, em termos de funções de custo e tempo de processamento, das estratégias de reamostragem validação cruzada $k$*-fold* e *holdout* para o algoritmo *elastic-net*;
+1. Aplicar o método *elastic net* para reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas e atestar sua validade em dados de alta dimensionalidade;
+1. Comparar a performance, em termos de funções de custo e tempo de processamento, do mpetodo *elastic net* nas configurações $\alpha=0$ (*lasso*), $\alpha=1$ (*ridge*) e uma combinação de ambos obtida via reamostragem;
+1. Comparar a performance, em termos de funções de custo e tempo de processamento, do método *elastic net* com os métodos analíticos *bottom-up*, *top-down* e *MinT Shrink*;
+1. Comparar a performance, em termos de funções de custo e tempo de processamento, das estratégias de reamostragem validação cruzada $k$*-fold* e *holdout* para o método *elastic net*;
 1. Verificar se a aplicação de regressão regularizada resulta em algum padrão reconhecível na estrutura (e.g., se a regularização tende a favorecer os coeficientes de séries temporais que compartilham o mesmo nó pai ou, em outras palavras, se tende a zerar os coeficientes de séries temporais que não compartilham o mesmo nó pai na hierarquia);
 
 ## Outline da dissertação
@@ -203,8 +203,8 @@ Essa estrutura pode ser representada através de equações para qualquer nível
 
 \begin{align}
 y_t &= y_{A,t} + y_{B,t} + y_{C,t} \label{eq:ha} \\
-y_t &= y_{AA,t} + y_{AB,t} + y_{AC,t} + y_{BA,t} + y_{BC,t} + y_{CA,t}\label{eq:ha_mun} \\
-y_{A,t} &= y_{AA,t} + y_{AB,t} + y_{AC,t} \label{eq:haES}
+y_t &= y_{AA,t} + y_{AB,t} + y_{BA,t} + y_{BB,t} + y_{CA,t} + y_{CB,t}\label{eq:ha_mun} \\
+y_{A,t} &= y_{AA,t} + y_{AB,t}\label{eq:haES}
 \end{align}
 
 Alternativamente, podemos descrever a estrutura completa de forma matricial:
@@ -217,34 +217,31 @@ $$
     y_{C, t} \\
     y_{AA, t} \\
     y_{AB, t} \\
-    y_{AC, t} \\
     y_{BA, t} \\
     y_{BB, t} \\
-    y_{BC, t} \\
-    y_{CA, t}
+    y_{CA, t} \\
+    y_{CB, t}
 \end{bmatrix}_{n \times 1}
 =
 \begin{bmatrix}
-    1 & 1 & 1 & 1 & 1 & 1 & 1 \\
-    1 & 1 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 1 & 1 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
-    1 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 1 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 1 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    1 & 1 & 1 & 1 & 1 & 1 \\
+    1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 1 \\
+    1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1
 \end{bmatrix}_{n \times m}
 \begin{bmatrix}
     y_{AA, t} \\
     y_{AB, t} \\
-    y_{AC, t} \\
     y_{BA, t} \\
     y_{BB, t} \\
-    y_{BC, t} \\
-    y_{CA, t}
+    y_{CA, t} \\
+    y_{CB, t}
 \end{bmatrix}_{m \times 1}
 $$ {#eq-matriz_hierarquia}
 
@@ -324,12 +321,12 @@ $$
 \mathbfit{G}
 =
 \begin{bmatrix}
-    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
 \end{bmatrix}_{m \times n}
 $$ {#eq-matriz_g}
 
@@ -357,12 +354,12 @@ $$
 =
 \mathbfit{S}_{n \times m}
 \begin{bmatrix}
-    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
 \end{bmatrix}_{m \times n}
 \begin{bmatrix}
     \hat{y}_{T+h|T} \\
@@ -422,12 +419,12 @@ $$
 =
 \mathbfit{S}_{n \times m}
 \begin{bmatrix}
-    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
 \end{bmatrix}_{m \times n}
 \begin{bmatrix}
     \hat{y}_{T+h|T} \\
@@ -469,8 +466,7 @@ $$
     0 & 0 & 1 & 0 & 0 & 0 \\
     0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 1 \\
-    0 & 0 & 0 & 0 & 0 & 0
+    0 & 0 & 0 & 0 & 0 & 1
 \end{bmatrix}_{n \times m}
 \begin{bmatrix}
     p_1\hat{y}_{T+h|T} \\
@@ -488,12 +484,12 @@ $$
 \mathbfit{G}
 =
 \begin{bmatrix}
-    0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0
+    0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
 \end{bmatrix}_{m \times n}
 $$ {#eq-matriz_gbu}
 
@@ -541,12 +537,12 @@ $$
 \mathbfit{G}
 =
 \begin{bmatrix}
-    0 & p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    0 & 0 & 0 & p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+    0 & p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & p_5 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & p_6 & 0 & 0 & 0 & 0 & 0 & 0
 \end{bmatrix}_{m \times n}
 $$ {#eq-matriz_gmo}
 
@@ -600,18 +596,33 @@ Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize
 
 ## Métodos analíticos de reconciliação ótima
 
+### Minimum Trace
+
 [Descrever as variações do MinT: OLS, WLS e shrink]
 
 ## Métodos de reconciliação ótima baseados em aprendizado de máquina
 
-[Descrever o algorítmo, os learners — GLMnet para Lasso e Ridge, XGBoost, SVM e rede neural]
+### O método elastic net
 
-### Elastic Net
+O *elastic net* [@zou_regularization_2005] é um método de regressão regularizada que combina as normas $L_1$ e $L_2$, as penalidades do *lasso* e do *ridge*, respectivamente. A função objetivo a ser minimizada é dada por
 
-O *elastic net* [@zou_regularization_2005] é um método de regressão regularizada que combina as normas $L_1$ e $L_2$, ou seja, penalidades do *lasso* e do *ridge*. A função objetivo a ser minimizada é dada por
 $$
 L(\lambda_1, \lambda_2, \mathbfit{\beta}) = |\mathbf{y} - \mathbf{X}\mathbfit{\beta}|^2 + \lambda_2|\mathbfit{\beta}|^2 + \lambda_1|\mathbfit{\beta}|_1
 $$ {#eq-elastic_net}
+
+\noindent em que $\lambda_1$ e $\lambda_2$ são os parâmetros de regularização e $\mathbfit{\beta}$ é o vetor de coeficientes a serem estimados. A solução para essa função objetivo é dada por^[Sob o valor otimizado ainda é aplicada correção de escala na forma $(1+\lambda_2)\mathbfit{\hat{\beta}}$. Ver @zou_regularization_2005.]
+
+$$
+\mathbfit{\hat{\beta}} = \arg \min_{\mathbfit{\beta}} |\mathbf{y}-\mathbf{X}\mathbfit{\beta}|^2 \text{, sujeito a } (1-\alpha)|\mathbfit{\beta}|_1 + \alpha|\mathbfit{\beta}|^2 \leq t
+$$ {#eq-elastic_net_solution}
+
+\noindent com $\alpha = \frac{\lambda_2}{\lambda_1 + \lambda_2}$ e $t \in \mathbb{R}^+$.
+
+A função $(1-\alpha)|\mathbfit{\beta}|_1 + \alpha|\mathbfit{\beta}|^2$ é a penalidade *elastic net*, uma combinação das penalidades *lasso* e *ridge*. O parâmetro $\alpha$ controla a mistura das duas penalidades, incluindo os casos extremos. Note que $\alpha = 0 \implies \lambda_2 = 0$, resultando em uma penalidade exclusivamente *lasso*, enquanto $\alpha = 1 \implies \lambda_1 = 0$, e a penalidade é apenas do tipo *ridge*.
+
+Portanto o *elastic net* é um método de *shrinkage*, uma vez que a penalidade *ridge* reduz o tamanho dos coeficientes, e de *seleção de variáveis*, uma vez que a penalidade *lasso* tende a anular os coeficientes de variáveis irrelevantes. Essas propriedades são desejáveis para a reconciliação de séries temporais, uma vez que a estrutura hierárquica pode conter séries insignificantes para a previsão de outras séries.
+
+Diferentemente dos métodos analíticos estudados, o *elastic net* não possui uma solução fechada. Portanto, é necessário utilizar métodos iterativos para encontrar o valor ótimo de $\mathbfit{\hat{\beta}}$ e [@zou_regularization_2005] utilizam validação cruzada $k$-fold para encontrar quais os valores de $\lambda_1$ e $\lambda_2$ que minimizam o resíduo. Nesse sentido, dado a metodologia de processo iterativo envolvendo calibragem de hiperparâmetros e reamostragem, podemos classificar o *elastic net* como um método de *machine learning*.
 
 ### O processo de ajuste e sobreajuste
 
@@ -946,11 +957,15 @@ estban_aggr |>
         )
 ```
 
+## Previsões base
+
+Uma vez que o foco deste trabalho é no ganho proporcionado pela reconciliação ótima, as previsões base serão obtidas por meio do métodos básicos para previsão de séries temporais, como algum tipo de suavimento exponencial ou pelo algoritmo de Hyndman-Khandakar [@hyndman_forecasting_2021]. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
+
 ## *Design* do experimento
 
-### Métodos analíticos de reconciliação ótima
+### Métodos analíticos de reconciliação
 
-[Descrever procedimentos com o {fable}]
+Os métodos analíticos de reconciliação utilizados no *benchmark* serão os de nível único *bottom-up* e o *top-down*; os de reconciliação ótima *MinT-OLS*, *MinT-WLS* e *MinT-shrink*. Essa escolha se justifica para que seja possível comparar os métodos de reconciliação ótima com os métodos de nível único, principalmente em relação ao tempo de processamento, que pode revelar um *trade-off* a ser analisado pelo pesquisador.
 
 ### Métodos de reconciliação ótima baseados em aprendizado de máquina
 
@@ -963,16 +978,12 @@ A metodologia para obtenção das previsões reconciliadas por métodos baseados
 1. passar as previsões base ao modelo treinado no passo 3 para se obter as previsões reconciliadas para o menor nível da hierarquia;
 1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
 
-Esse procedimento será realizado três vezes, uma para cada configuração do algoritmo elastic-net, com $\alpha=0$ (LASSO), $\alpha=1$ (Ridge) e uma combinação de ambos obtida via reamostragem (Elastic-Net).
+Esse procedimento será realizado três vezes, uma para cada configuração do algoritmo elastic net, com $\alpha=0$ (*lasso*), $\alpha=1$ (*ridge*) e uma combinação de ambos obtida via reamostragem.
 
 ### Espaço de busca dos hiperparâmetros
 
 [Descrever o espaço de hyperparâmetros]
 
-### Benchmarking
-
-[O *benchmarking* da performance dos métodos de reconciliação]
-
 # RESULTADOS
 
-[Escrever *outline* do capítulo]
+[Escrever o *benchmarking* da performance dos métodos de reconciliação]
