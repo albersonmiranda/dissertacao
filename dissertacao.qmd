@@ -7,11 +7,12 @@ format:
         include-before-body: config/elementos/pre_textuais.tex
         include-after-body: config/elementos/pos_textuais.tex
         keep-tex: false
-        cite-method: biblatex
         output-file: render/dissertacao.pdf
         documentclass: abntex2
-        classoption: [12pt, oneside, a4paper, chapter=TITLE, section=TITLE, brazil]
+        classoption: [12pt, twoside, openright, a4paper, chapter=TITLE, section=TITLE, brazil]
 number-sections: true
+cite-method: biblatex
+link-citations: true
 crossref:
   fig-prefix: Figura
   tbl-prefix: Tabela
@@ -86,7 +87,7 @@ estban = subset(estban,
 
 ## Previsão de saldos de crédito de instituições financeiras
 
-Embora no séc. XX ainda houvesse espaço para uma gestão guiada apenas por instinto [@wallander_budgeting_1999], atualmente é impensável um banco não realizar previsões de seus resultados e comunicar suas expectativas ao mercado. Nesse documento, ou *guidance*, a projeção da carteira de crédito — o total de empréstimos e financiamentos, dentre outros itens — é frequentemente a primeira informação fornecida, uma vez que é um dos principais elementos para o planejamento dos bancos comerciais. Juntamente com as projeções de depósitos, provisões para créditos de liquidação duvidosa, eficiência operacional, entre outros indicadores-chave, essas projeções determinam a temperatura das expectativas da instituição em relação a elementos cruciais como rentabilidade, dividendos e posição no mercado (*market-share*), e isso é essencial para os acionistas e investidores. Essas projeções precisam ser tão precisas quanto possível, para que se possa calcular o risco de transacionar com a instituição financeira, seja como investidor ou cliente.
+Embora no séc. XX ainda houvesse espaço para uma gestão guiada apenas por instinto [@wallander_budgeting_1999], atualmente é impensável um banco não realizar previsões de seus resultados e comunicar suas expectativas ao mercado. Nesse documento, ou *guidance*, a projeção da carteira de crédito — o total de empréstimos e financiamentos, dentre outros itens — é frequentemente a primeira informação fornecida, uma vez que é um dos principais elementos para o planejamento dos bancos comerciais. Juntamente com as projeções de depósitos, provisões para créditos de liquidação duvidosa, eficiência operacional, entre outros indicadores-chave, essas projeções determinam a temperatura das expectativas da instituição em relação a elementos cruciais como rentabilidade, dividendos e posição no mercado (*market-share*), e isso é essencial para os acionistas e investidores. Essas projeções precisam ser tão precisas quanto possível para que se possa calcular o risco de transacionar com a instituição financeira, seja como investidor ou cliente.
 
 Ainda que não existam penalidades específicas para instituições financeiras que erram (por uma boa margem) em suas projeções, elas podem sofrer consequências negativas em outros aspectos, como na avaliação de seus desempenhos por parte dos investidores e clientes. Os investidores e clientes podem considerar as projeções equivocadas como um sinal de falta de competência ou confiança na instituição financeira, o que pode afetar negativamente a reputação e a imagem da instituição. Isso pode levar a uma redução no número de investimentos e depósitos, o que irá afetar diretamente sua saúde financeira.
 
@@ -127,7 +128,7 @@ O objetivo geral da dissertação é estudar o problema da reconciliação ótim
 Os objetivos específicos são:
 
 1. Aplicar o método *elastic net* para reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas e atestar sua validade em dados de alta dimensionalidade;
-1. Comparar a performance, em termos de funções de custo e tempo de processamento, do mpetodo *elastic net* nas configurações $\alpha=0$ (*lasso*), $\alpha=1$ (*ridge*) e uma combinação de ambos obtida via reamostragem;
+1. Comparar a performance, em termos de funções de custo e tempo de processamento, do método *elastic net* nas configurações $\alpha=0$ (*lasso*), $\alpha=1$ (*ridge*) e uma combinação de ambos obtida via reamostragem;
 1. Comparar a performance, em termos de funções de custo e tempo de processamento, do método *elastic net* com os métodos analíticos *bottom-up*, *top-down* e *MinT Shrink*;
 1. Comparar a performance, em termos de funções de custo e tempo de processamento, das estratégias de reamostragem validação cruzada $k$*-fold* e *holdout* para o método *elastic net*;
 1. Verificar se a aplicação de regressão regularizada resulta em algum padrão reconhecível na estrutura (e.g., se a regularização tende a favorecer os coeficientes de séries temporais que compartilham o mesmo nó pai ou, em outras palavras, se tende a zerar os coeficientes de séries temporais que não compartilham o mesmo nó pai na hierarquia);
@@ -624,11 +625,11 @@ A função $(1-\alpha)|\mathbfit{\beta}|_1 + \alpha|\mathbfit{\beta}|^2$ é a pe
 
 Portanto o *elastic net* é um método de *shrinkage*, uma vez que a penalidade *ridge* reduz o tamanho dos coeficientes, e de *seleção de variáveis*, uma vez que a penalidade *lasso* tende a anular os coeficientes de variáveis irrelevantes. Essas propriedades são desejáveis para a reconciliação de séries temporais, uma vez que a estrutura hierárquica pode conter séries insignificantes para a previsão de outras séries.
 
-Diferentemente dos métodos analíticos estudados, o *elastic net* não possui uma solução fechada. Portanto, é necessário utilizar métodos iterativos para encontrar o valor ótimo de $\mathbfit{\hat{\beta}}$ e [@zou_regularization_2005] utilizam validação cruzada $k$-fold para encontrar quais os valores de $\lambda_1$ e $\lambda_2$ que minimizam o resíduo. Nesse sentido, dado a metodologia de processo iterativo envolvendo calibragem de hiperparâmetros e reamostragem, podemos classificar o *elastic net* como um método de *machine learning*.
+Diferentemente dos métodos analíticos estudados, o *elastic net* não possui uma solução fechada. Portanto, é necessário utilizar métodos iterativos para encontrar o valor ótimo de $\mathbfit{\hat{\beta}}$ e @zou_regularization_2005 utilizam validação cruzada $k$-fold para encontrar quais os valores de $\lambda_1$ e $\lambda_2$ que minimizam o resíduo. Nesse sentido, dado a metodologia de processo iterativo envolvendo calibragem de hiperparâmetros e reamostragem, podemos classificar o *elastic net* como um método de *machine learning*.
 
 ### O processo de ajuste e sobreajuste
 
-Dada uma função de ajuste $f$, um conjunto de pontos $D = {d_1, ..., d_n}$ com $d_i = (\mathbf{x}_i \; \mathbf{y}_i)'$, variáveis de decisão ou parâmetros $\mathbf{x}_i \in \mathbb{R}^m$ e imagem $\mathbf{y}_i = f(\mathbf{x}_i) \in \mathbb{R}$. Diferentemente da abordagem do modelo clássico de regressão linear em que, cumpridas certas hipóteses, há um modelo teórico de coeficientes estimados por mínimos quadrados ordinários (MQO) que é garantido pelo teorema de Gauss-Markov ser o melhor estimador linear não viesado (BLUE), em *machine learning* o objetivo é encontrar, de forma iterativa, um modelo que melhor aproxima a função $f$ usando a informação contida em $D$, ou seja, queremos ajustar uma função de regressão $\hat{f}_D$ aos nossos dados $D$ de forma que $\hat{\mathbf{y}} = \hat{f}_D(\mathbf{x}, \varepsilon)$ tenha o menor erro de aproximação $\varepsilon$ [@bischl_resampling_2012].
+Considere uma função de ajuste $f$, um conjunto de pontos $D = {d_1, ..., d_n}$ com $d_i = (\mathbf{x}_i \; \mathbf{y}_i)'$, variáveis de decisão ou parâmetros $\mathbf{x}_i \in \mathbb{R}^m$ e imagem $\mathbf{y}_i = f(\mathbf{x}_i) \in \mathbb{R}$. Diferentemente da abordagem do modelo clássico de regressão linear em que, cumpridas certas hipóteses, há um modelo teórico de coeficientes estimados por mínimos quadrados ordinários (MQO) que é garantido pelo teorema de Gauss-Markov ser o melhor estimador linear não viesado (BLUE), em *machine learning* o objetivo é encontrar, de forma iterativa, um modelo que melhor aproxima a função $f$ usando a informação contida em $D$, ou seja, queremos ajustar uma função de regressão $\hat{f}_D$ aos nossos dados $D$ de forma que $\hat{\mathbf{y}} = \hat{f}_D(\mathbf{x}, \varepsilon)$ tenha o menor erro de aproximação $\varepsilon$ [@bischl_resampling_2012].
 
 Para verificar o quão bem o modelo $\hat{f}_D$ se aproxima da função real $f$, é necessário uma função de perda $L(\mathbf{y}, \hat{f}(\mathbf{x}))$ que, no caso de regressão, será a perda quadrática $(\mathbf{y} - \hat{f}(\mathbf{x}))^2$ ou a perda absoluta $|\mathbf{\mathbf{x}} - \hat{f}(\mathbf{x})|$. Esses valores são agregados pela média para formar as funções de custo erro médio quadrático (MSE) e erro médio absoluto (MAE).
 
@@ -857,7 +858,7 @@ estban_aggr |>
         tema
 ```
 
-A concentração na mesorregião Central Espírito-santense, @fig-meso, pode ser um indicativo de que os elementos das demais regiões tenham menor peso na reconciliação.
+A concentração na mesorregião Central Espírito-santense (@fig-meso) pode ser um indicativo de que os elementos das demais regiões tenham menor peso na reconciliação.
 
 ```{r}
 #| label: fig-meso
@@ -989,3 +990,6 @@ Esse procedimento será realizado três vezes, uma para cada configuração do m
 # RESULTADOS
 
 [Escrever o *benchmarking* da performance dos métodos de reconciliação]
+
+<!-- adicionar entrada de referências no sumário -->
+\addcontentsline{toc}{chapter}{REFERÊNCIAS}
