@@ -18,7 +18,7 @@ execute:
 
 # opções
 knitr::opts_chunk$set(
-    out.width = "100%",
+    out.width = "90%",
     echo = FALSE
 )
 
@@ -28,7 +28,10 @@ set.seed(1)
 # pacotes
 pacman::p_load(
     kableExtra,
-    ggplot2
+    ggplot2,
+    tsibble,
+    fable,
+    fabletools
 )
 
 # tema ggplot
@@ -38,10 +41,57 @@ tema = theme_classic() +
     )
 
 # gerar bibliografia de pacotes
-knitr::write_bib(file = "config/packages.bib")
+knitr::write_bib(
+    c(.packages(), "basedosdados")
+    , file = "config/elementos/packages.bib"
+)
+
+# scripts
+source("scripts/hierarq.R")
+
+# dados
+estban = readRDS("data/estban.rds")
+
+# filtrando dados
+estban = subset(estban,
+    ref >= "2010-01-01",
+    select = c(
+        ref,
+        nome_mesorregiao,
+        nome_microrregiao,
+        nome,
+        cnpj_agencia,
+        verbete,
+        valor
+    )
+) |>
+(\(x) x[order(
+    x$ref,
+    x$nome_mesorregiao,
+    x$nome_microrregiao,
+    x$nome,
+    x$cnpj_agencia,
+    x$verbete
+), ])()
 ```
 
 # CONTEXTUALIZAÇÃO DA PESQUISA
+
+## ANÁLISE DE SÉRIES TEMPORAIS EM ECONOMIA BANCÁRIA
+
+- Problemas populares na literatura: risco de crédito, detecção de anomalias (fraude), preços de ativos, alocação ótima de numerários
+- Pouco sobre projeção de saldos e rendas (*guidance*, *budgeting*)
+- Previsões equivocadas = percepção de incompetência, redução de reputação e receitas
+- *Budgeting* em empresas de muitas filiais: alta dimensionalidade e dúvidas
+
+## ANÁLISE DE SÉRIES TEMPORAIS EM ECONOMIA BANCÁRIA
+
+- Banestes: 96 agências, 70 municípios do ES^[Postos de atendimento não contam como agência.], 13 microrregiões, 4 mesorregiões
+- Qual a melhor forma de realizar projeções?
+    - Individualmente por agência?
+    - Apenas o total e distribuir proporcionalmente?
+    - As informações por mesorregião ou microrregião são importantes?
+    - Como usar toda a informação?
 
 ## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
 
@@ -79,30 +129,48 @@ Séries temporais agrupadas são aquelas que não impõem uma única estrutura h
 - Não há razão para que as previsões individuais (e.g., Arima, ETS) sejam coerentes
 
 ### RECONCILIAÇÃO ÓTIMA
-Corrigir as previsões de forma que elas sejam coerentes, utilizando toda a informação disponível na estrutura hierárquica, ao mesmo tempo em que minimiza a variância total
+Reescrever as previsões de forma que elas sejam coerentes, utilizando toda a informação disponível na estrutura hierárquica, ao mesmo tempo em que minimiza a variância do erro de previsão
 
-## OBJETIVOS
+# OBJETIVOS
+
+## OBJETIVO GERAL
 
 Estudar o problema da reconciliação ótima de previsões pontuais a partir de métodos de *machine learning*
 
-### OBJETIVOS ESPECÍFICOS
+## OBJETIVOS ESPECÍFICOS
 
-1. Estudar métodos para estimação da matriz de reconciliação aplicando algoritmos e fluxos de trabalho de machine learning, como *tuning* e *resampling*;
+1. Aplicar o método *elastic net* para reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas e atestar sua validade em dados de alta dimensionalidade;
+1. Comparar a performance, em termos de funções de custo e tempo de processamento, do mpetodo *elastic net* nas configurações $\alpha=0$ (*lasso*), $\alpha=1$ (*ridge*) e uma combinação de ambos obtida via reamostragem;
+1. Comparar a performance, em termos de funções de custo e tempo de processamento, do método *elastic net* com os métodos analíticos *bottom-up*, *top-down* e *MinT Shrink*;
 
-2. Identificar possíveis vantagens e limitações da abordagem por *machine learning* na reconciliação de previsões pontuais a partir de aplicação do método estudado na previsão de saldos de crédito do Banestes.
+## OBJETIVOS ESPECÍFICOS
 
-# MÉTODOS ANALÍTICOS DE RECONCILIAÇÃO ÓTIMA
+4. Comparar a performance, em termos de funções de custo e tempo de processamento, das estratégias de reamostragem validação cruzada $k$*-fold* e *holdout* para o método *elastic net*;
+5. Verificar se a aplicação de regressão regularizada resulta em algum padrão reconhecível na estrutura (e.g., se a regularização tende a favorecer os coeficientes de séries temporais que compartilham o mesmo nó pai ou, em outras palavras, se tende a zerar os coeficientes de séries temporais que não compartilham o mesmo nó pai na hierarquia);
 
-## ABORDAGENS DE NÍVEL ÚNICO
+# ABORDAGENS DE NÍVEL ÚNICO
+
+## *BOTTOM-UP*
+
+- informações apenas dos níveis mais desagregados
+- soma-se para obter os níveis agregados
+
+## *TOP-DOWN*
 
 ::: {.incremental}
-- *Bottom-up*: informações apenas dos níveis mais desagregados
-- *Top-down*: apenas informações do nível mais agregado
+- apenas informações do nível mais agregado
+- há dezenas de métodos para distribuir proporcionalmente as previsões agregadas
     - proporções históricas $$p_j = \frac{1}{T} \sum^{T}_{t=1} \frac{y_{j,t}}{y_t}$$
     - médias históricas $$p_j = \frac{\sum^{T}_{t=1} \frac{y_{j,t}}{T}}{\sum^{T}_{t=1} \frac{y_{t}}{T}}$$
-    - proporções das previsões $$p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}$$
-- *middle-out*
+    - proporções das previsões [@athanasopoulos_hierarchical_2009] $$p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}$$
 :::
+
+## *MIDDLE-OUT*
+
+- informações apenas de um nível intermediário
+- soma-se para obter os níveis agregados e distribui-se proporcionalmente para os níveis mais desagregados
+
+# MÉTODOS ANALÍTICOS DE RECONCILIAÇÃO ÓTIMA
 
 ## NOTAÇÃO MATRICIAL
 
@@ -112,7 +180,7 @@ Em que
 
 - $\mathbfit{\tilde{y}_t}$ é o vetor de previsões reconciliadas
 - $\mathbfit{S}$ é a matriz de soma
-- $\mathbfit{S}$ é a matriz de reconciliação
+- $\mathbfit{G}$ é a matriz de reconciliação
 - $\mathbfit{\hat{y}_t}$ é o vetor de previsões base
 
 ## MATRIZ DE SOMA
@@ -239,7 +307,7 @@ $$
 
 E se quisermos utilizar toda a informação e não apenas parte do espaço das previsões base?
 
-### O PROBELMA DE PESQUISA DA RECONCILIAÇÃO ÓTIMA
+### O PROBLEMA DE PESQUISA DA RECONCILIAÇÃO ÓTIMA
 
 Estimar uma matriz de reconciliação $\mathbfit{G}$ que utilize toda a informação disponível e com o menor erro de previsão
 
@@ -247,22 +315,40 @@ Estimar uma matriz de reconciliação $\mathbfit{G}$ que utilize toda a informa�
 
 ### PROBLEMA DE REGRESSÃO
 
+- Minimização do traço da matriz de covariância dos erros das previsões reconciliadas (MinT)
 $$\min_{\tilde{e}} y_{T+h} - \tilde{y}_{T+h}$$
 
-- 1ª abordagem: Mínimos Quadrados Ordinários (MQO)
-    - Não há qualquer razão ou justificativa para supor
-
-### RECONCILIAÇÃO ÓTIMA
-
 - Mínimos Quadrados Generalizados (MQG)
+$$\mathbfit{G}=(\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{S})^{-1}\mathbfit{S}'\mathbfit{W}_h^{\dagger}$$
 
-$$\mathbfit{G}=(\mathbfit{S}'\mathbfit{W}_h^{-1}\mathbfit{S})^{-1}\mathbfit{S}'\mathbfit{W}_h^{-1}$$
+## RECONCILIAÇÃO ÓTIMA
 
-## REFERÊNCIAS
+### PROBLEMA DE REGRESSÃO
+
+- 1ª abordagem: Mínimos Quadrados Ordinários (MQO)
+    - Não há qualquer razão ou justificativa para supor homoscedasticidade
+    - Erros descorrelacionados e equivariantes não fazem sentido em séries hierárquicas
+
+## RECONCILIAÇÃO ÓTIMA
+
+### PROBLEMA DE REGRESSÃO
+
+# REFERÊNCIAS
+
+## BIBLIOGRAFIA
 
 \footnotesize
-HYNDMAN, R. J.; ATHANASOPOULOS, G. Forecasting: principles and practice. 3. ed. Melbourne, Austrália: OTexts, 2021.
+BISCHL, B. et al. Resampling Methods for Meta-Model Validation with Recommendations for Evolutionary Computation. Evolutionary Computation, v. 20, n. 2, p. 249–275, jun. 2012. 
+
+DAHIS, R. et al. Data Basis (Base Dos Dados): Universalizing Access to High-Quality Data. SSRN Electronic Journal, 2022. 
+
+GROSS, C. W.; SOHL, J. E. Disaggregation methods to expedite product line forecasting. Journal of Forecasting, v. 9, n. 3, p. 233–254, 1990. 
+
+HYNDMAN, R. J.; ATHANASOPOULOS, G. Forecasting: principles and practice. 3. ed. Melbourne, Austrália: OTexts, 2021. 
 
 SPILIOTIS, E. et al. Hierarchical forecast reconciliation with machine learning. Applied Soft Computing, v. 112, p. 107756, 1 nov. 2021. 
 
-WICKRAMASURIYA, S. L.; ATHANASOPOULOS, G.; HYNDMAN, R. J. Optimal Forecast Reconciliation for Hierarchical and Grouped Time Series Through TraceMinimization. Journal of the American Statistical Association, v. 114, n. 526, p. 804–819, 3 abr. 2019. 
+WICKRAMASURIYA, S. L.; ATHANASOPOULOS, G.; HYNDMAN, R. J. Optimal Forecast Reconciliation for Hierarchical and Grouped Time Series Through Trace Minimization. Journal of the American Statistical Association, v. 114, n. 526, p. 804–819, 3 abr. 2019. 
+
+ZOU, H.; HASTIE, T. Regularization and variable selection via the elastic net. Journal of the Royal Statistical Society: Series B (Statistical Methodology), v. 67, n. 2, p. 301–320, 2005. 
+
