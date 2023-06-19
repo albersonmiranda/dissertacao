@@ -3,10 +3,17 @@
 \usepackage{verbatim, ragged2e}
 \usepackage{bm}
 \usepackage{config/apresentacao/ppgeco}
-\usefonttheme{serif}
+\usepackage[backend=biber, style=abnt, justify, giveninits, backref=true, backrefstyle=three, citecounter=true]{biblatex}
 
 % justificar
 \justifying
+
+% font
+\usefonttheme{serif}
+
+% bibliografia
+\addbibresource{config/elementos/dissertacao.bib}
+\addbibresource{config/elementos/packages.bib}
 
 % TYPESETTING ELEMENTS
 

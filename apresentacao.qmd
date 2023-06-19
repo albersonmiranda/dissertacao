@@ -9,6 +9,10 @@ format:
         include-after-body: config/apresentacao/backmatter.tex
         output-file: render/apresentacao.pdf
         keep-tex: false
+bibliography: config/elementos/dissertacao.bib
+cite-method: biblatex
+link-citations: true
+link-bibliography: true
 execute:
     echo: false
 ---
@@ -323,9 +327,24 @@ $$\mathbfit{G}=(\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{S})^{-1}\mathbfit
 
 ## RECONCILIAÇÃO ÓTIMA
 
-### PROBLEMA DE REGRESSÃO
+- 1ª abordagem: $\mathbfit{W}_h = k_hI$
+    - Mínimos Quadrados Ordinários (MQO)
+    - Não há qualquer razão ou justificativa para supor homoscedasticidade
+    - Erros descorrelacionados e equivariantes não fazem sentido em séries hierárquicas
 
-- 1ª abordagem: Mínimos Quadrados Ordinários (MQO)
+## RECONCILIAÇÃO ÓTIMA
+
+- 2ª abordagem: $\mathbfit{W}_h = k_h\text{diag}(\mathbfit{\hat{W_1}}); \mathbfit{\hat{W_1}} = \frac{1}{T}\sum^{T}_{t=1}\mathbfit{\hat{e}}_{T+1}\mathbfit{\hat{e}'}_{T+1}$
+    - Mínimos Quadrados Ponderados (MQP)
+    - $\mathbfit{\hat{e}}_{T+1} = \mathbfit{y_{T+1}} - \mathbfit{\hat{y}}_{T+1}$
+    - Não há qualquer razão ou justificativa para supor homoscedasticidade
+    - Erros descorrelacionados e equivariantes não fazem sentido em séries hierárquicas
+
+## RECONCILIAÇÃO ÓTIMA
+
+- 3ª abordagem: $\mathbfit{W}_h = k_h(\lambda_D)$
+    - Mínimos Quadrados Ponderados (MQP)
+    - $\mathbfit{\hat{e}}_{T+1} = \mathbfit{y_{T+1}} - \mathbfit{\hat{y}}_{T+1}$
     - Não há qualquer razão ou justificativa para supor homoscedasticidade
     - Erros descorrelacionados e equivariantes não fazem sentido em séries hierárquicas
 
@@ -335,20 +354,5 @@ $$\mathbfit{G}=(\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{S})^{-1}\mathbfit
 
 # REFERÊNCIAS
 
-## BIBLIOGRAFIA
-
+## REFERÊNCIAS
 \footnotesize
-BISCHL, B. et al. Resampling Methods for Meta-Model Validation with Recommendations for Evolutionary Computation. Evolutionary Computation, v. 20, n. 2, p. 249–275, jun. 2012. 
-
-DAHIS, R. et al. Data Basis (Base Dos Dados): Universalizing Access to High-Quality Data. SSRN Electronic Journal, 2022. 
-
-GROSS, C. W.; SOHL, J. E. Disaggregation methods to expedite product line forecasting. Journal of Forecasting, v. 9, n. 3, p. 233–254, 1990. 
-
-HYNDMAN, R. J.; ATHANASOPOULOS, G. Forecasting: principles and practice. 3. ed. Melbourne, Austrália: OTexts, 2021. 
-
-SPILIOTIS, E. et al. Hierarchical forecast reconciliation with machine learning. Applied Soft Computing, v. 112, p. 107756, 1 nov. 2021. 
-
-WICKRAMASURIYA, S. L.; ATHANASOPOULOS, G.; HYNDMAN, R. J. Optimal Forecast Reconciliation for Hierarchical and Grouped Time Series Through Trace Minimization. Journal of the American Statistical Association, v. 114, n. 526, p. 804–819, 3 abr. 2019. 
-
-ZOU, H.; HASTIE, T. Regularization and variable selection via the elastic net. Journal of the Royal Statistical Society: Series B (Statistical Methodology), v. 67, n. 2, p. 301–320, 2005. 
-
