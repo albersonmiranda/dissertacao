@@ -7,11 +7,13 @@ format:
         include-before-body: config/elementos/pre_textuais.tex
         include-after-body: config/elementos/pos_textuais.tex
         keep-tex: false
-        output-file: render/dissertacao.pdf
+        output-file: dissertacao.pdf
+        output-dir: render
         documentclass: abntex2
         classoption: [12pt, twoside, openright, a4paper, chapter=TITLE, section=TITLE, brazil]
 number-sections: true
 cite-method: biblatex
+biblio-title: REFERÊNCIAS
 link-citations: true
 crossref:
   fig-prefix: Figura
@@ -599,9 +601,11 @@ Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize
 
 ## Métodos analíticos de reconciliação ótima
 
+Os métodos analíticos de reconciliação ótima são aqueles que estimam a matriz de reconciliação, $\mathbfit{G}$, a partir de regressão linear. Isso resulta na redefinição das previsões do nível mais desagregado como combinação linear das previsões de todos os elementos de todos os níveis da hierarquia, utilizando, assim, toda a informação disponível.
+
 ### Minimum Trace
 
-[Descrever as variações do MinT: OLS, WLS e shrink]
+MinT [@wickramasuriya_optimal_2019] 
 
 ## Métodos de reconciliação ótima baseados em aprendizado de máquina
 
@@ -990,6 +994,3 @@ Esse procedimento será realizado três vezes, uma para cada configuração do m
 # RESULTADOS
 
 [Escrever o *benchmarking* da performance dos métodos de reconciliação]
-
-<!-- adicionar entrada de referências no sumário -->
-\addcontentsline{toc}{chapter}{REFERÊNCIAS}
