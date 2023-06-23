@@ -1,16 +1,18 @@
 ---
 author: ALBERSON DA SILVA MIRANDA
-date: "2023"
+date: last-modified
+date-format: "YYYY"
 format:
     pdf:
         include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
         include-before-body: config/elementos/pre_textuais.tex
         include-after-body: config/elementos/pos_textuais.tex
-        keep-tex: false
-        output-file: dissertacao.pdf
-        output-dir: render
         documentclass: abntex2
         classoption: [12pt, twoside, openright, a4paper, chapter=TITLE, section=TITLE, brazil]
+        keep-tex: false
+        latex-max-runs: 4
+        output-file: dissertacao.pdf
+        latex-output-dir: render
 number-sections: true
 cite-method: biblatex
 biblio-title: REFERÊNCIAS
@@ -601,11 +603,15 @@ Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize
 
 ## Métodos analíticos de reconciliação ótima
 
-Os métodos analíticos de reconciliação ótima são aqueles que estimam a matriz de reconciliação, $\mathbfit{G}$, a partir de regressão linear. Isso resulta na redefinição das previsões do nível mais desagregado como combinação linear das previsões de todos os elementos de todos os níveis da hierarquia, utilizando, assim, toda a informação disponível.
+Os métodos analíticos de reconciliação ótima são aqueles que estimam a matriz de reconciliação, $\mathbfit{G}$, através de regressão linear. Isso resulta na redefinição das previsões do nível mais desagregado como uma combinação linear^[Por essa razão, esses métodos são também chamados de métodos de combinação.] das previsões de todos os elementos de todos os níveis da hierarquia, utilizando, assim, toda a informação disponível.
 
-### Minimum Trace
+O estado-da-arte para esse tipo de método é o *MinT* [@wickramasuriya_optimal_2019]. Nele, o objetivo é minimizar o erro das previsões reconciliadas:
 
-MinT [@wickramasuriya_optimal_2019] 
+$$
+\mathbfit{\tilde{e}}_{t+h|t} = \mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}
+$$ {#eq-mint1}
+
+A abordagem consiste em estimar um modelo por mínimos quadrados generalizados factíveis (MQGF), em que $\mathbfit{S}$ é a matriz de preditores e $\mathbfit{G}$ a matriz dos coeficientes a serem estimados
 
 ## Métodos de reconciliação ótima baseados em aprendizado de máquina
 
