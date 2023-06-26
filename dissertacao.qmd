@@ -1,28 +1,5 @@
 ---
 author: ALBERSON DA SILVA MIRANDA
-date: last-modified
-date-format: "YYYY"
-format:
-    pdf:
-        include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
-        include-before-body: config/elementos/pre_textuais.tex
-        include-after-body: config/elementos/pos_textuais.tex
-        documentclass: abntex2
-        classoption: [12pt, twoside, openright, a4paper, chapter=TITLE, section=TITLE, brazil]
-        keep-tex: false
-        latex-max-runs: 4
-        output-file: dissertacao.pdf
-        latex-output-dir: render
-number-sections: true
-cite-method: biblatex
-biblio-title: REFERÊNCIAS
-link-citations: true
-crossref:
-  fig-prefix: Figura
-  tbl-prefix: Tabela
-  eq-prefix: Equação
-  lof-title: LISTA DE FIGURAS
-  lot-title: LISTA DE TABELAS
 ---
 
 ```{r config}
@@ -611,13 +588,18 @@ $$
 \mathbfit{\tilde{e}}_{t+h|t} = \mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}
 $$ {#eq-mint1}
 
-Dada a \nameref{lema1} e o lema \ref{lema2}, a @eq-mint1 pode ser reescrita como:
+Esse equação pode ser reescrita como $\mathbfit{\tilde{e}}_t = \mathbfit{SG\hat{e}}_t$, que tem variância dada por^[Ver teorema \ref{teorema1}]
 
 $$
-\mathbfit{\tilde{e}}_t = \mathbfit{SG\hat{e}}_t
+\text{Var}[\mathbfit{\tilde{e}}] = \mathbfit{SG\hat{W}G'S'}
 $$ {#eq-mint2}
 
-A abordagem consiste em estimar um modelo por mínimos quadrados generalizados factíveis (MQGF), em que $\mathbfit{S}$ é a matriz de preditores e $\mathbfit{G}$ a matriz dos coeficientes a serem estimados
+\noindent em que $\mathbfit{\hat{W}}$ é a matriz de variância-covariância dos erros de previsão base.
+
+
+A abordagem consiste então em se obter um valor de $\mathbfit{G}$ que minimize o traço de $\text{Var}[\mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}]$. Isso resultaria no melhor (variância mínima) estimador linear não viesado [@wickramasuriya_optimal_2019].
+
+estimar um modelo por mínimos quadrados generalizados factíveis (MQGF), em que $\mathbfit{S}$ é a matriz de preditores e $\mathbfit{G}$ a matriz dos coeficientes a serem estimados
 
 ## Métodos de reconciliação ótima baseados em aprendizado de máquina
 
