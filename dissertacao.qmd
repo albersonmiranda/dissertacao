@@ -611,6 +611,12 @@ $$
 \mathbfit{\tilde{e}}_{t+h|t} = \mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}
 $$ {#eq-mint1}
 
+Dada a \nameref{lema1} e o lema \ref{lema2}, a @eq-mint1 pode ser reescrita como:
+
+$$
+\mathbfit{\tilde{e}}_t = \mathbfit{SG\hat{e}}_t
+$$ {#eq-mint2}
+
 A abordagem consiste em estimar um modelo por mínimos quadrados generalizados factíveis (MQGF), em que $\mathbfit{S}$ é a matriz de preditores e $\mathbfit{G}$ a matriz dos coeficientes a serem estimados
 
 ## Métodos de reconciliação ótima baseados em aprendizado de máquina
