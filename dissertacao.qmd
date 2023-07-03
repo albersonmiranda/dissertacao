@@ -588,7 +588,7 @@ $$
 \mathbfit{\tilde{e}}_{t+h|t} = \mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}
 $$ {#eq-mint1}
 
-Esse equação pode ser reescrita como $\mathbfit{\tilde{e}}_t = \mathbfit{SG\hat{e}}_t$, que tem variância dada por^[Ver teorema \ref{teorema1}]
+Esse equação pode ser reescrita como $\mathbfit{\tilde{e}}_t = \mathbfit{SG\hat{e}}_t$, que tem variância dada por^[Ver teorema \ref{proposicao3}]
 
 $$
 \text{Var}[\mathbfit{\tilde{e}}] = \mathbfit{SG\hat{W}G'S'}
