@@ -9,12 +9,12 @@
 \chapter{DEMONSTRAÇÕES} \label{apendice_a}
 
 % lema 1
-\begin{lemma}[condição de ausência de viés em $\mathbfit{\tilde{y}}$]
-  \label{lema1}
+\begin{proposition}[condição de ausência de viés em $\mathbfit{\tilde{y}}$]
+  \label{proposicao1}
 
   Se as previsões reconciliadas são não viesadas, então $\mathbfit{SGS=S}$, ou seja, $\mathbfit{G}$ é inversa generalizada de $\mathbfit{S}$.
 
-\end{lemma}
+\end{proposition}
 
 \begin{proof}
   \begin{equation} \label{eq:ap1}
@@ -43,12 +43,12 @@
 \end{proof}
 
 % lema 2
-\begin{lemma}
-  \label{lema2}
+\begin{proposition}
+  \label{proposicao2}
 
   $\mathbfit{\tilde{e}}_t = \mathbfit{SG\hat{e}}_t$.
 
-\end{lemma}
+\end{proposition}
 
 \begin{proof}
   \begin{equation} \label{eq:apa22}
@@ -85,7 +85,7 @@
     &=  \mathbfit{Sb}_{t+h} - \mathbfit{SG}\mathbfit{Sb}_{t+h} + \mathbfit {SG\hat{e}}_{t+h|t}
   \end{align}
 
-  Finalmente, pela \nameref{lema1}, temos que
+  Finalmente, pela \nameref{proposicao1}, temos que
 
   \begin{align}
     \mathbfit{\tilde{e}}_{t+h|t} &=  \mathbfit{Sb}_{t+h} - \mathbfit{Sb}_{t+h}  + \mathbfit{SG\hat{e}}_{t+h|t}  \\
@@ -94,15 +94,15 @@
 \end{proof}
 
 % teorema 1
-\begin{theorem}
-  \label{teorema1}
+\begin{proposition}
+  \label{proposicao3}
 
   $\text{Var}[\mathbfit{\tilde{e}}_t] = \mathbfit{SG\hat{W}G'S'}$.
 
-\end{theorem}
+\end{proposition}
 
 \begin{proof}
-  Por \ref{lema2}, temos que
+  Por \ref{proposicao2}, temos que
 
   \begin{align}
     \text{Var}[\mathbfit{\tilde{e}}] &= \mathbb{E}[\mathbfit{(SG\hat{e})(SG\hat {e})'}] \\
