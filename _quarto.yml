@@ -1,7 +1,7 @@
 project:
   title: "dissertacao"
   post-render:
-    - xcopy *.pdf render
+    - config/clean.r
 
 date: last-modified
 date-format: "YYYY"

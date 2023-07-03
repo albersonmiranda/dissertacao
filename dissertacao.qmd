@@ -43,7 +43,7 @@ estban = readRDS("data/estban.rds")
 
 # filtrando dados
 estban = subset(estban,
-    ref >= "2010-01-01",
+    ref >= "2010-01-01" & ref <= "2023-12-31",
     select = c(
         ref,
         nome_mesorregiao,
