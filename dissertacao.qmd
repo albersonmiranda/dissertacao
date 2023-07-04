@@ -599,13 +599,13 @@ $$ {#eq-mint2}
 A abordagem consiste então em se obter um valor de $\mathbfit{G}$ que minimize o traço de $\text{Var}[\mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}]$. Isso resultaria no melhor (variância mínima) estimador linear não viesado^[A ausência de viés é garantida pela \nameref{proposicao1}.] [@wickramasuriya_optimal_2019].
 
 $$
-G = (\mathbfit{S'\hat{W}^\dagger_{t+h|t}S})^{-1}S'\hat{W}^\dagger_{t+h|t}
+G = (\mathbfit{S'\hat{W}^\dagger_{t+h|t}S)^{-1}S'\hat{W}^\dagger_{t+h|t}}
 $$ {#eq-mint3}
 
-Essa formulação corresponde a um problema de regressão por mínimos quadradados generalizados, considerando $\mathbfit{S}$ como a matriz de preditores e $\mathbfit{G}$ os coeficientes a serem estimados. Consequentemente, as previsões ótimas reconciliadas são dadas por
+\noindent em que $\mathbfit{\hat{W}^\dagger_{t+h|t}}$ é a inversa generalizada de Moore-Penrose para $\mathbfit{\hat{W}_{t+h|t}}$. Essa formulação corresponde a um problema de regressão por mínimos quadradados generalizados, considerando $\mathbfit{S}$ como a matriz de preditores e $\mathbfit{G}$ os coeficientes a serem estimados. Consequentemente, as previsões ótimas reconciliadas são dadas por
 
 $$
-\mathbfit{\tilde{y}}_{t+h|t} = \mathbfit{SG\hat{y}}_{t+h|t}
+\mathbfit{\tilde{y}}_{t+h|t} = S(\mathbfit{S'\hat{W}^\dagger_{t+h|t}S)^{-1}S'\hat{W}^\dagger_{t+h|t}\hat{y}_{t+h|t}}
 $$ {#eq-mint4}
 
 ## Métodos de reconciliação ótima baseados em aprendizado de máquina
