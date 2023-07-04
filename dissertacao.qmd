@@ -588,18 +588,25 @@ $$
 \mathbfit{\tilde{e}}_{t+h|t} = \mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}
 $$ {#eq-mint1}
 
-Esse equação pode ser reescrita como $\mathbfit{\tilde{e}}_t = \mathbfit{SG\hat{e}}_t$, que tem variância dada por^[Ver teorema \ref{proposicao3}]
+Essa equação pode ser reescrita como $\mathbfit{\tilde{e}}_t = \mathbfit{SG\hat{e}}_t$, que tem variância dada por^[Ver demonstração \ref{proposicao3}.]
 
 $$
-\text{Var}[\mathbfit{\tilde{e}}] = \mathbfit{SG\hat{W}G'S'}
+\text{Var}[\mathbfit{\tilde{e}}] = \mathbfit{SG\hat{W}_{t+h|t}G'S'}
 $$ {#eq-mint2}
 
-\noindent em que $\mathbfit{\hat{W}}$ é a matriz de variância-covariância dos erros de previsão base.
+\noindent em que $\mathbfit{\hat{W}_{t+h|t}}$ é a matriz de variância-covariância dos erros de previsão base.
 
+A abordagem consiste então em se obter um valor de $\mathbfit{G}$ que minimize o traço de $\text{Var}[\mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}]$. Isso resultaria no melhor (variância mínima) estimador linear não viesado^[A ausência de viés é garantida pela \nameref{proposicao1}.] [@wickramasuriya_optimal_2019].
 
-A abordagem consiste então em se obter um valor de $\mathbfit{G}$ que minimize o traço de $\text{Var}[\mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}]$. Isso resultaria no melhor (variância mínima) estimador linear não viesado [@wickramasuriya_optimal_2019].
+$$
+G = (\mathbfit{S'\hat{W}^\dagger_{t+h|t}S})^{-1}S'\hat{W}^\dagger_{t+h|t}
+$$ {#eq-mint3}
 
-estimar um modelo por mínimos quadrados generalizados factíveis (MQGF), em que $\mathbfit{S}$ é a matriz de preditores e $\mathbfit{G}$ a matriz dos coeficientes a serem estimados
+Essa formulação corresponde a um problema de regressão por mínimos quadradados generalizados, considerando $\mathbfit{S}$ como a matriz de preditores e $\mathbfit{G}$ os coeficientes a serem estimados. Consequentemente, as previsões ótimas reconciliadas são dadas por
+
+$$
+\mathbfit{\tilde{y}}_{t+h|t} = \mathbfit{SG\hat{y}}_{t+h|t}
+$$ {#eq-mint4}
 
 ## Métodos de reconciliação ótima baseados em aprendizado de máquina
 
