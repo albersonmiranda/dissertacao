@@ -8,7 +8,7 @@
 % Apêndice A
 \chapter{DEMONSTRAÇÕES} \label{apendice_a}
 
-% lema 1
+% proposição 1
 \begin{proposition}[condição de ausência de viés em $\mathbfit{\tilde{y}}$]
   \label{proposicao1}
 
@@ -42,7 +42,7 @@
 
 \end{proof}
 
-% lema 2
+% proposição 2
 \begin{proposition}
   \label{proposicao2}
 
@@ -93,7 +93,7 @@
   \end{align}
 \end{proof}
 
-% teorema 1
+% proposição 3
 \begin{proposition}
   \label{proposicao3}
 
@@ -111,6 +111,26 @@
   \end{align}
 
   Em que $\mathbfit{\hat{W}}$ é a matriz de variância-covariância dos erros de  previsão base.
+\end{proof}
+
+% proposição 4
+\begin{proposition}
+  \label{proposicao4}
+
+  $\mathbfit{\hat{W}}$ é posto incompleto.
+
+\end{proposition}
+
+\begin{proof}
+  Pela propriedade do vínculo do posto de um produto de matrizes, ou seja, $rank(\mathbfit{AB}) \leq min(pos(\mathbfit{A}), pos(\mathbfit{B}))$, temos que
+  
+  \begin{equation}
+    pos(\mathbfit{SG\hat{e}}_{t+h|t}) \leq min(pos(\mathbfit{S}), pos(\mathbfit{G}), pos(\mathbfit{\hat{e}}_{t+h|t})) \label{eq:ap_a_4_1}
+  \end{equation}
+
+  Como $\mathbfit{S}$ é a representação matricial de uma estrutura hierárquica, em que os nós pais totalizam os nós filhos, $\mathbfit{S}$ apresenta, por hipótese, dependência linear e, consequentemente, posto incompleto.
+
+  Pela equação \eqref{eq:ap_a_4_1}, segue que $\mathbfit{\tilde{e}}$ é posto incompleto. Da mesma forma, $pos(\mathbfit{\tilde{e}\tilde{e}'}) \leq min(pos(\mathbfit{\tilde{e}}), pos(\mathbfit{\tilde{e}'}))$. Portanto, $\mathbfit{\hat{W}}$ é posto incompleto.
 \end{proof}
 
 \end{apendicesenv}

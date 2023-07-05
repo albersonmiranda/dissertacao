@@ -591,21 +591,21 @@ $$ {#eq-mint1}
 Essa equação pode ser reescrita como $\mathbfit{\tilde{e}}_t = \mathbfit{SG\hat{e}}_t$, que tem variância dada por^[Ver demonstração \ref{proposicao3}.]
 
 $$
-\text{Var}[\mathbfit{\tilde{e}}] = \mathbfit{SG\hat{W}_{t+h|t}G'S'}
+\text{Var}[\mathbfit{\tilde{e}}] = \mathbfit{SG\hat{W}}_{t+h|t}\mathbfit{G'S'}
 $$ {#eq-mint2}
 
-\noindent em que $\mathbfit{\hat{W}_{t+h|t}}$ é a matriz de variância-covariância dos erros de previsão base.
+\noindent em que $\mathbfit{\hat{W}}_{t+h|t}$ é a matriz de variância-covariância dos erros de previsão base.
 
 A abordagem consiste então em se obter um valor de $\mathbfit{G}$ que minimize o traço de $\text{Var}[\mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}]$. Isso resultaria no melhor (variância mínima) estimador linear não viesado^[A ausência de viés é garantida pela \nameref{proposicao1}.] [@wickramasuriya_optimal_2019].
 
 $$
-G = (\mathbfit{S'\hat{W}^\dagger_{t+h|t}S)^{-1}S'\hat{W}^\dagger_{t+h|t}}
+\mathbfit{G} = (\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{S})^{-1}\mathbfit{S'\hat{W}}^\dagger_{t+h|t}
 $$ {#eq-mint3}
 
-\noindent em que $\mathbfit{\hat{W}^\dagger_{t+h|t}}$ é a inversa generalizada de Moore-Penrose para $\mathbfit{\hat{W}_{t+h|t}}$. Essa formulação corresponde a um problema de regressão por mínimos quadradados generalizados, considerando $\mathbfit{S}$ como a matriz de preditores e $\mathbfit{G}$ os coeficientes a serem estimados. Consequentemente, as previsões ótimas reconciliadas são dadas por
+\noindent em que $\mathbfit{\hat{W}}^\dagger_{t+h|t}$ é a inversa generalizada de Moore-Penrose para $\mathbfit{\hat{W}}_{t+h|t}$^[A necessidade da inversa generalizada aqui é trivial, uma vez que a inversa regular, do tipo $\mathbfit{A}^{-1}$, requer matriz quadrada, o que não acontece no caso de séries temporais hierárquicas, uma vez que, necessariamente, tem-se $n>m$. Além disso, $\mathbfit{\hat{W}}$ é posto incompleto (ver demonstração \ref{proposicao4}).]. Essa formulação corresponde a um problema de regressão por mínimos quadradados generalizados, considerando $\mathbfit{S}$ como a matriz de preditores e $\mathbfit{G}$ os coeficientes a serem estimados. Consequentemente, as previsões ótimas reconciliadas são dadas por
 
 $$
-\mathbfit{\tilde{y}}_{t+h|t} = S(\mathbfit{S'\hat{W}^\dagger_{t+h|t}S)^{-1}S'\hat{W}^\dagger_{t+h|t}\hat{y}_{t+h|t}}
+\mathbfit{\tilde{y}}_{t+h|t} = \mathbfit{S}(\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{S})^{-1}\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{\hat{y}}_{t+h|t}
 $$ {#eq-mint4}
 
 ## Métodos de reconciliação ótima baseados em aprendizado de máquina
