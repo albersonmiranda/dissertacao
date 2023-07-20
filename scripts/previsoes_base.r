@@ -9,7 +9,7 @@ pacman::p_load(
 # dados
 estban = readRDS("data/estban.rds") |>
     subset(
-        ref >= "2010-01-01" & ref <= "2023-12-31",
+        ref >= "2010-01-01" & ref <= "2022-12-31",
         select = c(
             ref,
             nome_mesorregiao,
@@ -26,7 +26,7 @@ estban = readRDS("data/estban.rds") |>
     )
 
 # obtendo previsões base
-estban_preds = estban |>
+estban_arima = estban |>
     as_tsibble(
         key = c(
             "nome_mesorregiao",
@@ -47,5 +47,11 @@ estban_preds = estban |>
             saldo,
             order_constraint = p + q + P + Q <= 4 & (constant + d + D <= 3) & (d <= 1) & (D <= 1)
         ),
-    ) |>
-    forecast(h = "1 years")
+    )
+
+# preds
+estban_arima_preds = estban_arima |> forecast(h = "1 years")
+
+# save
+saveRDS(estban_arima, "data/estban_arima.rds")
+saveRDS(estban_arima_preds, "data/estban_arima_preds.rds")
