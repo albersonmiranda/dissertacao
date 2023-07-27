@@ -9,7 +9,6 @@ pacman::p_load(
 # dados
 estban = readRDS("data/estban.rds") |>
     subset(
-        ref >= "2010-01-01" & ref <= "2022-12-31",
         select = c(
             ref,
             nome_mesorregiao,
@@ -23,10 +22,8 @@ estban = readRDS("data/estban.rds") |>
     # alterando referência para mensal
     transform(
         ref = tsibble::yearmonth(ref)
-    )
-
-# obtendo previsões base
-estban_arima = estban |>
+    ) |>
+    # formatando como tsibble
     as_tsibble(
         key = c(
             "nome_mesorregiao",
@@ -41,7 +38,11 @@ estban_arima = estban |>
     aggregate_key(
         (nome_mesorregiao / nome_microrregiao / nome / cnpj_agencia) * verbete,
         saldo = sum(valor)
-    ) |>
+    )
+
+# obtendo modelos
+estban_arima = estban |>
+    tsibble::filter_index("2010 jan" ~ "2019 dec") |>
     model(
         arima = fable::ARIMA(
             saldo,
@@ -49,8 +50,10 @@ estban_arima = estban |>
         ),
     )
 
-# preds
-estban_arima_preds = estban_arima |> forecast(h = "1 years")
+# one-step-ahead preds
+new_data = estban |>
+    tsibble::filter_index("2020 jan" ~ "2022 dec")
+estban_arima_preds = refit(estban_arima, new_data, reestimate = FALSE) |> fitted()
 
 # save
 saveRDS(estban_arima, "data/estban_arima.rds")
