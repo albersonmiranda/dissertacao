@@ -55,6 +55,12 @@ new_data = estban |>
     tsibble::filter_index("2020 jan" ~ "2022 dec")
 estban_arima_preds = refit(estban_arima, new_data, reestimate = FALSE) |> fitted()
 
+# portmanteau tests para autocorrelação
+testes_lb = estban_arima |>
+    augment() |>
+    features(.innov, feasts::ljung_box, lag = 12)
+
 # save
 saveRDS(estban_arima, "data/estban_arima.rds")
 saveRDS(estban_arima_preds, "data/estban_arima_preds.rds")
+saveRDS(testes_lb, "data/testes_lb.rds")

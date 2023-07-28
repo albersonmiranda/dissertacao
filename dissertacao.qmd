@@ -969,7 +969,9 @@ estban_aggr |>
 
 ## Previsões base
 
-Uma vez que o foco deste trabalho é no ganho proporcionado pela reconciliação ótima, as previsões base serão obtidas por meio do métodos básicos para previsão de séries temporais, como algum tipo de suavimento exponencial ou pelo algoritmo de Hyndman-Khandakar [@hyndman_forecasting_2021]. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
+Uma vez que o foco deste trabalho é no ganho proporcionado pela reconciliação ótima, as previsões base foram obtidas por meio de métodos básicos para previsão de séries temporais, especificamente modelagem Arima pelo algoritmo de Hyndman-Khandakar [@hyndman_forecasting_2021]. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
+
+[Explicar o refit e adicionar o gráfico de p-valor]
 
 ## *Design* do experimento
 
