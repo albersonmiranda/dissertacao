@@ -13,8 +13,6 @@ bibliography: config/elementos/dissertacao.bib
 cite-method: biblatex
 link-citations: true
 link-bibliography: true
-execute:
-    echo: false
 ---
 
 ```{r config}
@@ -22,8 +20,7 @@ execute:
 
 # opções
 knitr::opts_chunk$set(
-    out.width = "90%",
-    echo = FALSE
+    out.width = "90%"
 )
 
 # reprodutibilidade

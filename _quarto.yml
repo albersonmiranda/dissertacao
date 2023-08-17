@@ -3,6 +3,7 @@ project:
   post-render:
     - config/clean.r
 
+author: ALBERSON DA SILVA MIRANDA
 date: last-modified
 date-format: "YYYY"
 
@@ -16,14 +17,5 @@ crossref:
   eq-prefix: Equação
   lof-title: LISTA DE FIGURAS
   lot-title: LISTA DE TABELAS
-
-format:
-  pdf:
-    include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
-    include-before-body: config/elementos/pre_textuais.tex
-    include-after-body: config/elementos/pos_textuais.tex
-    documentclass: abntex2
-    classoption: [12pt, twoside, openright, a4paper, chapter=TITLE, section=TITLE, brazil]
-    keep-tex: false
-    latex-max-runs: 4
-    output-file: dissertacao.pdf
+execute:
+  echo: false

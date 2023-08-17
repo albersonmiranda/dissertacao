@@ -1,6 +1,4 @@
 ---
-author: ALBERSON DA SILVA MIRANDA
-date: "2023"
 format:
     pdf:
         include-in-header: [config/tema/preamble.tex, config/tema/customizacao.tex]
@@ -23,8 +21,7 @@ crossref:
 
 # opções
 knitr::opts_chunk$set(
-    out.width = "90%",
-    echo = FALSE
+    out.width = "90%"
 )
 
 # reprodutibilidade
