@@ -41,26 +41,28 @@ estban = readRDS("data/estban.rds") |>
     )
 
 # obtendo modelos
-estban_arima = estban |>
-    tsibble::filter_index("2010 jan" ~ "2019 dec") |>
-    model(
-        arima = fable::ARIMA(
-            saldo,
-            order_constraint = p + q + P + Q <= 4 & (constant + d + D <= 3) & (d <= 1) & (D <= 1)
-        ),
-    )
+estban_ets = estban |>
+    tsibble::filter_index("2010 jan" ~ "2014 dec") |>
+    model(ets = fable::ETS(saldo))
 
 # one-step-ahead preds
 new_data = estban |>
-    tsibble::filter_index("2020 jan" ~ "2022 dec")
-estban_arima_preds = refit(estban_arima, new_data, reestimate = FALSE) |> fitted()
+    tsibble::filter_index("2015 jan" ~ "2019 dec")
+
+# validation set
+validation_set = estban |>
+    tsibble::filter_index("2020 jan" ~ "2021 dec")
+
+estban_ets_preds = refit(estban_ets, new_data, reestimate = FALSE) |> fitted()
 
 # portmanteau tests para autocorrelação
-testes_lb = estban_arima |>
+testes_lb = estban_ets |>
     augment() |>
     features(.innov, feasts::ljung_box, lag = 12)
 
 # save
-saveRDS(estban_arima, "data/estban_arima.rds")
-saveRDS(estban_arima_preds, "data/estban_arima_preds.rds")
+saveRDS(estban_ets, "data/estban_ets.rds")
+saveRDS(estban_ets_preds, "data/estban_ets_preds.rds")
 saveRDS(testes_lb, "data/testes_lb.rds")
+saveRDS(new_data, "data/test_set.rds")
+saveRDS(validation_set, "data/validation_set.rds")
