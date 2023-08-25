@@ -1,18 +1,12 @@
-# BENCHMARKING - MINT - TOP-DOWN #
+# BENCHMARKING ANALÍTICOS #
 
-
-# pacotes
-pacman::p_load(
-    fabletools
-)
 
 # modelo previsões base
-estban_ets = readRDS("data/estban_ets.rds")
+estban_arima = readRDS("data/estban_arima.rds")
 
-# mint
+# mint e bottom-up
 estban_ets_mint = estban_ets |>
     reconcile(
         mint = min_trace(ets, "mint_shrink"),
         bu = bottom_up(ets)
     )
-

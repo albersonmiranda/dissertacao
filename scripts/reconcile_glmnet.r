@@ -1,6 +1,16 @@
 # BENCHMARK GLMNET #
 
 
+# one-step-ahead preds
+new_data = estban |>
+    tsibble::filter_index("2015 jan" ~ "2019 dec")
+
+# validation set
+validation_set = estban |>
+    tsibble::filter_index("2020 jan" ~ "2021 dec")
+
+estban_ets_preds = refit(estban_ets, new_data, reestimate = FALSE) |> fitted()
+
 # fitted values
 fitted = data.frame(
     augment(estban_arima$arima[[i]])[, c("ref", "saldo")]
