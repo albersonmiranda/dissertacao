@@ -45,7 +45,7 @@ WITH estban AS (
 
   WHERE
     cnpj_basico = '28127603'
-    AND id_verbete BETWEEN '161' AND '166'
+    AND id_verbete BETWEEN '161' AND '162'
 )
 
 SELECT
@@ -74,10 +74,15 @@ estban = within(estban, {
 agencias_fim = subset(estban, ref == max(ref), select = cnpj_agencia) |>
   (\(x) unique(x$cnpj_agencia))()
 
-# filtrando apenas agências em atividade
+# identificando agências que já estavam em atividade ao início da série
+agencias_ini = subset(estban, ref == min(ref), select = cnpj_agencia) |>
+  (\(x) unique(x$cnpj_agencia))()
+
+# filtrando apenas agências em atividade durante todo período
 estban = subset(
   estban,
   cnpj_agencia %in% agencias_fim
+  & cnpj_agencia %in% agencias_ini
 )
 
 # criando modelo de dados
@@ -95,6 +100,40 @@ dm::dm(estban, municipios) |>
 
 # mesclando com tabela municípios
 estban = merge(estban, municipios, by = "id_municipio")
+
+# formatando em tsibble
+estban = estban |>
+  subset(
+    select = c(
+      ref,
+      nome_mesorregiao,
+      nome_microrregiao,
+      nome,
+      cnpj_agencia,
+      verbete,
+      valor
+    )
+  ) |>
+  # alterando referência para mensal
+  transform(
+    ref = tsibble::yearmonth(ref)
+  ) |>
+  # formatando como tsibble
+  tsibble::as_tsibble(
+    key = c(
+      "nome_mesorregiao",
+      "nome_microrregiao",
+      "nome",
+      "cnpj_agencia",
+      "verbete"
+    ),
+    index = ref
+  ) |>
+  tsibble::fill_gaps() |>
+  fabletools::aggregate_key(
+    (nome_mesorregiao / nome_microrregiao / nome / cnpj_agencia) * verbete,
+    saldo = sum(valor)
+  )
 
 # salvando dataframe
 saveRDS(estban, "data/estban.RDS", compress = FALSE)
