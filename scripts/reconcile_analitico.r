@@ -29,11 +29,11 @@ estban_analiticos_preds = estban_analiticos |>
 
 # combinações para acurácia
 combinacoes = list(
-  agregado = "is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & is_aggregated(nome_microrregiao) & is_aggregated(nome_mesorregiao)", # nolint
-  mesorregiao = "is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao)", # nolint
-  microrregiao = "is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao)", # nolint
-  municipio = "is_aggregated(verbete) & is_aggregated(cnpj_agencia) & !is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao)", # nolint
-  agencia = "is_aggregated(verbete) & !is_aggregated(cnpj_agencia) & !is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao)", # nolint
+  agregado = "is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome_microrregiao) & is_aggregated(nome_mesorregiao)", # nolint
+  mesorregiao = "is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao)", # nolint
+  microrregiao = "is_aggregated(verbete) & is_aggregated(cnpj_agencia) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao)", # nolint
+  agencia = "is_aggregated(verbete) & !is_aggregated(cnpj_agencia) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao)", # nolint
+  verbete = "!is_aggregated(verbete) & !is_aggregated(cnpj_agencia) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao)", # nolint
   hierarquia = "!is.null(.mean)" # nolint
 )
 
