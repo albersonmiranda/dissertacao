@@ -50,8 +50,7 @@ pipeline = po("scale") %>>%
 
 # learners
 learners = list(
-  rpart = as_learner(pipeline %>>% po("learner", lrn("regr.rpart"))),
   glmnet = as_learner(pipeline %>>% po("learner", lrn("regr.glmnet"))),
   xgb = as_learner(pipeline %>>% po("learner", lrn("regr.xgboost"))),
-  random_forest = as_learner(pipeline %>>% po("learner", lrn("regr.ranger")))
+  ranger = as_learner(pipeline %>>% po("learner", lrn("regr.ranger")))
 )

@@ -13,19 +13,13 @@
 # Model selection depends on test set performance of
 # a tuned model.
 
-source("3_hyperparameters.R")
-
-# learners tunados
-learners_t = c(
-  learners,
-  xgb_tuned = xgb_tuned
-)
+source("scripts/reconcile_ml/3_hyperparameters.R")
 
 # outer resampling
 outer_resampling = rsmp("cv", folds = 5)
 
 # benchmark design
-design = benchmark_grid(task, learners_t, outer_resampling)
+design = benchmark_grid(task, learners, outer_resampling)
 
 # benchmark execution
 bmr = benchmark(design, store_models = TRUE)
