@@ -108,6 +108,7 @@ estban = estban |>
       ref,
       nome_mesorregiao,
       nome_microrregiao,
+      nome,
       cnpj_agencia,
       verbete,
       valor
@@ -122,6 +123,7 @@ estban = estban |>
     key = c(
       "nome_mesorregiao",
       "nome_microrregiao",
+      "nome",
       "cnpj_agencia",
       "verbete"
     ),
@@ -129,7 +131,7 @@ estban = estban |>
   ) |>
   tsibble::fill_gaps() |>
   fabletools::aggregate_key(
-    (nome_mesorregiao / nome_microrregiao / cnpj_agencia) * verbete,
+    (nome_mesorregiao / nome_microrregiao / nome / cnpj_agencia) * verbete,
     saldo = sum(valor)
   )
 
