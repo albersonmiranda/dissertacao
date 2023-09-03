@@ -7,7 +7,6 @@ set.seed(123)
 # meta pacote
 pacman::p_load(
   mlr3verse,
-  mlr3temporal,
   fabletools
 )
 
@@ -51,6 +50,8 @@ pipeline = po("scale") %>>%
 # learners
 learners = list(
   glmnet = as_learner(pipeline %>>% po("learner", lrn("regr.glmnet"))),
+  glmnet_lasso = as_learner(pipeline %>>% po("learner", lrn("regr.glmnet", alpha = 1))),
+  glmnet_ridge = as_learner(pipeline %>>% po("learner", lrn("regr.glmnet", alpha = 0))),
   xgb = as_learner(pipeline %>>% po("learner", lrn("regr.xgboost"))),
   ranger = as_learner(pipeline %>>% po("learner", lrn("regr.ranger")))
 )
