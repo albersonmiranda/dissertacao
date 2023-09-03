@@ -1,0 +1,33 @@
+{
+	"name": "R Data Science Environment",
+	"build": {
+		"dockerfile": "Dockerfile",
+		// Update VARIANT to pick a specific R version: 4, 4.1, 4.0
+		// More info: https://github.com/rocker-org/devcontainer-images/pkgs/container/devcontainer%2Ftidyverse
+		"args": { "VARIANT": "4.3" }
+	},
+
+	// Install Dev Container Features. More info: https://containers.dev/features
+	"features": {
+		"ghcr.io/rocker-org/devcontainer-features/quarto-cli:1": {},
+		// Install JupyterLab and IRkernel.
+		// More info: https://github.com/rocker-org/devcontainer-templates/tree/main/src/r-ver
+		"ghcr.io/rocker-org/devcontainer-features/r-rig:1": {
+			"version": "none",
+			"installJupyterlab": true
+		}
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				// Add Jupyter and Python vscode extensions
+				"GitHub.copilot-chat",
+				"GitHub.copilot",
+        "quarto.quarto",
+        "REditorSupport.r",
+        "tomoki1207.pdf"
+			]
+		}
+	}
+}
