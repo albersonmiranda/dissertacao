@@ -11,7 +11,7 @@ pacman::p_load(
 )
 
 # dados
-train_data = readRDS("data/estban_ets_preds.RDS") |>
+train_data = readRDS("data/estban_ets_preds.rds") |>
   tibble::as_tibble(subset(select = -.model)) |>
   tidyr::pivot_wider(
     id_cols = c("ref"),

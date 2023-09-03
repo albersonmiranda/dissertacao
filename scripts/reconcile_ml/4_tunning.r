@@ -13,7 +13,7 @@
 # Model selection depends on test set performance of
 # a tuned model.
 
-source("scripts/reconcile_ml/3_hyperparameters.R")
+source("scripts/reconcile_ml/3_hyperparameters.r")
 
 # outer resampling
 outer_resampling = rsmp("repeated_cv", repeats = 2, folds = 3)

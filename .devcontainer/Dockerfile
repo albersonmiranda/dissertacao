@@ -9,6 +9,11 @@ RUN install2.r --error --skipinstalled -n -1 \
         feasts \
         fable \
         dplyr \
+        pacman \
+        janitor \
+        glmnet \
+        ranger \
+        xgboost \
     && rm -rf /tmp/downloaded_packages
 
 # Install Python packages
