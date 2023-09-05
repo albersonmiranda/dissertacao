@@ -1,3 +1,6 @@
+### ESPAÇO DE HIPERPARÂMETROS ###
+
+
 source("scripts/reconcile_ml/2_task_learners.r")
 
 ## XGBOOST ##
@@ -50,13 +53,25 @@ ranger = auto_tuner(
   terminator = trm("stagnation", iters = 5)
 )
 
-## GLMnet ##
+## Elastic net ##
 
 # search space
 search_space = ps(
-  # alpha
-  regr.glmnet.alpha = p_int(lower = 0, upper = 1)
+  # determina mistura entre lasso e ridge
+  regr.glmnet.alpha = p_dbl(lower = 0, upper = 1),
+  # controla regularização
+  regr.glmnet.s = p_dbl(lower = -12, upper = 12)
 )
+
+# transformação
+search_space$trafo = function(x, param_set) {
+
+  if (!is.null(x$regr.glmnet.s)) {
+    x$regr.glmnet.s = 2^(x$regr.glmnet.s)
+  }
+
+  return(x)
+}
 
 # tuner
 glmnet = auto_tuner(
