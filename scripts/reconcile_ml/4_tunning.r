@@ -16,7 +16,7 @@
 source("scripts/reconcile_ml/3_hyperparameters.r")
 
 # outer resampling
-outer_resampling = rsmp("repeated_cv", repeats = 2, folds = 3)
+outer_resampling = rsmp("repeated_cv", repeats = 2, folds = 5)
 
 # benchmark design
 design = benchmark_grid(task, learners, outer_resampling)
