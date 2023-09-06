@@ -44,8 +44,8 @@ WITH estban AS (
   FROM `basedosdados.br_bcb_estban.agencia`
 
   WHERE
+    # filtrando CNPJ do Banestes
     cnpj_basico = '28127603'
-    AND id_verbete BETWEEN '161' AND '162'
 )
 
 SELECT
@@ -104,6 +104,11 @@ estban = merge(estban, municipios, by = "id_municipio")
 # formatando em tsibble
 estban = estban |>
   subset(
+    # filtrando verbetes a serem utilizados na dissertação
+    verbete %in% c(
+      "empréstimos e títulos descontados",
+      "financiamentos"
+    ),
     select = c(
       ref,
       nome_mesorregiao,
@@ -136,4 +141,4 @@ estban = estban |>
   )
 
 # salvando dataframe
-saveRDS(estban, "data/estban.RDS", compress = FALSE)
+saveRDS(estban, "data/estban.RDS")
