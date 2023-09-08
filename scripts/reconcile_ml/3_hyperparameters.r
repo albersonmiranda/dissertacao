@@ -30,12 +30,15 @@ search_space = ps(
 search_space$trafo = trafo_xgb
 
 xgb = auto_tuner(
-  tuner = tnr("mbo"),
+  tuner = tnr("random_search"),
   learner = learners$xgb,
-  resampling = rsmp("cv", folds = 10),
+  resampling = rsmp("cv", folds = 5),
   measure = msr("regr.rmse"),
   search_space = search_space,
-  terminator = trm("stagnation", iters = 5)
+  terminator = trm("combo", list(
+    trm("stagnation", iters = 2),
+    trm("stagnation_batch")
+  ), any = TRUE)
 )
 
 ## RANGER ##
@@ -62,10 +65,13 @@ search_space$trafo = trafo_ranger
 ranger = auto_tuner(
   tuner = tnr("mbo"),
   learner = learners$ranger,
-  resampling = rsmp("cv", folds = 10),
+  resampling = rsmp("cv", folds = 5),
   measure = msr("regr.rmse"),
   search_space = search_space,
-  terminator = trm("stagnation", iters = 5)
+  terminator = trm("combo", list(
+    trm("stagnation", iters = 2),
+    trm("stagnation_batch")
+  ), any = TRUE)
 )
 
 ## Elastic net ##
@@ -85,16 +91,21 @@ search_space$trafo = trafo_glmnet
 glmnet = auto_tuner(
   tuner = tnr("mbo"),
   learner = learners$glmnet,
-  resampling = rsmp("cv", folds = 10),
+  resampling = rsmp("cv", folds = 5),
   measure = msr("regr.rmse"),
   search_space = search_space,
-  terminator = trm("stagnation", iters = 5)
+  terminator = trm("combo", list(
+    trm("stagnation", iters = 2),
+    trm("stagnation_batch")
+  ), any = TRUE)
 )
 
 ## Lasso ##
 
 # search space
 search_space = ps(
+  # determina mistura entre lasso e ridge
+  regr.glmnet.alpha = p_dbl(lower = 1, upper = 1),
   # controla regularização
   regr.glmnet.s = p_dbl(lower = -12, upper = 12)
 )
@@ -106,16 +117,21 @@ search_space$trafo = trafo_glmnet
 glmnet_lasso = auto_tuner(
   tuner = tnr("mbo"),
   learner = learners$glmnet_lasso,
-  resampling = rsmp("cv", folds = 10),
+  resampling = rsmp("cv", folds = 5),
   measure = msr("regr.rmse"),
   search_space = search_space,
-  terminator = trm("stagnation", iters = 5)
+  terminator = trm("combo", list(
+    trm("stagnation", iters = 2),
+    trm("stagnation_batch")
+  ), any = TRUE)
 )
 
 ## Ridge ##
 
 # search space
 search_space = ps(
+  # determina mistura entre lasso e ridge
+  regr.glmnet.alpha = p_dbl(lower = 0, upper = 0),
   # controla regularização
   regr.glmnet.s = p_dbl(lower = -12, upper = 12)
 )
@@ -127,10 +143,13 @@ search_space$trafo = trafo_glmnet
 glmnet_ridge = auto_tuner(
   tuner = tnr("mbo"),
   learner = learners$glmnet_ridge,
-  resampling = rsmp("cv", folds = 10),
+  resampling = rsmp("cv", folds = 5),
   measure = msr("regr.rmse"),
   search_space = search_space,
-  terminator = trm("stagnation", iters = 5)
+  terminator = trm("combo", list(
+    trm("stagnation", iters = 2),
+    trm("stagnation_batch")
+  ), any = TRUE)
 )
 
 # atualizando learners
