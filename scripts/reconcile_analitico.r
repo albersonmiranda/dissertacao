@@ -11,7 +11,7 @@ pacman::p_load(
 
 # dados
 estban = readRDS("data/estban.rds") |>
-  tsibble::filter_index("2010 jan" ~ "2022 dec")
+  tsibble::filter_index(~ "2022 dec")
 
 # modelo previsões base
 estban_arima = readRDS("data/estban_arima.rds")

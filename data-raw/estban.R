@@ -56,6 +56,7 @@ SELECT
   , verbete
   , SUM(valor) AS valor
 FROM estban
+WHERE CAST(ano AS INT) >= 2003
 GROUP BY
   ano
   , mes

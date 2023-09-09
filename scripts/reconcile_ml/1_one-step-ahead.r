@@ -6,11 +6,11 @@ set.seed(123)
 
 # training set
 estban = readRDS("data/estban.rds") |>
-  tsibble::filter_index("2010 jan" ~ "2015 dec")
+  tsibble::filter_index(~ "2012 dec")
 
 # test set
 new_data = readRDS("data/estban.rds") |>
-  tsibble::filter_index("2016 jan" ~ "2021 dec")
+  tsibble::filter_index("2013 jan" ~ "2021 dec")
 
 # obtendo modelos
 estban_ets = estban |>

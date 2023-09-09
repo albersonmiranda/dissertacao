@@ -14,7 +14,7 @@ estban = readRDS("data/estban.rds")
 
 # obtendo modelos
 estban_arima = estban |>
-  tsibble::filter_index("2010 jan" ~ "2021 dec") |>
+  tsibble::filter_index(~ "2021 dec") |>
   model(
     base = fable::ARIMA(
       saldo,

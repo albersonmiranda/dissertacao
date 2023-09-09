@@ -21,7 +21,7 @@ train_data = readRDS("data/estban_ets_preds.rds") |>
   janitor::clean_names()
 
 test_data = readRDS("data/estban.RDS") |>
-  tsibble::filter_index("2016 jan" ~ "2021 dec") |>
+  tsibble::filter_index("2013 jan" ~ "2021 dec") |>
   tibble::as_tibble() |>
   tidyr::pivot_wider(
     id_cols = c("ref"),
