@@ -30,7 +30,7 @@ search_space = ps(
 search_space$trafo = trafo_xgb
 
 xgb = auto_tuner(
-  tuner = tnr("random_search"),
+  tuner = tnr("mbo"),
   learner = learners$xgb,
   resampling = rsmp("cv", folds = 5),
   measure = msr("regr.rmse"),
@@ -47,14 +47,12 @@ xgb = auto_tuner(
 search_space = ps(
   # quantidade mínima de observações no nó a ser dividido
   regr.ranger.min.node.size = p_int(lower = 1, upper = 7),
-  # quantidade mínima de observações no nó folha
-  regr.ranger.min.bucket = p_int(lower = 1, upper = 6),
   # número de variáveis candidatas para divisão a cada divsão
   regr.ranger.mtry = p_int(lower = 2, upper = ncol(train_data) - 2),
   # as observações são selecionadas com ou sem reposição
-  regr.ranger.replace = p_lgl(),
+  regr.ranger.replace = p_lgl(default = TRUE),
   # proporção de observações selecionadas aleatoriamente
-  regr.ranger.sample.fraction = p_dbl(lower = 0.1, upper = 1),
+  regr.ranger.sample.fraction = p_dbl(lower = 0.1, upper = 1, depends = regr.ranger.replace == TRUE),
   # número de árvores
   regr.ranger.num.trees = p_int(lower = 1, upper = 2000)
 )

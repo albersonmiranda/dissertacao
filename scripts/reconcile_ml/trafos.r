@@ -15,10 +15,6 @@ trafo_ranger = function(x, param_set) {
     x$regr.ranger.min.node.size = 2^(x$regr.ranger.min.node.size)
   }
 
-  if (!is.null(x$regr.ranger.min.bucket)) {
-    x$regr.ranger.min.bucket = 2^(x$regr.ranger.min.bucket)
-  }
-
   return(x)
 }
 
