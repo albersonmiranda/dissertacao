@@ -15,6 +15,9 @@
 
 source("scripts/reconcile_ml/3_hyperparameters.r")
 
+# reprodutibilidade
+set.seed(123)
+
 # outer resampling
 outer_resampling = rsmp("cv", folds = 3)
 

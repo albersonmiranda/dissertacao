@@ -15,6 +15,9 @@
 
 source("scripts/reconcile_ml/3_hyperparameters.r")
 
+# reprodutibilidade
+set.seed(123)
+
 # outer resampling
 outer_resampling = rsmp("cv", folds = 3)
 
@@ -25,7 +28,7 @@ design = benchmark_grid(task, list(learners$xgb, learners$ranger), outer_resampl
 future::plan(list("sequential", "multisession"))
 
 # benchmark execution
-bmr = benchmark(design, store_models = TRUE) |> progressr::with_progress()
+bmr = benchmark(design, store_models = FALSE) |> progressr::with_progress()
 results = bmr$aggregate(list(msr("regr.rmse"), msr("time_both")))[, 3:8]
 
 # resultados

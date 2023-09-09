@@ -1,9 +1,6 @@
 ### TAREFA E LEARNERS ###
 
 
-# reprodutibilidade
-set.seed(123)
-
 # meta pacote
 pacman::p_load(
   mlr3verse,

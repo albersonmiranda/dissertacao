@@ -30,7 +30,7 @@ search_space = ps(
 search_space$trafo = trafo_xgb
 
 xgb = auto_tuner(
-  tuner = tnr("mbo"),
+  tuner = tnr("random_search"),
   learner = learners$xgb,
   resampling = rsmp("cv", folds = 5),
   measure = msr("regr.rmse"),
