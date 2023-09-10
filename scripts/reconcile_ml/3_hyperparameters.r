@@ -30,14 +30,14 @@ search_space = ps(
 search_space$trafo = trafo_xgb
 
 xgb = auto_tuner(
-  tuner = tnr("random_search"),
+  tuner = tnr("mbo"),
   learner = learners$xgb,
   resampling = rsmp("cv", folds = 5),
   measure = msr("regr.rmse"),
   search_space = search_space,
   terminator = trm("combo", list(
-    trm("stagnation", iters = 2),
-    trm("stagnation_batch")
+    trm("stagnation", iters = 3),
+    trm("stagnation_batch", n = 3)
   ), any = TRUE)
 )
 
@@ -67,8 +67,8 @@ ranger = auto_tuner(
   measure = msr("regr.rmse"),
   search_space = search_space,
   terminator = trm("combo", list(
-    trm("stagnation", iters = 2),
-    trm("stagnation_batch")
+    trm("stagnation", iters = 3),
+    trm("stagnation_batch", n = 3)
   ), any = TRUE)
 )
 
@@ -93,8 +93,8 @@ glmnet = auto_tuner(
   measure = msr("regr.rmse"),
   search_space = search_space,
   terminator = trm("combo", list(
-    trm("stagnation", iters = 2),
-    trm("stagnation_batch")
+    trm("stagnation", iters = 3),
+    trm("stagnation_batch", n = 3)
   ), any = TRUE)
 )
 
@@ -119,8 +119,8 @@ glmnet_lasso = auto_tuner(
   measure = msr("regr.rmse"),
   search_space = search_space,
   terminator = trm("combo", list(
-    trm("stagnation", iters = 2),
-    trm("stagnation_batch")
+    trm("stagnation", iters = 3),
+    trm("stagnation_batch", n = 3)
   ), any = TRUE)
 )
 
@@ -145,8 +145,8 @@ glmnet_ridge = auto_tuner(
   measure = msr("regr.rmse"),
   search_space = search_space,
   terminator = trm("combo", list(
-    trm("stagnation", iters = 2),
-    trm("stagnation_batch")
+    trm("stagnation", iters = 3),
+    trm("stagnation_batch", n = 3)
   ), any = TRUE)
 )
 

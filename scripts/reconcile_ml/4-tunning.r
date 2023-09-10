@@ -22,25 +22,27 @@ set.seed(123)
 outer_resampling = rsmp("cv", folds = 3)
 
 # benchmark design
-design = benchmark_grid(task, list(learners$glmnet, learners$glmnet_lasso, learners$glmnet_ridge), outer_resampling)
+design = benchmark_grid(
+  task,
+  list(
+    learners$xgb,
+    learners$ranger,
+    learners$glmnet,
+    learners$glmnet_lasso,
+    learners$glmnet_ridge
+  ),
+  outer_resampling
+)
 
 # Runs the inner loop in parallel and the outer loop sequentially
 future::plan(list("sequential", "multisession"))
 
 # benchmark execution
-bmr = benchmark(design, store_models = TRUE) |> progressr::with_progress()
+bmr = benchmark(design, store_models = FALSE, store_backends = FALSE) |> progressr::with_progress()
 results = bmr$aggregate(list(msr("regr.rmse"), msr("time_both")))[, 3:8]
-
-# resultados
-aggregate(regr.rmse ~ learner_id, data = results, FUN = mean)
-autoplot(bmr, measure = msr("regr.rmse")) +
-  ggplot2::scale_y_continuous(labels = scales::number_format(scale = 1 / 1000)) +
-  ggplot2::labs(
-    y = "RMSE (mil)"
-  )
 
 # optimal configurations
 extract_inner_tuning_results(bmr)
 
 # save results
-saveRDS(bmr, "data/bmr_b.rds")
+saveRDS(bmr, "data/bmr.rds")
