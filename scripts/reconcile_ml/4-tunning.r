@@ -19,7 +19,7 @@ source("scripts/reconcile_ml/3_hyperparameters.r")
 set.seed(123)
 
 # outer resampling
-outer_resampling = rsmp("cv", folds = 3)
+outer_resampling = rsmp("repeated_cv", folds = 5, repeats = 3)
 
 # benchmark design
 design = benchmark_grid(
@@ -38,11 +38,11 @@ design = benchmark_grid(
 future::plan(list("sequential", "multisession"))
 
 # benchmark execution
-bmr = benchmark(design, store_models = FALSE, store_backends = FALSE) |> progressr::with_progress()
-results = bmr$aggregate(list(msr("regr.rmse"), msr("time_both")))[, 3:8]
+bmr = benchmark(design, store_models = TRUE) |> progressr::with_progress()
 
-# optimal configurations
-extract_inner_tuning_results(bmr)
+# results
+results = bmr$aggregate(list(msr("regr.rmse"), msr("time_both")))[, 3:8]
+aggregate(cbind(regr.rmse, time_both) ~ learner_id, data = results, FUN = mean)
 
 # save results
 saveRDS(bmr, "data/bmr.rds")

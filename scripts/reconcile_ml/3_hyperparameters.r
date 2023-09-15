@@ -32,7 +32,7 @@ search_space$trafo = trafo_xgb
 xgb = auto_tuner(
   tuner = tnr("mbo"),
   learner = learners$xgb,
-  resampling = rsmp("cv", folds = 5),
+  resampling = rsmp("holdout"),
   measure = msr("regr.rmse"),
   search_space = search_space,
   terminator = trm("combo", list(
@@ -63,7 +63,7 @@ search_space$trafo = trafo_ranger
 ranger = auto_tuner(
   tuner = tnr("mbo"),
   learner = learners$ranger,
-  resampling = rsmp("cv", folds = 5),
+  resampling = rsmp("holdout"),
   measure = msr("regr.rmse"),
   search_space = search_space,
   terminator = trm("combo", list(
@@ -89,7 +89,7 @@ search_space$trafo = trafo_glmnet
 glmnet = auto_tuner(
   tuner = tnr("mbo"),
   learner = learners$glmnet,
-  resampling = rsmp("cv", folds = 5),
+  resampling = rsmp("holdout"),
   measure = msr("regr.rmse"),
   search_space = search_space,
   terminator = trm("combo", list(
@@ -115,7 +115,7 @@ search_space$trafo = trafo_glmnet
 glmnet_lasso = auto_tuner(
   tuner = tnr("mbo"),
   learner = learners$glmnet_lasso,
-  resampling = rsmp("cv", folds = 5),
+  resampling = rsmp("holdout"),
   measure = msr("regr.rmse"),
   search_space = search_space,
   terminator = trm("combo", list(
@@ -141,7 +141,7 @@ search_space$trafo = trafo_glmnet
 glmnet_ridge = auto_tuner(
   tuner = tnr("mbo"),
   learner = learners$glmnet_ridge,
-  resampling = rsmp("cv", folds = 5),
+  resampling = rsmp("holdout"),
   measure = msr("regr.rmse"),
   search_space = search_space,
   terminator = trm("combo", list(
