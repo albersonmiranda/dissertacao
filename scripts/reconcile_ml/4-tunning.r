@@ -38,7 +38,7 @@ design = benchmark_grid(
 future::plan(list("sequential", "multisession"))
 
 # benchmark execution
-bmr = benchmark(design, store_models = TRUE) |> progressr::with_progress()
+bmr = benchmark(design, store_models = FALSE, store_backends = FALSE) |> progressr::with_progress()
 
 # results
 results = bmr$aggregate(list(msr("regr.rmse"), msr("time_both")))[, 3:8]
