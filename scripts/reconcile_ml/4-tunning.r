@@ -46,3 +46,4 @@ aggregate(cbind(regr.rmse, time_both) ~ learner_id, data = results, FUN = mean)
 
 # save results
 saveRDS(bmr, "data/bmr.rds")
+saveRDS(results, "data/bmr_results.rds")
