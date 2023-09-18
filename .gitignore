@@ -2,3 +2,4 @@
 *.fdb_latexmk
 nul
 /.quarto/
+bmr.rds
