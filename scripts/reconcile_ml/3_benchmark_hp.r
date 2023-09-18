@@ -4,6 +4,15 @@
 source("scripts/reconcile_ml/2_task_learners.r")
 source("scripts/reconcile_ml/trafos.r")
 
+# configurações
+tuner = tnr("mbo")
+inner_resampling = rsmp("holdout")
+measure = msr("regr.rmse")
+terminator = trm("combo", list(
+  trm("stagnation", iters = 3),
+  trm("stagnation_batch", n = 3)
+), any = TRUE)
+
 ## XGBOOST ##
 
 # search space
@@ -30,15 +39,12 @@ search_space = ps(
 search_space$trafo = trafo_xgb
 
 xgb = auto_tuner(
-  tuner = tnr("mbo"),
+  tuner = tuner,
   learner = learners$xgb,
-  resampling = rsmp("holdout"),
-  measure = msr("regr.rmse"),
+  resampling = inner_resampling,
+  measure = measure,
   search_space = search_space,
-  terminator = trm("combo", list(
-    trm("stagnation", iters = 3),
-    trm("stagnation_batch", n = 3)
-  ), any = TRUE)
+  terminator = terminator
 )
 
 ## RANGER ##
@@ -61,15 +67,12 @@ search_space = ps(
 search_space$trafo = trafo_ranger
 
 ranger = auto_tuner(
-  tuner = tnr("mbo"),
+  tuner = tuner,
   learner = learners$ranger,
-  resampling = rsmp("holdout"),
-  measure = msr("regr.rmse"),
+  resampling = inner_resampling,
+  measure = measure,
   search_space = search_space,
-  terminator = trm("combo", list(
-    trm("stagnation", iters = 3),
-    trm("stagnation_batch", n = 3)
-  ), any = TRUE)
+  terminator = terminator
 )
 
 ## Elastic net ##
@@ -87,15 +90,12 @@ search_space$trafo = trafo_glmnet
 
 # tuner
 glmnet = auto_tuner(
-  tuner = tnr("mbo"),
+  tuner = tuner,
   learner = learners$glmnet,
-  resampling = rsmp("holdout"),
-  measure = msr("regr.rmse"),
+  resampling = inner_resampling,
+  measure = measure,
   search_space = search_space,
-  terminator = trm("combo", list(
-    trm("stagnation", iters = 3),
-    trm("stagnation_batch", n = 3)
-  ), any = TRUE)
+  terminator = terminator
 )
 
 ## Lasso ##
@@ -113,15 +113,12 @@ search_space$trafo = trafo_glmnet
 
 # tuner
 glmnet_lasso = auto_tuner(
-  tuner = tnr("mbo"),
+  tuner = tuner,
   learner = learners$glmnet_lasso,
-  resampling = rsmp("holdout"),
-  measure = msr("regr.rmse"),
+  resampling = inner_resampling,
+  measure = measure,
   search_space = search_space,
-  terminator = trm("combo", list(
-    trm("stagnation", iters = 3),
-    trm("stagnation_batch", n = 3)
-  ), any = TRUE)
+  terminator = terminator
 )
 
 ## Ridge ##
@@ -139,15 +136,12 @@ search_space$trafo = trafo_glmnet
 
 # tuner
 glmnet_ridge = auto_tuner(
-  tuner = tnr("mbo"),
+  tuner = tuner,
   learner = learners$glmnet_ridge,
-  resampling = rsmp("holdout"),
-  measure = msr("regr.rmse"),
+  resampling = inner_resampling,
+  measure = measure,
   search_space = search_space,
-  terminator = trm("combo", list(
-    trm("stagnation", iters = 3),
-    trm("stagnation_batch", n = 3)
-  ), any = TRUE)
+  terminator = terminator
 )
 
 # atualizando learners

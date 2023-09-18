@@ -13,7 +13,7 @@
 # Model selection depends on test set performance of
 # a tuned model.
 
-source("scripts/reconcile_ml/3_hyperparameters.r")
+source("scripts/reconcile_ml/3_benchmark_hp.r")
 
 # reprodutibilidade
 set.seed(123)
