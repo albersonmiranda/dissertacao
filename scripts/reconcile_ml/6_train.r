@@ -26,7 +26,7 @@ nomes_tasks = lapply(task, function(tarefa) {
 }) |> unlist()
 
 names(lasso_coef) = nomes_tasks
-names(tasks) = nomes_tasks
+names(task) = nomes_tasks
 
 saveRDS(lasso_coef, "data/lasso_coef.RDS", compress = FALSE)
 
