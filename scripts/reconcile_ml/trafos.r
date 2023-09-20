@@ -2,8 +2,8 @@
 
 trafo_glmnet = function(x, param_set) {
 
-  if (!is.null(x$regr.glmnet.s)) {
-    x$regr.glmnet.s = 2^(x$regr.glmnet.s)
+  if (!is.null(x$regr.glmnet.lambda)) {
+    x$regr.glmnet.lambda = 2^(x$regr.glmnet.lambda)
   }
 
   return(x)

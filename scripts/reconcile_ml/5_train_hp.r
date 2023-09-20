@@ -82,7 +82,7 @@ search_space = ps(
   # determina mistura entre lasso e ridge
   regr.glmnet.alpha = p_dbl(lower = 0, upper = 1),
   # controla regularização
-  regr.glmnet.lambda = p_dbl(lower = 0, upper = 10000)
+  regr.glmnet.lambda = p_dbl(lower = -12, upper = 12)
 )
 
 # transformação
@@ -105,7 +105,7 @@ search_space = ps(
   # determina mistura entre lasso e ridge
   regr.glmnet.alpha = p_dbl(lower = 1, upper = 1),
   # controla regularização
-  regr.glmnet.lambda = p_dbl(lower = 0, upper = 10000)
+  regr.glmnet.lambda = p_dbl(lower = -12, upper = 12)
 )
 
 # transformação
@@ -128,7 +128,7 @@ search_space = ps(
   # determina mistura entre lasso e ridge
   regr.glmnet.alpha = p_dbl(lower = 0, upper = 0),
   # controla regularização
-  regr.glmnet.lambda = p_dbl(lower = 0, upper = 10000)
+  regr.glmnet.lambda = p_dbl(lower = -12, upper = 12)
 )
 
 # transformação
