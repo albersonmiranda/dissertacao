@@ -13,24 +13,19 @@ pacman::p_load(
 estban = readRDS("data/estban.rds")
 
 # obtendo modelos
-estban_arima = estban |>
+estban_ets = estban |>
   tsibble::filter_index(~ "2021 dec") |>
-  model(
-    base = fable::ARIMA(
-      saldo,
-      order_constraint = p + q + P + Q <= 4 & (constant + d + D <= 3) & (d <= 1) & (D <= 1)
-    )
-  )
+  model(base = fable::ETS(saldo))
 
 # portmanteau tests para autocorrelação
-testes_lb = estban_arima |>
+testes_lb = estban_ets |>
   augment() |>
   features(.innov, feasts::ljung_box, lag = 12)
 
 # previsões base
-previsoes_base = forecast(estban_arima, h = "1 years")
+previsoes_base = forecast(estban_ets, h = "1 years")
 
 # save
-saveRDS(estban_arima, "data/estban_arima.rds")
+saveRDS(estban_ets, "data/estban_ets.rds")
 saveRDS(testes_lb, "data/testes_lb.rds")
 saveRDS(previsoes_base, "data/previsoes_base.rds")
