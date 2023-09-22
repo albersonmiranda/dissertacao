@@ -13,6 +13,7 @@ train_data = readRDS("data/estban_ets_preds.rds") |>
   tidyr::pivot_wider(
     id_cols = c("ref"),
     names_from = c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "verbete"),
+    names_sep = "x",
     values_from = ".fitted"
   ) |>
   janitor::clean_names()
@@ -23,6 +24,7 @@ new_data = readRDS("data/estban.RDS") |>
   tidyr::pivot_wider(
     id_cols = c("ref"),
     names_from = c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "verbete"),
+    names_sep = "x",
     values_from = "saldo"
   ) |>
   janitor::clean_names()
