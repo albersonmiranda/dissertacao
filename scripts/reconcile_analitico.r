@@ -14,10 +14,10 @@ estban = readRDS("data/estban.rds") |>
   tsibble::filter_index(~ "2022 dec")
 
 # modelo previsões base
-estban_arima = readRDS("data/estban_arima.rds")
+estban_ets = readRDS("data/estban_ets.rds")
 
 # reconciliação mint e bottom-up
-estban_analiticos = estban_arima |>
+estban_analiticos = estban_ets |>
   reconcile(
     mint = min_trace(base, "mint_shrink"),
     bu = bottom_up(base)
