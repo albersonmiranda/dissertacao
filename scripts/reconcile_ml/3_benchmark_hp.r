@@ -58,7 +58,7 @@ search_space = ps(
   # as observações são selecionadas com ou sem reposição
   regr.ranger.replace = p_lgl(default = TRUE),
   # proporção de observações selecionadas aleatoriamente
-  regr.ranger.sample.fraction = p_dbl(lower = 0.1, upper = 1, depends = regr.ranger.replace == TRUE),
+  regr.ranger.sample.fraction = p_dbl(lower = 0.1, upper = 1),
   # número de árvores
   regr.ranger.num.trees = p_int(lower = 1, upper = 2000)
 )
