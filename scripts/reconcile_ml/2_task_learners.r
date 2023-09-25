@@ -18,7 +18,7 @@ train_data = readRDS("data/estban_ets_preds.rds") |>
   ) |>
   janitor::clean_names()
 
-new_data = readRDS("data/estban.RDS") |>
+test_set = readRDS("data/estban.RDS") |>
   tsibble::filter_index("2022 jan" ~ "2022 dec") |>
   tibble::as_tibble() |>
   tidyr::pivot_wider(
