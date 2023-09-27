@@ -29,6 +29,16 @@ test_set = readRDS("data/estban.RDS") |>
   ) |>
   janitor::clean_names()
 
+new_data = readRDS("data/previsoes_base.rds") |>
+  tibble::as_tibble() |>
+  tidyr::pivot_wider(
+    id_cols = c("ref"),
+    names_from = c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "verbete"),
+    names_sep = "x",
+    values_from = ".mean"
+  ) |>
+  janitor::clean_names()
+
 # targets
 target = names(train_data) |>
   grep(pattern = "aggregated|ref", invert = TRUE, value = TRUE)
