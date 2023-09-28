@@ -1,7 +1,7 @@
 ### TRAIN ###
 
 
-source("scripts/reconcile_ml/5_train_hp.R")
+source("scripts/reconcile_ml/5_train_hp.r")
 
 # reprodutibilidade
 set.seed(123)

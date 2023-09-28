@@ -14,6 +14,7 @@ RUN install2.r --error --skipinstalled -n -1 \
         glmnet \
         ranger \
         xgboost \
+        DiceKriging \
     && rm -rf /tmp/downloaded_packages
 
 # Install Python packages
