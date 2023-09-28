@@ -6,10 +6,13 @@ source("scripts/reconcile_ml/5_train_hp.R")
 # reprodutibilidade
 set.seed(123)
 
+# parallelization
+future::plan("multisession")
+
 # lasso
 lasso_coef = lapply(task, function(tarefa) {
   # realiza treino
-  learners$glmnet_lasso$train(task)
+  learners$glmnet_lasso$train(tarefa)
   # obtém s ótimo
   lambda = learners$glmnet_lasso$model$learner$model$regr.glmnet$param_vals$lambda
   # obtém coeficientes
