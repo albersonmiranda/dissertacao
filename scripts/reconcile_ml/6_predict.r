@@ -20,7 +20,7 @@ future::plan("multisession")
 # xgboost
 ini = Sys.time()
 preds_xgb = lapply(task, function(tarefa) {
-  learners$xgb$train(tarefa) |> progressr::with_progress()
+  learners$xgb$train(tarefa)
   preds = learners$xgb$predict_newdata(newdata = new_data)
 
   return(preds)
@@ -33,7 +33,7 @@ list(preds_xgb, xgb_time) |> saveRDS("data/preds_xgb.RDS", compress = FALSE)
 # ranger
 ini = Sys.time()
 preds_ranger = lapply(task, function(tarefa) {
-  learners$ranger$train(tarefa) |> progressr::with_progress()
+  learners$ranger$train(tarefa)
   preds = learners$ranger$predict_newdata(newdata = new_data)
 
   return(preds)
@@ -46,7 +46,7 @@ list(preds_ranger, ranger_time) |> saveRDS("data/preds_ranger.RDS", compress = F
 # glmnet
 ini = Sys.time()
 preds_glmnet = lapply(task, function(tarefa) {
-  learners$glmnet$train(tarefa) |> progressr::with_progress()
+  learners$glmnet$train(tarefa)
   preds = learners$glmnet$predict_newdata(newdata = new_data)
 
   return(preds)
@@ -59,7 +59,7 @@ list(preds_glmnet, glmnet_time) |> saveRDS("data/preds_glmnet.RDS", compress = F
 # lasso
 ini = Sys.time()
 preds_lasso = lapply(task, function(tarefa) {
-  learners$glmnet_lasso$train(tarefa) |> progressr::with_progress()
+  learners$glmnet_lasso$train(tarefa)
   preds = learners$glmnet_lasso$predict_newdata(newdata = new_data)
 
   return(preds)
@@ -72,7 +72,7 @@ list(preds_lasso, lasso_time) |> saveRDS("data/preds_lasso.RDS", compress = FALS
 # ridge
 ini = Sys.time()
 preds_ridge = lapply(task, function(tarefa) {
-  learners$glmnet_ridge$train(tarefa) |> progressr::with_progress()
+  learners$glmnet_ridge$train(tarefa)
   preds = learners$glmnet_ridge$predict_newdata(newdata = new_data)
 
   return(preds)
