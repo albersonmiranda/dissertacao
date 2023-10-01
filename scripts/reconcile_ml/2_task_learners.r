@@ -44,7 +44,7 @@ test_set = readRDS("data/estban.RDS") |>
   ) |>
   janitor::clean_names()
 
-new_data = readRDS("data/previsoes_base.rds") |>
+new_data_estatica = readRDS("data/previsoes_base_estatica.rds") |>
   tibble::as_tibble() |>
   tidyr::pivot_wider(
     id_cols = c("ref"),
