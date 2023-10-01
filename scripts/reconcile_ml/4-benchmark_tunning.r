@@ -19,7 +19,7 @@ source("scripts/reconcile_ml/3_benchmark_hp.r")
 set.seed(123)
 
 # outer resampling
-outer_resampling = rsmp("repeated_cv", folds = 5, repeats = 3)
+outer_resampling = rsmp("repeated_cv", folds = 5, repeats = 2)
 
 # benchmark design
 design = benchmark_grid(
