@@ -17,7 +17,7 @@ true_data = readRDS("data/estban.rds") |>
     values_from = "saldo"
   ) |>
   janitor::clean_names() |>
-  subset(ref >= tsibble::yearmonth("2013-01-01") & ref <= tsibble::yearmonth("2021 dec"))
+  subset(ref >= tsibble::yearmonth("2013 jan") & ref <= tsibble::yearmonth("2021 dec"))
 
 # add suffix to colnames
 names(true_data) = paste0(names(true_data), "_true")
@@ -70,8 +70,7 @@ task = lapply(target, function(y_m) {
 })
 
 # pipeline
-pipeline = po("scale") %>>%
-  po("encode", method = "treatment", affect_columns = selector_type("factor"))
+pipeline = po("encode", method = "treatment", affect_columns = selector_type("factor"))
 
 # learners
 learners = list(
