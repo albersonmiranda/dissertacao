@@ -17,12 +17,12 @@ true_data = readRDS("data/estban.rds") |>
     values_from = "saldo"
   ) |>
   janitor::clean_names() |>
-  subset(ref >= tsibble::yearmonth("2013 jan") & ref <= tsibble::yearmonth("2021 dec"))
+  subset(ref <= tsibble::yearmonth("2021 dec"))
 
 # add suffix to colnames
 names(true_data) = paste0(names(true_data), "_true")
 
-train_data = readRDS("data/estban_ets_preds.rds") |>
+train_data = readRDS("data/previsoes_base_fitted.rds") |>
   tibble::as_tibble(subset(select = -.model)) |>
   tidyr::pivot_wider(
     id_cols = c("ref"),

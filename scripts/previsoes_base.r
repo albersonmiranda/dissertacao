@@ -28,10 +28,10 @@ testes_lb = estban_ets |>
 
 # previsões base
 previsoes_base_estatica = forecast(estban_ets, h = "1 years")
-previsoes_base_dinamica = fabletools::refit(estban_ets, new_data, reestimate = FALSE) |> fitted()
+previsoes_base_fitted = estban_ets |> fitted()
 
 # save
 saveRDS(estban_ets, "data/estban_ets.rds")
 saveRDS(testes_lb, "data/testes_lb.rds")
 saveRDS(previsoes_base_estatica, "data/previsoes_base_estatica.rds")
-saveRDS(previsoes_base_dinamica, "data/previsoes_base_dinamica.rds")
+saveRDS(previsoes_base_fitted, "data/previsoes_base_fitted.rds")
