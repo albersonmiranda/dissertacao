@@ -135,52 +135,6 @@ data = merge(estban, preds)
 # teste se merge foi completo
 nrow(data) == 5 * nrow(estban)
 
-# combinações para acurácia
-combinacoes = list(
-  agregado = "modelo", # nolint
-  mesorregiao = "nome_mesorregiao, nome_microrregiao, nome, cnpj_agencia, verbete, modelo", # nolint, # nolint
-  microrregiao = "nome_mesorregiao, nome_microrregiao, nome, cnpj_agencia, verbete, modelo", # nolint, # nolint
-  municipio = "nome_mesorregiao, nome_microrregiao, nome, cnpj_agencia, verbete, modelo", # nolint, # nolint
-  agencia = "nome_mesorregiao, nome_microrregiao, nome, cnpj_agencia, verbete, modelo", # nolint, # nolint
-  verbete = "nome_mesorregiao, nome_microrregiao, nome, cnpj_agencia, verbete, modelo", # nolint, # nolint
-  hierarquia = "nome_mesorregiao, nome_microrregiao, nome, cnpj_agencia, verbete, modelo", # nolint # nolint
-)
-
-# calcular rmse para cada nível de agregação
-
-data |>
-  dplyr::mutate(se = (prediction - saldo) ^ 2) |>
-  dplyr::group_by(nome_mesorregiao, nome_microrregiao, nome, cnpj_agencia, verbete, modelo) |>
-  dplyr::summarise(rmse = sqrt(mean(se))) |>
-  dplyr::group_by(modelo) |>
-  dplyr::summarise(rmse = mean(rmse))
-
-# calcular rmse para cada nível de agregação
-data |>
-  dplyr::mutate(se = (prediction - saldo) ^ 2) |>
-  dplyr::group_by(nome_mesorregiao, modelo) |>
-  dplyr::summarise(rmse = sqrt(mean(se))) |>
-  dplyr::group_by(modelo) |>
-  dplyr::summarise(rmse = mean(rmse))
-
-# calcular rmse para cada nível de agregação
-data |>
-  dplyr::mutate(se = (prediction - saldo) ^ 2) |>
-  dplyr::group_by(nome_microrregiao, modelo) |>
-  dplyr::summarise(mse = mean(se)) |>
-  dplyr::mutate(rmse = sqrt(mse)) |>
-  dplyr::group_by(modelo) |>
-  dplyr::summarise(rmse = mean(rmse))
-
-# calcular rmse para cada nível de agregação
-data |>
-  dplyr::mutate(se = (prediction - saldo) ^ 2) |>
-  dplyr::group_by(modelo) |>
-  dplyr::summarise(mse = sum(se), n = dplyr::n()) |>
-  dplyr::mutate(rmse = sqrt(mse)) |>
-  dplyr::group_by(modelo) |>
-  dplyr::summarise(rmse = mean(rmse))
-
 # agregando
 data = data |>
   transform(ref = tsibble::yearmonth(as.Date(paste0(ref, "-01"), format = "%Y %b-%d"))) |>
@@ -203,23 +157,22 @@ data = data |>
 
 # combinações para acurácia
 combinacoes = list(
-  agregado = c("is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & is_aggregated(nome_microrregiao) & is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)"), # nolint
-  mesorregiao = c("is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", "nome_mesorregiao"), # nolint
-  microrregiao = c("is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", "nome_microrregiao"), # nolint
-  municipio = c("is_aggregated(verbete) & is_aggregated(cnpj_agencia) & !is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", "nome"), # nolint
-  agencia = c("is_aggregated(verbete) & !is_aggregated(cnpj_agencia) & !is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", "cnpj_agencia"), # nolint
-  verbete = c("!is_aggregated(verbete) & !is_aggregated(cnpj_agencia) & !is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", "verbete"), # nolint
-  hierarquia = c("!is_aggregated(modelo)") # nolint
+  agregado = list("is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & is_aggregated(nome_microrregiao) & is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("modelo")), # nolint
+  mesorregiao = list("is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("nome_mesorregiao", "modelo")), # nolint
+  microrregiao = list("is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("nome_microrregiao", "nome_mesorregiao", "modelo")), # nolint
+  municipio = list("is_aggregated(verbete) & is_aggregated(cnpj_agencia) & !is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("nome", "nome_microrregiao", "nome_mesorregiao", "modelo")), # nolint
+  agencia = list("is_aggregated(verbete) & !is_aggregated(cnpj_agencia) & !is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "modelo")), # nolint
+  verbete = list("!is_aggregated(verbete) & !is_aggregated(cnpj_agencia) & !is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("verbete", "cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "modelo")), # nolint
+  hierarquia = list("!is_aggregated(modelo)", c("modelo")) # nolint
 )
 
 # acurácia
 data_acc = lapply(names(combinacoes), function(nivel) {
   data = tsibble::as_tibble(data) |>
-    dplyr::filter(!!rlang::parse_expr(combinacoes[[nivel]][1])) |>
-    dplyr::mutate(se = (prediction - saldo) ^ 2, modelo = as.character(modelo)) |>
-    dplyr::group_by(!!rlang::parse_expr(combinacoes[[nivel]][2]), modelo) |>
-    dplyr::summarise(mse = mean(se)) |>
-    dplyr::mutate(rmse = sqrt(mse)) |>
+    dplyr::filter(!!rlang::parse_expr(combinacoes[[nivel]][[1]])) |>
+    dplyr::mutate(modelo = as.character(modelo)) |>
+    dplyr::group_by_at(dplyr::vars(combinacoes[[nivel]][[2]])) |>
+    dplyr::summarise(rmse = sqrt(mean((prediction - saldo) ^ 2))) |>
     dplyr::group_by(modelo) |>
     dplyr::summarise(rmse = mean(rmse))
   data$serie = nivel
