@@ -172,19 +172,21 @@ data_acc = lapply(names(combinacoes), function(nivel) {
     dplyr::filter(!!rlang::parse_expr(combinacoes[[nivel]][[1]])) |>
     dplyr::mutate(modelo = as.character(modelo)) |>
     dplyr::group_by_at(dplyr::vars(combinacoes[[nivel]][[2]])) |>
-    dplyr::summarise(rmse = sqrt(mean((prediction - saldo) ^ 2))) |>
+    dplyr::summarise(rmse = sqrt(mean((prediction - saldo) ^ 2)), mae = mean(abs(prediction - saldo))) |>
     dplyr::group_by(modelo) |>
-    dplyr::summarise(rmse = mean(rmse))
+    dplyr::summarise(rmse = mean(rmse), mae = mean(mae))
   data$serie = nivel
 
   return(data)
 })
 
 # agregando dataframes
-acuracia_ml = do.call("rbind", data_acc) |>
-  tidyr::pivot_wider(
-    names_from = serie,
-    values_from = c(rmse)
-  ) |>
-  as.data.frame(t()) |>
-  tibble::as_tibble()
+acuracia_ml = lapply(list("rmse", "mae"), function(medida) {
+  do.call("rbind", data_acc)[, c("modelo", medida, "serie")] |>
+    tidyr::pivot_wider(
+      names_from = serie,
+      values_from = rlang::parse_expr(medida)
+    ) |>
+    as.data.frame(t()) |>
+    tibble::as_tibble()
+})

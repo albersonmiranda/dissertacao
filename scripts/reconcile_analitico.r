@@ -44,10 +44,10 @@ estban_analiticos_acc = lapply(names(combinacoes), function(nivel) {
     dplyr::filter(!!rlang::parse_expr(combinacoes[[nivel]])) |>
     fabletools::accuracy(
       data = estban,
-      measures = list(mase = fabletools::MASE, rmse = fabletools::RMSE)
+      measures = list(mae = fabletools::MAE, rmse = fabletools::RMSE)
     ) |>
     dplyr::group_by(.model) |>
-    dplyr::summarise(rmse = mean(rmse))
+    dplyr::summarise(rmse = mean(rmse), mae = mean(mae))
 
   data$serie = nivel
 
@@ -55,13 +55,15 @@ estban_analiticos_acc = lapply(names(combinacoes), function(nivel) {
 })
 
 # agregando dataframes
-acuracia_analiticos = do.call("rbind", estban_analiticos_acc) |>
-  tidyr::pivot_wider(
-    names_from = serie,
-    values_from = c(rmse)
-  ) |>
-  as.data.frame(t()) |>
-  tibble::as_tibble()
+acuracia_analiticos = lapply(list("rmse", "mae"), function(medida) {
+  do.call("rbind", estban_analiticos_acc)[, c(".model", medida, "serie")] |>
+    tidyr::pivot_wider(
+      names_from = serie,
+      values_from = rlang::parse_expr(medida)
+    ) |>
+    as.data.frame(t()) |>
+    tibble::as_tibble()
+})
 
 # save
 saveRDS(acuracia_analiticos, "data/acuracia_analiticos.rds")
