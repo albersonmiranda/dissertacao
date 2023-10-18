@@ -22,7 +22,7 @@ testes_lb = estban_ets |>
   fabletools::features(.innov, feasts::ljung_box, lag = 12)
 
 # previsões 1-step-ahead
-estban_ets_preds = fabletools::refit(estban_ets, new_data, reestimate = FALSE) |> fitted()
+estban_ets_preds = fabletools::refit(estban_ets, new_data, reestimate = TRUE) |> fitted()
 
 # save
 saveRDS(testes_lb, "data/testes_lb_ets.rds")
