@@ -59,8 +59,7 @@ task = lapply(target, function(y_m) {
 })
 
 # pipeline
-pipeline = po("scale") %>>%
-  po("encode", method = "treatment", affect_columns = selector_type("factor"))
+pipeline = po("encode", method = "treatment", affect_columns = selector_type("factor"))
 
 # learners
 learners = list(
