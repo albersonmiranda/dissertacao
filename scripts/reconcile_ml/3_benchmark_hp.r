@@ -5,7 +5,7 @@ source("scripts/reconcile_ml/2_task_learners.r")
 source("scripts/reconcile_ml/trafos.r")
 
 # configurações
-tuner = tnr("mbo")
+tuner = tnr("mbo", batch_size = 5)
 inner_resampling = rsmp("holdout")
 measure = msr("regr.rmse")
 terminator = trm("combo", list(

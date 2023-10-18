@@ -7,7 +7,7 @@ source("scripts/reconcile_ml/5_train_hp.R")
 set.seed(123)
 
 # convertendo test set para data.table
-new_data = data.table::as.data.table(new_data_estatica)
+new_data = data.table::as.data.table(subset(new_data_estatica, select = -ref))
 
 # nomeando listas
 nomes_tasks = lapply(task, function(tarefa) {

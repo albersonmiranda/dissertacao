@@ -1,17 +1,47 @@
 ### ESPAÇO DE HIPERPARÂMETROS ###
 
 
-source("scripts/reconcile_ml/2_task_learners_fitted.r")
+source("scripts/reconcile_ml/2_task_learners.r")
 source("scripts/reconcile_ml/trafos.r")
 
+# pacotes
+library(mlr3mbo)
+
+# bayesiano
+bayesopt_ego = mlr_loop_functions$get("bayesopt_ego")
+surrogate = srlrn(
+  lrn(
+    "regr.km",
+    covtype = "matern5_2",
+    optim.method = "BFGS",
+    control = list(trace = FALSE)
+  )
+)
+acq_function = acqf("ei")
+acq_optimizer = acqo(
+  bbotk::opt("nloptr", algorithm = "NLOPT_GN_ORIG_DIRECT"),
+  terminator = trm("stagnation", iters = 100, threshold = 1e-5)
+)
+
 # configurações
-tuner = tnr("mbo")
 inner_resampling = rsmp("cv", folds = 10)
 measure = msr("regr.rmse")
 terminator = trm("combo", list(
   trm("stagnation", iters = 3),
   trm("stagnation_batch", n = 3)
 ), any = TRUE)
+
+# tuner bayesiano
+tuner_mbo = tnr(
+  "mbo",
+  loop_function = bayesopt_ego,
+  surrogate = surrogate,
+  acq_function = acq_function,
+  acq_optimizer = acq_optimizer
+)
+
+# grid search
+tuner_grid = tnr("grid_search", batch_size = 10)
 
 ## XGBOOST ##
 
@@ -39,7 +69,7 @@ search_space = ps(
 search_space$trafo = trafo_xgb
 
 xgb = auto_tuner(
-  tuner = tuner,
+  tuner = tuner_mbo,
   learner = learners$xgb,
   resampling = inner_resampling,
   measure = measure,
@@ -67,7 +97,7 @@ search_space = ps(
 search_space$trafo = trafo_ranger
 
 ranger = auto_tuner(
-  tuner = tuner,
+  tuner = tuner_mbo,
   learner = learners$ranger,
   resampling = inner_resampling,
   measure = measure,
@@ -82,7 +112,7 @@ search_space = ps(
   # determina mistura entre lasso e ridge
   regr.glmnet.alpha = p_dbl(lower = 0, upper = 1),
   # controla regularização
-  regr.glmnet.lambda = p_dbl(lower = -12, upper = 12)
+  regr.glmnet.lambda = p_dbl(lower = -12, upper = 16)
 )
 
 # transformação
@@ -90,7 +120,7 @@ search_space$trafo = trafo_glmnet
 
 # tuner
 glmnet = auto_tuner(
-  tuner = tuner,
+  tuner = tuner_grid,
   learner = learners$glmnet,
   resampling = inner_resampling,
   measure = measure,
@@ -105,7 +135,7 @@ search_space = ps(
   # determina mistura entre lasso e ridge
   regr.glmnet.alpha = p_dbl(lower = 1, upper = 1),
   # controla regularização
-  regr.glmnet.lambda = p_dbl(lower = -12, upper = 12)
+  regr.glmnet.lambda = p_dbl(lower = -12, upper = 16)
 )
 
 # transformação
@@ -113,7 +143,7 @@ search_space$trafo = trafo_glmnet
 
 # tuner
 glmnet_lasso = auto_tuner(
-  tuner = tuner,
+  tuner = tuner_grid,
   learner = learners$glmnet_lasso,
   resampling = inner_resampling,
   measure = measure,
@@ -128,7 +158,7 @@ search_space = ps(
   # determina mistura entre lasso e ridge
   regr.glmnet.alpha = p_dbl(lower = 0, upper = 0),
   # controla regularização
-  regr.glmnet.lambda = p_dbl(lower = -12, upper = 12)
+  regr.glmnet.lambda = p_dbl(lower = -12, upper = 16)
 )
 
 # transformação
@@ -136,7 +166,7 @@ search_space$trafo = trafo_glmnet
 
 # tuner
 glmnet_ridge = auto_tuner(
-  tuner = tuner,
+  tuner = tuner_grid,
   learner = learners$glmnet_ridge,
   resampling = inner_resampling,
   measure = measure,
