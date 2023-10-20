@@ -4,9 +4,12 @@
 # pacotes
 library(fabletools)
 
+# tipo
+tipo = "reestimate"
+
 # juntando predições em um único dataframe
 preds = lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge"), function(learner) {
-  preds = readRDS(paste0("data/preds_", learner, ".RDS"))
+  preds = readRDS(paste0("data/preds/", tipo, "/preds_", learner, ".RDS"))
   preds = lapply(preds[[1]], function(df) data.table::as.data.table(df) |> subset(select = response))
   preds = do.call(cbind, preds)
   # adicionando coluna ref
