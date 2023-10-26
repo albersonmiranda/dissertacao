@@ -13,30 +13,37 @@ true_data = readRDS("data/estban/estban.rds") |>
   tidyr::pivot_wider(
     id_cols = c("ref"),
     names_from = c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "verbete"),
-    names_sep = "|",
+    names_sep = "__",
     values_from = "saldo"
   ) |>
   subset(ref >= tsibble::yearmonth("2013 jan") & ref <= tsibble::yearmonth("2021 dec"))
 
+# limpar nomes de colunas
+names(true_data) = gsub("<|>", "", names(true_data))
+
 # add suffix to colnames
-names(true_data) = paste0(names(true_data), "|true")
+names(true_data) = paste0(names(true_data), "__true")
 
 train_data = readRDS("data/estban/preds_ml/train/preds.rds") |>
   tibble::as_tibble(subset(select = -.model)) |>
   tidyr::pivot_wider(
     id_cols = c("ref"),
     names_from = c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "verbete"),
-    names_sep = "|",
+    names_sep = "__",
     values_from = ".fitted"
   ) |>
-  cbind(subset(true_data, select = -`ref|true`))
+  cbind(subset(true_data, select = -`ref__true`))
+
+# limpar nomes de colunas
+names(train_data) = gsub("<|>", "", names(train_data))
+names(train_data) = paste0("x", names(train_data))
 
 previsoes_base = readRDS("data/estban/previsoes_base/previsoes_base.rds") |>
   tibble::as_tibble() |>
   tidyr::pivot_wider(
     id_cols = c("ref"),
     names_from = c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "verbete"),
-    names_sep = "|",
+    names_sep = "__",
     values_from = ".mean"
   )
 
