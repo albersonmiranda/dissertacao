@@ -122,7 +122,11 @@ estban = estban |>
   ) |>
   # alterando referência para mensal
   transform(
-    ref = tsibble::yearmonth(ref)
+    ref = tsibble::yearmonth(ref),
+    nome_mesorregiao = iconv(tolower(gsub("-| ", "_", nome_mesorregiao)), "UTF-8", "ASCII//TRANSLIT"),
+    verbete = iconv(tolower(gsub("-| ", "_", verbete)), "UTF-8", "ASCII//TRANSLIT"),
+    nome_microrregiao = iconv(tolower(gsub("-| ", "_", nome_microrregiao)), "UTF-8", "ASCII//TRANSLIT"),
+    nome = iconv(tolower(gsub("-| ", "_", nome)), "UTF-8", "ASCII//TRANSLIT")
   ) |>
   # formatando como tsibble
   tsibble::as_tsibble(
@@ -142,4 +146,4 @@ estban = estban |>
   )
 
 # salvando dataframe
-saveRDS(estban, "data/estban.RDS")
+saveRDS(estban, "data/estban/estban.RDS")
