@@ -4,17 +4,22 @@
 # reproducibilidade
 set.seed(123)
 
-# training set
-estban = readRDS("data/estban/estban.rds") |>
-  tsibble::filter_index(~ "2012 dec")
+# fim das janelas de treino
+window_end = tsibble::yearmonth(seq(as.Date("2012-12-01"), as.Date("2021-11-01"), by = "month"))
 
-# test set
-new_data = readRDS("data/estban/estban.rds") |>
-  tsibble::filter_index("2013 jan" ~ "2021 dec")
+preds = lapply(window_end, function(fim) {
+  # training set
+  estban = readRDS("data/estban/estban.rds") |>
+    tsibble::filter_index(~ as.character.Date(fim))
 
-# obtendo modelos
-modelo = estban |>
-  fabletools::model(ets = fable::ETS(saldo))
+  # obtendo predições
+  preds = estban |>
+    fabletools::model(ets = fable::ETS(saldo)) |>
+    fabletools::forecast(h = "1 months")
+
+  return(preds)
+})
+
 
 # portmanteau tests para autocorrelação
 testes_lb = modelo |>
