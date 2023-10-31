@@ -4,6 +4,9 @@
 # reproducibilidade
 set.seed(123)
 
+# pacotes
+library(fabletools)
+
 # datas fim para janelas de treino
 window_end = tsibble::yearmonth(seq(as.Date("2012-12-01"), as.Date("2021-11-01"), by = "month"))
 
@@ -19,7 +22,7 @@ preds = function(x) {
     # set progress
     p()
     # training set
-    estban = readRDS("data/estban/estban.rds") |>
+    estban = readRDS("data/estban/estban.RDS") |>
       tsibble::filter_index(~ as.character.Date(fim))
 
     # obtendo predições
