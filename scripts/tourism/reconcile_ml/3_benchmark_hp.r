@@ -1,8 +1,8 @@
 ### ESPAÇO DE HIPERPARÂMETROS ###
 
 
-source("scripts/estban/reconcile_ml/2_task_learners.r")
-source("scripts/estban/reconcile_ml/trafos.r")
+source("scripts/tourism/reconcile_ml/2_task_learners.r")
+source("scripts/tourism/reconcile_ml/trafos.r")
 
 # configurações
 inner_resampling = rsmp("holdout")

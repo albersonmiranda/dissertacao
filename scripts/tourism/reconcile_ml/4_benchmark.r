@@ -13,7 +13,7 @@
 # Model selection depends on test set performance of
 # a tuned model.
 
-source("scripts/estban/reconcile_ml/3_benchmark_hp.r")
+source("scripts/tourism/reconcile_ml/3_benchmark_hp.r")
 
 # reprodutibilidade
 set.seed(123)
@@ -45,5 +45,5 @@ results = bmr$aggregate(list(msr("regr.rmse"), msr("regr.mae"), msr("regr.mape")
 aggregate(cbind(regr.rmse, regr.mae, regr.mape, time_both) ~ learner_id, data = results, FUN = mean)
 
 # save results
-saveRDS(bmr, "data/estban/preds_ml/train/bmr.rds")
-saveRDS(results, "data/estban/preds_ml/train/bmr_results.rds")
+saveRDS(bmr, "data/tourism/preds_ml/train/bmr.rds")
+saveRDS(results, "data/tourism/preds_ml/train/bmr_results.rds")
