@@ -14,7 +14,7 @@ window_end = tsibble::yearmonth(seq(as.Date("2012-12-01"), as.Date("2021-11-01")
 future::plan("multisession")
 
 # função para obter previsões com rolling window, paralelização e progresso
-preds = function(x) {
+preds_fun = function(x) {
   # progresso
   p = progressr::progressor(along = x)
   # loop
@@ -35,8 +35,10 @@ preds = function(x) {
 }
 
 # obter previsões
-preds(window_end) |> progressr::with_progress()
+preds = preds_fun(window_end) |> progressr::with_progress()
+
+# mesclando em um único dataframe
+preds = do.call(bind_rows, preds)
 
 # save
-saveRDS(testes_lb, "data/estban/preds_ml/train/testes_lb_ets.rds")
 saveRDS(preds, "data/estban/preds_ml/train/preds.rds")

@@ -27,7 +27,7 @@ train_data = readRDS("data/estban/preds_ml/train/preds.rds") |>
     id_cols = c("ref"),
     names_from = c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "verbete"),
     names_sep = "__",
-    values_from = ".fitted"
+    values_from = ".mean"
   ) |>
   cbind(subset(true_data, select = -`ref__true`))
 
