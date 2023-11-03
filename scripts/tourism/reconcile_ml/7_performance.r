@@ -6,11 +6,11 @@ library(fabletools)
 
 # juntando predições em um único dataframe
 preds = lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge"), function(learner) {
-  preds = readRDS(paste0("data/estban/preds_ml/preds/preds_", learner, ".RDS"))
+  preds = readRDS(paste0("data/tourism/preds_ml/preds/preds_", learner, ".RDS"))
   preds = lapply(preds[[1]], function(df) data.table::as.data.table(df) |> subset(select = response))
   preds = do.call(cbind, preds)
   # adicionando coluna ref
-  preds$ref = tsibble::yearmonth(seq(as.Date("2022-01-01"), as.Date("2022-12-01"), by = "month"))
+  preds$ref = tsibble::yearquarter(seq(as.Date("2017-01-01"), as.Date("2017-12-01"), by = "quarter"))
   return(preds)
 })
 
@@ -51,12 +51,12 @@ preds = lapply(names(preds), function(learner) {
 # juntando todos os dataframes em um único
 preds = do.call(rbind, preds)
 
-# estban dataset
-estban = readRDS("data/estban/estban.rds") |>
+# tourism dataset
+tourism = readRDS("data/tourism/tourism.rds") |>
   tsibble::filter_index("2022 jan" ~ "2022 dec")
 
 # remover agregados
-estban = estban |>
+tourism = tourism |>
   subset(
     !is_aggregated(nome_mesorregiao)
     & !is_aggregated(nome_microrregiao)
@@ -66,12 +66,12 @@ estban = estban |>
   ) |>
   as.data.frame()
 
-# convertendo coluna ref para yearmonth
+# convertendo coluna ref para yearquarter
 preds$ref = as.character(preds$ref)
-estban$ref = as.character(estban$ref)
+tourism$ref = as.character(tourism$ref)
 
-# convertendo colunas chr* do dataframe estban para character
-estban = within(estban, {
+# convertendo colunas chr* do dataframe tourism para character
+tourism = within(tourism, {
   nome_mesorregiao = as.character(nome_mesorregiao)
   nome_microrregiao = as.character(nome_microrregiao)
   nome = as.character(nome)
@@ -79,23 +79,23 @@ estban = within(estban, {
   cnpj_agencia = as.character(cnpj_agencia)
 })
 
-# limpando dataframe estban
-estban = within(estban, {
+# limpando dataframe tourism
+tourism = within(tourism, {
   nome_mesorregiao = iconv(tolower(gsub("-", " ", nome_mesorregiao)), "LATIN1", "ASCII//TRANSLIT")
   verbete = iconv(tolower(verbete), "LATIN1", "ASCII//TRANSLIT")
   nome_microrregiao = iconv(tolower(nome_microrregiao), "LATIN1", "ASCII//TRANSLIT")
   nome = iconv(tolower(nome), "LATIN1", "ASCII//TRANSLIT")
 })
 
-# merge entre estban e preds
-data = merge(estban, preds)
+# merge entre tourism e preds
+data = merge(tourism, preds)
 
 # teste se merge foi completo
-nrow(data) == 5 * nrow(estban)
+nrow(data) == 5 * nrow(tourism)
 
 # agregando
 data = data |>
-  transform(ref = tsibble::yearmonth(as.Date(paste0(ref, "-01"), format = "%Y %b-%d"))) |>
+  transform(ref = tsibble::yearquarter(as.Date(paste0(ref, "-01"), format = "%Y %b-%d"))) |>
   tsibble::as_tsibble(
     key = c(
       "nome_mesorregiao",
