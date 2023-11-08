@@ -21,13 +21,13 @@ true_data = readRDS("data/tourism/tourism.rds") |>
 # add suffix to colnames
 names(true_data) = paste0(names(true_data), "__true")
 
-train_data = readRDS("data/tourism/preds_ml/train/preds.rds") |>
+train_data = readRDS("data/tourism/preds_ml/train/preds_rolling.rds") |>
   tibble::as_tibble(subset(select = -.model)) |>
   tidyr::pivot_wider(
     id_cols = c("Quarter"),
     names_from = c("State", "Region", "Purpose"),
     names_sep = "__",
-    values_from = ".fitted"
+    values_from = ".mean"
   ) |>
   cbind(subset(true_data, select = -`Quarter__true`))
 

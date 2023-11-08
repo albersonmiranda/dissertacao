@@ -8,7 +8,7 @@ set.seed(123)
 library(fabletools)
 
 # datas fim para janelas de treino
-window_end = tsibble::yearmonth(seq(as.Date("2012-12-01"), as.Date("2021-11-01"), by = "month"))
+window_end = tsibble::yearquarter(seq(as.Date("2007-12-01"), as.Date("2016-09-01"), by = "quarter"))
 
 # paralelização
 future::plan("multisession")
@@ -22,13 +22,13 @@ preds_fun = function(x) {
     # set progress
     p()
     # training set
-    estban = readRDS("data/estban/estban.RDS") |>
+    tourism = readRDS("data/tourism/tourism.RDS") |>
       tsibble::filter_index(~ as.character.Date(fim))
 
     # obtendo predições
-    preds = estban |>
-      fabletools::model(ets = fable::ETS(saldo)) |>
-      fabletools::forecast(h = "1 months")
+    preds = tourism |>
+      fabletools::model(arima = fable::ARIMA(Trips)) |>
+      fabletools::forecast(h = 1)
 
     return(preds)
   })
@@ -38,7 +38,7 @@ preds_fun = function(x) {
 preds = preds_fun(window_end) |> progressr::with_progress()
 
 # mesclando em um único dataframe
-preds = do.call(bind_rows, preds)
+preds = do.call(dplyr::bind_rows, preds)
 
 # save
-saveRDS(preds, "data/estban/preds_ml/train/preds_rolling.rds")
+saveRDS(preds, "data/tourism/preds_ml/train/preds_rolling.rds")

@@ -19,12 +19,12 @@ new_data = tourism |>
 # obtendo modelos
 modelo = tourism |>
   tsibble::filter_index(~ "2016 Q4") |>
-  model(base = fable::ETS(Trips))
+  model(base = fable::ARIMA(Trips))
 
 # portmanteau tests para autocorrelação
 testes_lb = modelo |>
   augment() |>
-  features(.innov, feasts::ljung_box, lag = 12)
+  features(.innov, feasts::ljung_box, lag = 4)
 
 # previsões base
 previsoes_base = forecast(modelo, h = "1 years")

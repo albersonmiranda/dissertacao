@@ -14,7 +14,7 @@ new_data = readRDS("data/tourism/tourism.rds") |>
 
 # obtendo modelos
 modelo = tourism |>
-  fabletools::model(ets = fable::ETS(Trips))
+  fabletools::model(ets = fable::ARIMA(Trips))
 
 # portmanteau tests para autocorrelação
 testes_lb = modelo |>
@@ -27,3 +27,5 @@ preds = fabletools::refit(modelo, new_data, reestimate = TRUE) |> fitted()
 # save
 saveRDS(testes_lb, "data/tourism/preds_ml/train/testes_lb_ets.rds")
 saveRDS(preds, "data/tourism/preds_ml/train/preds.rds")
+
+# ! MARK: esse código não executa por non-stationary seasonal AR part from CSS
