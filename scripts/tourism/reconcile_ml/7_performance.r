@@ -4,18 +4,21 @@
 # pacotes
 library(fabletools)
 
+# tipo de previsões treino: one-step-ahead ou rolling_forecast
+tipo = "rolling_forecast"
+
 # juntando predições em um único dataframe
-preds = lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge"), function(learner) {
-  preds = readRDS(paste0("data/tourism/preds_ml/preds/preds_", learner, ".RDS"))
+preds = lapply(c("xgb", "glmnet", "lasso", "ridge"), function(learner) {
+  preds = readRDS(paste0("data/tourism/preds_ml/preds/", tipo, "/preds_", learner, ".RDS"))
   preds = lapply(preds[[1]], function(df) data.table::as.data.table(df) |> subset(select = response))
   preds = do.call(cbind, preds)
-  # adicionando coluna ref
-  preds$ref = tsibble::yearquarter(seq(as.Date("2017-01-01"), as.Date("2017-12-01"), by = "quarter"))
+  # adicionando coluna Quarter
+  preds$Quarter = tsibble::yearquarter(seq(as.Date("2017-01-01"), as.Date("2017-12-01"), by = "quarter"))
   return(preds)
 })
 
 # nomeando a lista
-names(preds) = c("xgb", "ranger", "glmnet", "lasso", "ridge")
+names(preds) = c("xgb", "glmnet", "lasso", "ridge")
 
 # remover primeiro caractere do nome das colunas
 preds = lapply(preds, function(df) {
@@ -23,9 +26,9 @@ preds = lapply(preds, function(df) {
   return(df)
 })
 
-# renomeando coluna ef para ref
+# renomeando coluna ef para Quarter
 preds = lapply(preds, function(df) {
-  names(df)[names(df) == "ef"] = "ref"
+  names(df)[names(df) == "uarter"] = "Quarter"
   return(df)
 })
 
@@ -33,8 +36,8 @@ preds = lapply(preds, function(df) {
 preds = lapply(preds, function(df) {
   df = df |>
     tidyr::pivot_longer(
-      cols = -ref,
-      names_to = c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "verbete", "tipo"),
+      cols = -Quarter,
+      names_to = c("State", "Region", "Purpose", "tipo"),
       values_to = "prediction",
       names_sep = "__"
     ) |>
@@ -53,75 +56,66 @@ preds = do.call(rbind, preds)
 
 # tourism dataset
 tourism = readRDS("data/tourism/tourism.rds") |>
-  tsibble::filter_index("2022 jan" ~ "2022 dec")
+  tsibble::filter_index("2017 Q1" ~ "2017 Q4")
 
 # remover agregados
 tourism = tourism |>
   subset(
-    !is_aggregated(nome_mesorregiao)
-    & !is_aggregated(nome_microrregiao)
-    & !is_aggregated(nome)
-    & !is_aggregated(verbete)
-    & !is_aggregated(cnpj_agencia)
+    !is_aggregated(State)
+    & !is_aggregated(Region)
+    & !is_aggregated(Purpose)
   ) |>
   as.data.frame()
 
-# convertendo coluna ref para yearquarter
-preds$ref = as.character(preds$ref)
-tourism$ref = as.character(tourism$ref)
+# convertendo coluna Quarter para yearquarter
+preds$Quarter = as.character(preds$Quarter)
+tourism$Quarter = as.character(tourism$Quarter)
 
 # convertendo colunas chr* do dataframe tourism para character
 tourism = within(tourism, {
-  nome_mesorregiao = as.character(nome_mesorregiao)
-  nome_microrregiao = as.character(nome_microrregiao)
-  nome = as.character(nome)
-  verbete = as.character(verbete)
-  cnpj_agencia = as.character(cnpj_agencia)
+  State = as.character(State)
+  Region = as.character(Region)
+  Purpose = as.character(Purpose)
 })
 
 # limpando dataframe tourism
 tourism = within(tourism, {
-  nome_mesorregiao = iconv(tolower(gsub("-", " ", nome_mesorregiao)), "LATIN1", "ASCII//TRANSLIT")
-  verbete = iconv(tolower(verbete), "LATIN1", "ASCII//TRANSLIT")
-  nome_microrregiao = iconv(tolower(nome_microrregiao), "LATIN1", "ASCII//TRANSLIT")
-  nome = iconv(tolower(nome), "LATIN1", "ASCII//TRANSLIT")
+  State = iconv(tolower(gsub("-", " ", State)), "LATIN1", "ASCII//TRANSLIT")
+  Purpose = iconv(tolower(Purpose), "LATIN1", "ASCII//TRANSLIT")
+  Region = iconv(tolower(Region), "LATIN1", "ASCII//TRANSLIT")
 })
 
 # merge entre tourism e preds
 data = merge(tourism, preds)
 
 # teste se merge foi completo
-nrow(data) == 5 * nrow(tourism)
+nrow(data) == 4 * nrow(tourism)
 
 # agregando
 data = data |>
-  transform(ref = tsibble::yearquarter(as.Date(paste0(ref, "-01"), format = "%Y %b-%d"))) |>
+  transform(Quarter = tsibble::yearquarter(Quarter)) |>
   tsibble::as_tsibble(
     key = c(
-      "nome_mesorregiao",
-      "nome_microrregiao",
-      "nome",
-      "cnpj_agencia",
-      "verbete",
+      "State",
+      "Region",
+      "Purpose",
       "modelo"
     ),
-    index = ref
+    index = Quarter
   ) |>
   fabletools::aggregate_key(
-    (nome_mesorregiao / nome_microrregiao / nome / cnpj_agencia) * verbete * modelo,
-    saldo = sum(saldo),
+    (State / Region) * Purpose * modelo,
+    saldo = sum(Trips),
     prediction = sum(prediction)
   )
 
 # combinações para acurácia
 combinacoes = list(
-  agregado = list("is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & is_aggregated(nome_microrregiao) & is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("modelo")), # nolint
-  mesorregiao = list("is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("nome_mesorregiao", "modelo")), # nolint
-  microrregiao = list("is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("nome_microrregiao", "nome_mesorregiao", "modelo")), # nolint
-  municipio = list("is_aggregated(verbete) & is_aggregated(cnpj_agencia) & !is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("nome", "nome_microrregiao", "nome_mesorregiao", "modelo")), # nolint
-  agencia = list("is_aggregated(verbete) & !is_aggregated(cnpj_agencia) & !is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "modelo")), # nolint
-  verbete = list("!is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & is_aggregated(nome_microrregiao) & is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("verbete", "modelo")), # nolint
-  bottom = list("!is_aggregated(verbete) & !is_aggregated(cnpj_agencia) & !is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("verbete", "cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "modelo")), # nolint
+  agregado = list("is_aggregated(Purpose) & is_aggregated(Region) & is_aggregated(State) & !is_aggregated(modelo)", c("modelo")), # nolint
+  State = list("is_aggregated(Purpose) & is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("State", "modelo")), # nolint
+  Region = list("is_aggregated(Purpose) & !is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("Region", "State", "modelo")), # nolint
+  Purpose = list("!is_aggregated(Purpose) & is_aggregated(Region) & is_aggregated(State) & !is_aggregated(modelo)", c("Purpose", "modelo")), # nolint
+  bottom = list("!is_aggregated(Purpose) & !is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("Purpose", "Region", "State", "modelo")), # nolint
   hierarquia = list("!is_aggregated(modelo)", c("modelo")) # nolint
 )
 
