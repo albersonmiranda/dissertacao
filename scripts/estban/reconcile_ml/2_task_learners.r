@@ -7,7 +7,10 @@ pacman::p_load(
   fabletools
 )
 
-# dados
+# tipo de previsões treino: one-step-ahead ou rolling_forecast
+tipo = "one-step-ahead"
+
+# true data (y_t)
 true_data = readRDS("data/estban/estban.rds") |>
   tibble::as_tibble(subset(select = -.model)) |>
   tidyr::pivot_wider(
@@ -21,15 +24,30 @@ true_data = readRDS("data/estban/estban.rds") |>
 # add suffix to colnames
 names(true_data) = paste0(names(true_data), "__true")
 
-train_data = readRDS("data/estban/preds_ml/train/preds.rds") |>
-  tibble::as_tibble(subset(select = -.model)) |>
-  tidyr::pivot_wider(
-    id_cols = c("ref"),
-    names_from = c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "verbete"),
-    names_sep = "__",
-    values_from = ".mean"
-  ) |>
-  cbind(subset(true_data, select = -`ref__true`))
+# dados para treino do modelo de combinação
+if (tipo == "one-step-ahead") {
+  train_data = readRDS("data/estban/preds_ml/train/preds.rds") |>
+    tibble::as_tibble(subset(select = -.model)) |>
+    tidyr::pivot_wider(
+      id_cols = c("ref"),
+      names_from = c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "verbete"),
+      names_sep = "__",
+      values_from = ".fitted"
+    ) |>
+    cbind(subset(true_data, select = -`ref__true`))
+}
+
+if (tipo == "rolling_forecast") {
+  train_data = readRDS("data/estban/preds_ml/train/preds_rolling.rds") |>
+    tibble::as_tibble(subset(select = -.model)) |>
+    tidyr::pivot_wider(
+      id_cols = c("ref"),
+      names_from = c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "verbete"),
+      names_sep = "__",
+      values_from = ".mean"
+    ) |>
+    cbind(subset(true_data, select = -`ref__true`))
+}
 
 # limpar nomes de colunas
 names(train_data) = gsub("<|>", "", names(train_data))

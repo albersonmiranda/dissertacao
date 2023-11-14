@@ -6,7 +6,7 @@ source("scripts/tourism/reconcile_ml/trafos.r")
 
 # configurações
 inner_resampling = rsmp("holdout")
-measure = msr("regr.rmse")
+measure = msr("regr.sse")
 terminator = trm("combo", list(
   trm("stagnation", iters = 3),
   trm("stagnation_batch", n = 3)
