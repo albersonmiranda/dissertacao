@@ -16,7 +16,7 @@ format:
 
 # opções
 knitr::opts_chunk$set(
-    out.width = "90%"
+  out.width = "90%"
 )
 
 # reprodutibilidade
@@ -24,52 +24,52 @@ set.seed(1)
 
 # pacotes
 pacman::p_load(
-    kableExtra,
-    ggplot2,
-    tsibble,
-    fable,
-    fabletools
+  kableExtra,
+  ggplot2,
+  tsibble,
+  fable,
+  fabletools
 )
 
 # tema ggplot
 tema = theme_classic() +
-    theme(
-        text = element_text(family = "serif")
-    )
+  theme(
+    text = element_text(family = "serif")
+  )
 
 # gerar bibliografia de pacotes
 knitr::write_bib(
-    c(.packages(), "basedosdados")
-    , file = "config/elementos/packages.bib"
+  c(.packages(), "basedosdados"),
+  file = "config/elementos/packages.bib"
 )
 
 # scripts
-source("scripts/hierarq.R")
+source("scripts/estban/hierarq.R")
 
 # dados
-estban = readRDS("data/estban.rds")
+estban = readRDS("data/estban/estban.rds")
 
 # filtrando dados
 estban = subset(estban,
-    ref >= "2010-01-01" & ref <= "2023-12-31",
-    select = c(
-        ref,
-        nome_mesorregiao,
-        nome_microrregiao,
-        nome,
-        cnpj_agencia,
-        verbete,
-        valor
-    )
+  select = c(
+    ref,
+    nome_mesorregiao,
+    nome_microrregiao,
+    nome,
+    cnpj_agencia,
+    verbete,
+    saldo
+  )
 ) |>
-(\(x) x[order(
+  tsibble::filter_index("2022-12-31") |>
+  (\(x) x[order(
     x$ref,
     x$nome_mesorregiao,
     x$nome_microrregiao,
     x$nome,
     x$cnpj_agencia,
     x$verbete
-), ])()
+  ), ])()
 ```
 
 # INTRODUÇÃO
@@ -642,52 +642,6 @@ Portanto o *elastic net* é um método de *shrinkage*, uma vez que a penalidade 
 
 Diferentemente dos métodos analíticos estudados, o *elastic net* não possui uma solução fechada. Portanto, é necessário utilizar métodos iterativos para encontrar o valor ótimo de $\mathbfit{\hat{\beta}}$ e @zou_regularization_2005 utilizam validação cruzada $k$-fold para encontrar quais os valores de $\lambda_1$ e $\lambda_2$ que minimizam o resíduo. Nesse sentido, dado a metodologia de processo iterativo envolvendo calibragem de hiperparâmetros e reamostragem, podemos classificar o *elastic net* como um método de *machine learning*.
 
-### O processo de ajuste e sobreajuste
-
-Considere uma função de ajuste $f$, um conjunto de pontos $D = {d_1, ..., d_n}$ com $d_i = (\mathbf{x}_i \; \mathbf{y}_i)'$, variáveis de decisão ou parâmetros $\mathbf{x}_i \in \mathbb{R}^m$ e imagem $\mathbf{y}_i = f(\mathbf{x}_i) \in \mathbb{R}$. Diferentemente da abordagem do modelo clássico de regressão linear em que, cumpridas certas hipóteses, há um modelo teórico de coeficientes estimados por mínimos quadrados ordinários (MQO) que é garantido pelo teorema de Gauss-Markov ser o melhor estimador linear não viesado (BLUE), em *machine learning* o objetivo é encontrar, de forma iterativa, um modelo que melhor aproxima a função $f$ usando a informação contida em $D$, ou seja, queremos ajustar uma função de regressão $\hat{f}_D$ aos nossos dados $D$ de forma que $\hat{\mathbf{y}} = \hat{f}_D(\mathbf{x}, \varepsilon)$ tenha o menor erro de aproximação $\varepsilon$ [@bischl_resampling_2012].
-
-Para verificar o quão bem o modelo $\hat{f}_D$ se aproxima da função real $f$, é necessário uma função de perda $L(\mathbf{y}, \hat{f}(\mathbf{x}))$ que, no caso de regressão, será a perda quadrática $(\mathbf{y} - \hat{f}(\mathbf{x}))^2$ ou a perda absoluta $|\mathbf{\mathbf{x}} - \hat{f}(\mathbf{x})|$. Esses valores são agregados pela média para formar as funções de custo erro médio quadrático (MSE) e erro médio absoluto (MAE).
-
-Calculando o custo sobre a amostra $D$ usada para ajustar o modelo, teremos o chamado erro de resubstituição (@eq-ge-resub). Nesse caso, estaríamos usando o mesmo conjunto de dados tanto para treinar o preditor quanto para estimar o erro, o que nos levaria a uma estimativa enviesada do erro de generalização. Caso usássemos essa estimativa para seleção de modelos, esse viés favoreceria modelos mais adaptados à amostra.
-
-$$
-\widehat{GE}(\hat{f}_{D}, D) = \sum_{(x \; y)' \in D} \frac{L(y, \hat{f}_{D}(x))}{|D|}
-$$ {#eq-ge-resub}
-
-Dadas suficientes iterações, o erro de resubstituição tende a zero. Isso acontece porque conforme o preditor se adapta cada vez mais aos dados de treinamento ele irá memorizar a relação entre o conjunto de pontos $D$ e a imagem $f(\mathbf{x}_i)$, ou seja, irá se ajustar perfeitamente ao formato da função a ser modelada. E não necessariamente um modelo perfeitamente ajustado se traduz na capacidade de predição de dados futuros (fora da amostra). De forma geral, espera-se que o preditor reduza seu viés durante o treino apenas o suficiente para que seja capaz de generalizar sua predição para fora da amostra em um nível ótimo de acurácia. A partir desse ponto, a redução no viés é penalizada com o aumento da variância, ou seja, com a redução de sua capacidade de prever dados futuros. A esse processo se dá o nome de *overfitting* ou sobreajuste. Isso quer dizer que não podemos considerar a performance do preditor em $D$ se desejamos estimar honestamente a performance real do modelo [@bischl_resampling_2012].
-
-### Reamostragem
-
-Uma forma de se corrigir esse problema é dividindo a amostra em um conjunto para treino $D^\phi$ e outro conjunto para teste $D^\theta$ de forma que $D^\phi \cup D^\theta = D$ e $D^\phi \cap D^\theta = \varnothing$. Assim, pode-se treinar um meta-modelo em $D^\phi$ para se obter $\hat{f}_{D^\phi}$ e calcular seu erro de generalização usando os dados de $D^\theta$. Essa abordagem é chamada de *hold-out* e ela é de simples implementação e utilização, uma vez que as observações do conjunto teste são completamente independentes das observações com as quais o modelo foi treinado. Então, podemos estimar o erro de generalização do modelo, que consiste no cômputo do custo de $\hat{f}_D^\phi$ aplicada à amostra de teste $D^\theta$.
-
-$$
-\widehat{GE}(\hat{f}_{D^\phi}, D^\theta) = \sum_{(x \; y)' \in D^\theta} \frac{L(y, \hat{f}_{D^\phi}(x))}{|D^\theta|}
-$$ {#eq-ge}
-
-Como esse método mais simples pode não ser suficiente para detectar a variância e instabilidade de modelos mais complexos, foram desenvolvidas diferentes técnicas de reamostragem ao longo do tempo. Uma das mais populares é a validação cruzada [@stone_cross-validation_1974], que consiste em gerar repetidamente $i$ subconjuntos de treino $D_i^\phi$ e teste $D_i^\theta$ com o conjunto de dados disponível, ajustar um meta-modelo com cada conjunto de treino e atestar sua qualidade no conjunto de teste correspondente. A estimativa do erro de generalização então se torna:
-
-$$
-\widehat{GE} = \frac{1}{k}\sum_{i=1}^{k}\widehat{GE}(\hat{f}_{D_i^\phi}, D_i^\theta)
-$$ {#eq-ge-cv}
-
-Dividindo a amostra em $k$ subconjuntos, utilizando $k-1$ para ajustar um meta-modelo e validando a performance no subconjunto restante — e repetindo esse procedimento para todas as possibilidades de subconjuntos —, temos a validação cruzada $k$-*fold*. Esta é uma técnica de reamostragem que permite estimar o erro de generalização de um modelo de forma mais robusta e confiável que o *hold-out* simples. Isso porque, ao contrário do *hold-out*, a validação cruzada permite que todos os dados sejam usados tanto para treino quanto para teste, o que reduz a variância da estimativa do erro de generalização.
-
-### Validação cruzada $k$-fold em séries temporais
-
-Para dados *cross-section*, essa definição de validação cruzada $k$-*fold* é suficiente para qualquer caso. Entretanto, no caso de séries temporais, o analista deve tomar alguns cuidados na escolha da abordagem de validação cruzada. Isso porque, ao contrário de dados *cross-section*, os dados de séries temporais são dependentes no tempo. Isso traz dois aparentes problemas: primeiramente, ao dividir a amostra em $k$ subconjuntos aleatórios, o meta-modelo será treinado em períodos descontínuos e com dados futuros aos dados de teste em, ao menos, $k-1$ subconjuntos. Em segundo lugar, realizando o *split* treino-teste em $y_t$, com $y_{t-1}$ na amostra treino, significa que os subconjuntos de treino e teste são dependentes (@fig-cv-aleatoria).
-
-![Validação $k$-fold aleatória](img/cv-aleatorio.png){#fig-cv-aleatoria width=70%}
-
-Para contornar esse problema, outros métodos de validação cruzada foram desenvolvidos pensando em séries temporais. Tomando o conjunto de validação com dados exclusivamente posteriores aos dados de treino, temos o método conhecido como validação cruzada com origem móvel (@fig-cv-blocked).
-
-![Validação $k$-fold com origem móvel](img/cv-blocked.png){#fig-cv-blocked width=70%}
-
-Já quando excluímos as defasagens dependentes do subconjunto de treino (em relação ao conjunto de validação), temos a validação cruzada não dependente (@fig-cv-n-dep). Para ilustrar esse caso, tome um processo AR(3). Excluir as defasagens dependentes significa que, se o conjunto de validação começa em $y_t$, então o conjunto de treino pode apenas ir até $y_{t-4}$. O problema evidente dessa abordagem é que, dependendo do tamanho da estrutura de autocorrelação da série, muitas defasagens são excluídas, podendo inviabilizar o processo de validação.
-
-![Validação $k$-fold não-dependente](img/cv-n-dep.png){#fig-cv-n-dep width=70%}
-
-Entretanto, esses problemas são apenas aparentes. @bergmeir_use_2012 comparam uma série de métodos de validação em séries temporais e concluem que, considerando séries estacionárias, os problemas teóricos relacionados à dependência não produzem impactos empíricos. @bergmeir_note_2018 vão além e abordam esse problema teórica e empiricamente, concluindo que não apenas é possível o uso de validação cruzada $k$-*fold* quando a série não apresenta autocorrelação serial nos resíduos, mas também é uma melhor escolha do que a validação fora da amostra^[*Out-of-sample evaluation* é o método padrão na literatura de séries temporais e consiste na separação da porção final da série — geralmente entre 20% e 30% — para validação.].
-
 # METODOLOGIA
 
 Neste capítulo estão contidas explicações sobre os dados e variáveis, sobre o *design* da modelagem e sobre a avaliação dos modelos.
@@ -696,13 +650,13 @@ Neste capítulo estão contidas explicações sobre os dados e variáveis, sobre
 
 Os dados usados nesse trabalho são dados terciários obtidos do *datalake* público Base dos Dados [@dahis_data_2022]. A fonte primária são os bancos comerciais e múltiplos com carteira comercial que disponibilizam mensalmente os saldos dos principais verbetes do balancete via documento 4500^[Esses documentos são relatórios eletrônicos obrigatórios demandados pelo Bacen às instituições financeiras que permitem ao regulador o conhecimento minucioso dos bancos e de seus clientes.] ao Banco Central do Brasil, que os compila e publica, agrupados por agência bancária e por município, no relatório ESTBAN — Estatística Bancária Mensal e por Município^[https://www4.bcb.gov.br/fis/cosif/estban.asp?frame=1].
 
-O que compõe os verbetes de crédito, ou seja, os valores das séries temporais a serem trabalhadas, são os saldos de crédito ativo (empréstimos e financiamentos), que são correspondem ao principal mais os juros calculados até 59 dias de atraso^[Não são consideradas crédito ativo as operações de crédito liquidadas ou que tenham sido transferidas para prejuízo. São transferidas para prejuízo as operações de crédito em atraso há mais 6 meses após sua classificação de risco em H, que é a mínima [@conselho_monetario_nacional_resolucao_1999].].
+O que compõe os verbetes de crédito, ou seja, os valores das séries temporais a serem trabalhadas, são os saldos de crédito ativo (empréstimos e financiamentos), que correspondem ao principal mais os juros calculados até 59 dias de atraso^[Não são consideradas crédito ativo as operações de crédito liquidadas ou que tenham sido transferidas para prejuízo. São transferidas para prejuízo as operações de crédito em atraso há mais 6 meses após sua classificação de risco em H, que é a mínima [@conselho_monetario_nacional_resolucao_1999].].
 
 Além das estatísticas bancárias, foram obtidas informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
 
-Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram mantidos apenas os verbetes relacionados a crédito e mantidas apenas as agências atualmente em atividade. Quanto ao período, há dados disponíveis desde 1988. Entretanto, utilizaremos os dados a partir de 2010 pois, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta.
+Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram selecionados os principais verbetes, que são *empréstimos e títulos descontados* e *financiamentos*, e mantidas apenas as agências atualmente em atividade. Quanto ao período, há dados disponíveis desde 1988. Entretanto, utilizaremos os dados a partir de 2003 pois, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta. Por essa razão, apesar do Banestes contar, atualmente, com 134 agências, foram mantidas apenas as agências com série completa, ou seja, que já estavam em atividade em 2003.
 
-Por fim, as variáveis mantidas no *dataset* foram as descritas no Quadro \ref{qdr-variaveis}. Dessa forma, temos séries mensais de saldos de créditos de `r length(unique(estban$cnpj_agencia))` agências bancárias, distribuídas por `r length(unique(estban$nome))` municípios, a partir de `r format(min(estban$ref), "%B de %Y")`, totalizando `r scales::number(nrow(estban), big.mark = ".", decimal.mark = ",")` observações.
+Por fim, as variáveis mantidas no *dataset* foram as descritas no Quadro \ref{qdr-variaveis}. Dessa forma, temos séries mensais de saldos de créditos de `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia))` agências bancárias, distribuídas por `r with(subset(estban, !is_aggregated(nome)), length(unique(nome))` municípios, a partir de `r format(min(estban$ref), "%B de %Y")`, totalizando `r scales::number(nrow(estban), big.mark = ".", decimal.mark = ",")` observações.
 
 ```{r}
 #| tbl-cap: "Variáveis do dataset"
@@ -710,18 +664,18 @@ Por fim, as variáveis mantidas no *dataset* foram as descritas no Quadro \ref{q
 #| include: false
 
 tibble::tribble(
-    ~Variável, ~Descrição,
-    "ref", "Data de referência do relatório ESTBAN",
-    "nome_mesorregiao", "Nome da mesorregião do ES",
-    "nome_microrregiao", "Nome da microrregião do ES",
-    "verbete", "Descrição da rubrica do balancete",
-    "nome", "Nome do município",
-    "cnpj_agencia", "CNPJ da agência bancária",
-    "valor", "Saldo do verbete"
+  ~Variável, ~Descrição,
+  "ref", "Data de referência do relatório ESTBAN",
+  "nome_mesorregiao", "Nome da mesorregião do ES",
+  "nome_microrregiao", "Nome da microrregião do ES",
+  "verbete", "Descrição da rubrica do balancete",
+  "nome", "Nome do município",
+  "cnpj_agencia", "CNPJ da agência bancária",
+  "valor", "Saldo do verbete"
 ) |>
-    kbl(booktabs = TRUE, row.names = FALSE) |>
-    kable_styling(latex_options = c("striped"), font_size = 12) |>
-    column_spec(2, width = "10cm")
+  kbl(booktabs = TRUE, row.names = FALSE) |>
+  kable_styling(latex_options = c("striped"), font_size = 12) |>
+  column_spec(2, width = "10cm")
 ```
 
 ```{=latex}
@@ -760,68 +714,71 @@ Após limpeza, o *dataset* adquiriu a estrutura apresentada na @tbl-dataset. As 
 ```{r}
 #| label: tbl-dataset
 #| tbl-cap: "Estrutura do dataset"
-  
+
 estban |>
-    transform(
-        valor = scales::number(
-            valor,
-            big.mark = ".", decimal.mark = ","
-        )
-    ) |>
-    subset(nome == "Vitória") |>
-    tail() |>
-    kbl(
-        booktabs = TRUE,
-        row.names = FALSE,
-        col.names = c(
-            "Data de referência",
-            "Mesorregião",
-            "Microrregião",
-            "Município",
-            "Agência",
-            "Verbete",
-            "Saldo"
-        )) |>
-    kable_styling(latex_options = c("striped", "scale_down"))
+  transform(
+    saldo = scales::number(
+      saldo,
+      big.mark = ".", decimal.mark = ","
+    )
+  ) |>
+  subset(nome == "vitoria") |>
+  tail() |>
+  kbl(
+    booktabs = TRUE,
+    row.names = FALSE,
+    col.names = c(
+      "Data de referência",
+      "Mesorregião",
+      "Microrregião",
+      "Município",
+      "Agência",
+      "Verbete",
+      "Saldo"
+    )
+  ) |>
+  kable_styling(latex_options = c("striped", "scale_down"))
 ```
 
 ```{r}
 #| label: tbl-microrregioes
 #| tbl-cap: "Microrregiões por mesorregião"
-  
+
 aggregate(
-        nome_microrregiao ~ nome_mesorregiao,
-        data = estban,
-        FUN = unique
-    ) |>
-    kbl(
-        booktabs = TRUE,
-        row.names = FALSE,
-        col.names = c(
-            "Mesorregião",
-            "Microrregiões"
-        )) |>
-    kable_styling(latex_options = c("striped"))
+  as.character(nome_microrregiao) ~ as.character(nome_mesorregiao),
+  data = estban,
+  FUN = unique
+) |>
+  kbl(
+    booktabs = TRUE,
+    row.names = FALSE,
+    col.names = c(
+      "Mesorregião",
+      "Microrregiões"
+    )
+  ) |>
+  kable_styling(latex_options = c("striped"))
 ```
 
 ```{r}
 #| label: tbl-municipios
 #| tbl-cap: "Municípios por microrregião"
-  
+
 aggregate(
-        nome ~ nome_microrregiao,
-        data = estban,
-        FUN = unique
-    ) |>
-    kbl(
-        booktabs = TRUE,
-        row.names = FALSE,
-        col.names = c(
-            "Microrregiões",
-            "Municípios"
-        )) |>
-    kable_styling(latex_options = c("striped"), font_size = 10) |>
-    column_spec(2, width = "10cm")
+  as.character(nome) ~ as.character(nome_microrregiao),
+  data = estban,
+  FUN = unique
+) |>
+  kbl(
+    booktabs = TRUE,
+    row.names = FALSE,
+    col.names = c(
+      "Microrregiões",
+      "Municípios"
+    )
+  ) |>
+  kable_styling(latex_options = c("striped"), font_size = 10) |>
+  column_spec(2, width = "10cm")
 ```
 
 O tamanho de uma estrutura hierárquica, em termos de observações, é determinada por seu nível mais desagregado. Assim, sendo `r length(unique(estban$ref))` meses e `r length(unique(estban$cnpj_agencia))` agências, a estrutura hierárquica deve contar com `r length(unique(estban$ref))`\times`r length(unique(estban$cnpj_agencia))` $=$ `r scales::number(length(unique(estban$ref)) * length(unique(estban$cnpj_agencia)), big.mark = ".", decimal.mark = ",")` observações. Sendo também uma estrutura agrupada por `r length(unique(estban$verbete))` verbetes, a quantidade de observações é multiplicada pela quantidade de níveis transversais, totalizando `r scales::number(length(unique(estban$ref)) * length(unique(estban$cnpj_agencia)) * length(unique(estban$verbete)), big.mark = ".", decimal.mark = ",")` observações. Como há apenas, `r scales::number(nrow(estban), big.mark = ".", decimal.mark = ",")` observações, podemos concluir que há dados faltantes, originados de agências que foram criadas no período e, portanto, não possuem a série completa desde 2010. Para permitir a estimação, esses dados serão imputados com zero.
@@ -831,14 +788,14 @@ O tamanho de uma estrutura hierárquica, em termos de observações, é determin
 #| tbl-cap: "Contagem de únicos no dataset ESTBAN"
 
 temp = lapply(
-    estban[sapply(estban, function(x) !is.numeric(x))],
-    unique
+  estban[sapply(estban, function(x) !is.numeric(x))],
+  unique
 ) |>
-lengths()
+  lengths()
 
 temp |>
-kbl(booktabs = TRUE, col.names = "Únicos") |>
-kable_styling(latex_options = c("striped"))
+  kbl(booktabs = TRUE, col.names = "Únicos") |>
+  kable_styling(latex_options = c("striped"))
 ```
 
 A série temporal do agregado de crédito no Banestes no Espírito Santo é apresentada na @fig-agregado. Podemos observar tendência de crescimento a partir de 2020, indicando que a série seja não estacionária e que talvez seja interessante adicionar um regressor externo para o período da pandemia, quando foram implementados programas de crédito emergenciais no país.
@@ -847,30 +804,20 @@ A série temporal do agregado de crédito no Banestes no Espírito Santo é apre
 #| label: fig-agregado
 #| fig-cap: "Série temporal do agregado de crédito do Banestes no ES"
 
-# adicionando estrutura hierárquica e agrupada
-estban_aggr = tsibble::tsibble(
-  estban,
-  index = ref,
-  key = c("nome", "cnpj_agencia", "verbete", "nome_mesorregiao", "nome_microrregiao")
-)
-
-estban_aggr = estban_aggr |>
-  fabletools::aggregate_key((nome_mesorregiao / nome_microrregiao / nome / cnpj_agencia) * verbete, valor = sum(valor))
-
 # plot agregado
-estban_aggr |>
-    dplyr::filter(
-        is_aggregated(nome),
-        is_aggregated(cnpj_agencia),
-        is_aggregated(nome_mesorregiao),
-        is_aggregated(nome_microrregiao),
-        is_aggregated(verbete)
-    ) |>
-    ggplot(aes(x = ref, y = valor)) +
-        geom_line() +
-        scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
-        labs(x = "", y = "Valor (em R$ bi)") +
-        tema
+estban |>
+  dplyr::filter(
+    is_aggregated(nome),
+    is_aggregated(cnpj_agencia),
+    is_aggregated(nome_mesorregiao),
+    is_aggregated(nome_microrregiao),
+    is_aggregated(verbete)
+  ) |>
+  ggplot(aes(x = ref, y = saldo)) +
+  geom_line() +
+  scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
+  labs(x = "", y = "Saldo (em R$ bi)") +
+  tema
 ```
 
 A concentração na mesorregião Central Espírito-santense (@fig-meso) pode ser um indicativo de que os elementos das demais regiões tenham menor peso na reconciliação.
@@ -880,25 +827,25 @@ A concentração na mesorregião Central Espírito-santense (@fig-meso) pode ser
 #| fig-cap: "Série temporal do agregado de crédito do Banestes por mesorregião do ES"
 
 # plot agregado
-estban_aggr |>
-    dplyr::filter(
-        is_aggregated(nome),
-        is_aggregated(cnpj_agencia),
-        !is_aggregated(nome_mesorregiao),
-        is_aggregated(nome_microrregiao),
-        is_aggregated(verbete)
-    ) |>
-    ggplot(aes(x = ref, y = valor)) +
-        geom_line() +
-        scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
-        facet_wrap(~factor(nome_mesorregiao), scales = "free_y") +
-        labs(x = "", y = "Valor (em R$ bi)") +
-        tema +
-        theme(
-            legend.text = element_text(size = 6),
-            legend.title = element_text(size = 6),
-            strip.text = element_text(size = 6)
-        )
+estban |>
+  dplyr::filter(
+    is_aggregated(nome),
+    is_aggregated(cnpj_agencia),
+    !is_aggregated(nome_mesorregiao),
+    is_aggregated(nome_microrregiao),
+    is_aggregated(verbete)
+  ) |>
+  ggplot(aes(x = ref, y = saldo)) +
+  geom_line() +
+  scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
+  facet_wrap(~ factor(nome_mesorregiao), scales = "free_y") +
+  labs(x = "", y = "Saldo (em R$ bi)") +
+  tema +
+  theme(
+    legend.text = element_text(size = 6),
+    legend.title = element_text(size = 6),
+    strip.text = element_text(size = 6)
+  )
 ```
 
 ```{r}
@@ -906,25 +853,25 @@ estban_aggr |>
 #| fig-cap: "Série temporal do agregado de crédito do Banestes por microrregião do ES"
 
 # plot agregado
-estban_aggr |>
-    dplyr::filter(
-        is_aggregated(nome),
-        is_aggregated(cnpj_agencia),
-        !is_aggregated(nome_mesorregiao),
-        !is_aggregated(nome_microrregiao),
-        is_aggregated(verbete)
-    ) |>
-    ggplot(aes(x = ref, y = valor, color = factor(nome_microrregiao))) +
-        geom_line() +
-        scale_y_continuous(labels = scales::number_format(scale = 1 / 1e6)) +
-        facet_wrap(~factor(nome_mesorregiao), scales = "free_y") +
-        labs(x = "", y = "Valor (em R$ mi)", color = "mesorregião") +
-        tema +
-        theme(
-            legend.text = element_text(size = 6),
-            legend.title = element_text(size = 6),
-            strip.text = element_text(size = 6)
-        )
+estban |>
+  dplyr::filter(
+    is_aggregated(nome),
+    is_aggregated(cnpj_agencia),
+    !is_aggregated(nome_mesorregiao),
+    !is_aggregated(nome_microrregiao),
+    is_aggregated(verbete)
+  ) |>
+  ggplot(aes(x = ref, y = saldo, color = factor(nome_microrregiao))) +
+  geom_line() +
+  scale_y_continuous(labels = scales::number_format(scale = 1 / 1e6)) +
+  facet_wrap(~ factor(nome_mesorregiao), scales = "free_y") +
+  labs(x = "", y = "Saldo (em R$ mi)", color = "mesorregião") +
+  tema +
+  theme(
+    legend.text = element_text(size = 6),
+    legend.title = element_text(size = 6),
+    strip.text = element_text(size = 6)
+  )
 ```
 
 Analisando o agregado por verbetes, a @fig-verbetes indica que o crescimento é liderado pelas alíneas empréstimos e títulos descontados.
@@ -934,19 +881,19 @@ Analisando o agregado por verbetes, a @fig-verbetes indica que o crescimento é 
 #| fig-cap: "Verbetes no agregado do ES"
 
 # plot por verbetes
-estban_aggr |>
-    dplyr::filter(
-        is_aggregated(nome),
-        is_aggregated(cnpj_agencia),
-        is_aggregated(nome_mesorregiao),
-        is_aggregated(nome_microrregiao),
-        !is_aggregated(verbete)
-    ) |>
-    ggplot(aes(x = ref, y = valor, color = factor(verbete))) +
-        geom_line() +
-        scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
-        labs(x = "", y = "Valor (em R$ bi)", color = "Verbete") +
-        tema
+estban |>
+  dplyr::filter(
+    is_aggregated(nome),
+    is_aggregated(cnpj_agencia),
+    is_aggregated(nome_mesorregiao),
+    is_aggregated(nome_microrregiao),
+    !is_aggregated(verbete)
+  ) |>
+  ggplot(aes(x = ref, y = saldo, color = factor(verbete))) +
+  geom_line() +
+  scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
+  labs(x = "", y = "Saldo (em R$ bi)", color = "Verbete") +
+  tema
 ```
 
 ```{r}
@@ -954,25 +901,25 @@ estban_aggr |>
 #| fig-cap: "Verbete por mesorregião do ES"
 
 # plot por mesorregião
-estban_aggr |>
-    dplyr::filter(
-        is_aggregated(nome),
-        is_aggregated(cnpj_agencia),
-        !is_aggregated(nome_mesorregiao),
-        is_aggregated(nome_microrregiao),
-        !is_aggregated(verbete)
-    ) |>
-    ggplot(aes(x = ref, y = valor, color = factor(verbete))) +
-        geom_line() +
-        facet_wrap(~factor(nome_mesorregiao), scales = "free_y") +
-        scale_y_continuous(labels = scales::number_format(scale = 1 / 1000000)) +
-        labs(x = "", y = "Valor (em R$ mi)", color = "Verbete") +
-        tema +
-        theme(
-            legend.text = element_text(size = 6),
-            legend.title = element_text(size = 6),
-            strip.text = element_text(size = 6)
-        )
+estban |>
+  dplyr::filter(
+    is_aggregated(nome),
+    is_aggregated(cnpj_agencia),
+    !is_aggregated(nome_mesorregiao),
+    is_aggregated(nome_microrregiao),
+    !is_aggregated(verbete)
+  ) |>
+  ggplot(aes(x = ref, y = saldo, color = factor(verbete))) +
+  geom_line() +
+  facet_wrap(~ factor(nome_mesorregiao), scales = "free_y") +
+  scale_y_continuous(labels = scales::number_format(scale = 1 / 1000000)) +
+  labs(x = "", y = "Saldo (em R$ mi)", color = "Verbete") +
+  tema +
+  theme(
+    legend.text = element_text(size = 6),
+    legend.title = element_text(size = 6),
+    strip.text = element_text(size = 6)
+  )
 ```
 
 ## Previsões base
