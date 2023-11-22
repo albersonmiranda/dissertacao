@@ -61,7 +61,7 @@ estban = subset(estban,
     saldo
   )
 ) |>
-  tsibble::filter_index("2022-12-31") |>
+  tsibble::filter_index(~"2022-12-31") |>
   (\(x) x[order(
     x$ref,
     x$nome_mesorregiao,
@@ -654,9 +654,13 @@ O que compõe os verbetes de crédito, ou seja, os valores das séries temporais
 
 Além das estatísticas bancárias, foram obtidas informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
 
-Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram selecionados os principais verbetes, que são *empréstimos e títulos descontados* e *financiamentos*, e mantidas apenas as agências atualmente em atividade. Quanto ao período, há dados disponíveis desde 1988. Entretanto, utilizaremos os dados a partir de 2003 pois, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta. Por essa razão, apesar do Banestes contar, atualmente, com 134 agências, foram mantidas apenas as agências com série completa, ou seja, que já estavam em atividade em 2003.
+<!-- TODO: explicar que a metodologia por rolling origin ou refit requer a realização de previsões para dentro da amostra treino e, por isso, eu preciso excluir as agências sem a série completa por conta do risco de não haver observações não nulas o suficiente para a realização dessas previsões -->
 
-Por fim, as variáveis mantidas no *dataset* foram as descritas no Quadro \ref{qdr-variaveis}. Dessa forma, temos séries mensais de saldos de créditos de `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia))` agências bancárias, distribuídas por `r with(subset(estban, !is_aggregated(nome)), length(unique(nome))` municípios, a partir de `r format(min(estban$ref), "%B de %Y")`, totalizando `r scales::number(nrow(estban), big.mark = ".", decimal.mark = ",")` observações.
+<!-- TODO: Explicar que essa é uma vantagem do MinT, que não requer previsões extras. Além disso, pode ser uma alternativa usar os valores ajustados das previsões base, o que permitiria incluir essas agências criadas durante o período -->
+
+Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram selecionados os principais verbetes, que são *empréstimos e títulos descontados* e *financiamentos*, e mantidas apenas as agências atualmente em atividade. Quanto ao período, há dados disponíveis desde 1988. Entretanto, utilizaremos os dados a partir de 2003 pois, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta. Por essa razão, apesar do Banestes contar com 134 agências, foram mantidas apenas as agências com série completa, ou seja, que já estavam em atividade em 2003.
+
+Por fim, as variáveis mantidas no *dataset* foram as descritas no Quadro \ref{qdr-variaveis}. Dessa forma, temos séries mensais de saldos de créditos de `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia)))` agências bancárias, distribuídas por `r with(subset(estban, !is_aggregated(nome)), length(unique(nome)))` municípios, a partir de `r format(min(estban$ref), "%B de %Y")`, totalizando `r scales::number(nrow(subset(estban, !is_aggregated(cnpj_agencia) & !is_aggregated(verbete))), big.mark = ".", decimal.mark = ",")` observações.
 
 ```{r}
 #| tbl-cap: "Variáveis do dataset"
@@ -671,74 +675,62 @@ tibble::tribble(
   "verbete", "Descrição da rubrica do balancete",
   "nome", "Nome do município",
   "cnpj_agencia", "CNPJ da agência bancária",
-  "valor", "Saldo do verbete"
+  "saldo", "Saldo do verbete"
 ) |>
-  kbl(booktabs = TRUE, row.names = FALSE) |>
+  kbl(booktabs = TRUE, row.names = FALSE, format = "latex") |>
   kable_styling(latex_options = c("striped"), font_size = 12) |>
   column_spec(2, width = "10cm")
 ```
 
 ```{=latex}
 \begin{quadro}
-    \caption{Variáveis do dataset}\tabularnewline
-    \label{qdr-variaveis}
+  \caption{Variáveis do dataset}\tabularnewline
+  \label{qdr-variaveis}
 
-    \centering\begingroup\fontsize{11}{12}\selectfont
+  \centering\begingroup\fontsize{12}{14}\selectfont
 
-    \begin{tabular}[t]{l>{\raggedright\arraybackslash}p{10cm}}
+  \begin{tabular}[t]{l>{\raggedright\arraybackslash}p{10cm}}
     \toprule
     Variável & Descrição\\
     \midrule
-    \cellcolor{gray!6}{ref} & \cellcolor{gray!6}{Data de referência do relatório    ESTBAN}\\
+    \cellcolor{gray!6}{ref} & \cellcolor{gray!6}{Data de referência do relatório ESTBAN}\\
     nome\_mesorregiao & Nome da mesorregião do ES\\
-    \cellcolor{gray!6}{nome\_microrregiao} & \cellcolor{gray!6}{Nome da     microrregião do ES}\\
+    \cellcolor{gray!6}{nome\_microrregiao} & \cellcolor{gray!6}{Nome da microrregião do ES}\\
     verbete & Descrição da rubrica do balancete\\
     \cellcolor{gray!6}{nome} & \cellcolor{gray!6}{Nome do município}\\
     \addlinespace
     cnpj\_agencia & CNPJ da agência bancária\\
-    \cellcolor{gray!6}{valor} & \cellcolor{gray!6}{Saldo do verbete}\\
+    \cellcolor{gray!6}{saldo} & \cellcolor{gray!6}{Saldo do verbete}\\
     \bottomrule
-    \end{tabular}
-    \endgroup{}
+  \end{tabular}
+\endgroup{}
 \end{quadro}
 ```
 
-Os dados foram organizados de forma hierárquica por estado, mesorregião, microrregião, município e agência bancária; e de forma agrupada, por verbete.
-
-O detalhamento da construção do *dataset* se encontra no Anexo \ref{anexo_a}.
-
-## Análise exploratória dos dados
-
-Após limpeza, o *dataset* adquiriu a estrutura apresentada na @tbl-dataset. As microrregiões que compõem cada mesorregião são apresentadas na @tbl-microrregioes e os municípios que compõem cada microrregião são apresentados na @tbl-municipios.
+Esses dados então são organizados de forma hierárquica por estado, mesorregião, microrregião, município e agência bancária; e, de forma agrupada, por verbete. Isso significa que, para cada nó de agregação, são adicionadas mais três observações ao *dataset*: duas para cada verbete e a terceira para a soma de ambos. Com a estrutura hierárquica e agrupada, o conjunto alcança `r scales::number(nrow(estban))` observações. Por fim, o *dataset* adquiriu a estrutura apresentada na @tbl-dataset.
 
 ```{r}
 #| label: tbl-dataset
 #| tbl-cap: "Estrutura do dataset"
 
 estban |>
+  tail(12) |>
   transform(
     saldo = scales::number(
       saldo,
       big.mark = ".", decimal.mark = ","
     )
   ) |>
-  subset(nome == "vitoria") |>
-  tail() |>
   kbl(
     booktabs = TRUE,
-    row.names = FALSE,
-    col.names = c(
-      "Data de referência",
-      "Mesorregião",
-      "Microrregião",
-      "Município",
-      "Agência",
-      "Verbete",
-      "Saldo"
-    )
+    row.names = FALSE
   ) |>
   kable_styling(latex_options = c("striped", "scale_down"))
 ```
+
+## Análise exploratória dos dados
+
+ As microrregiões que compõem cada mesorregião são apresentadas na @tbl-microrregioes e os municípios que compõem cada microrregião são apresentados na @tbl-municipios.
 
 ```{r}
 #| label: tbl-microrregioes
@@ -746,7 +738,7 @@ estban |>
 
 aggregate(
   as.character(nome_microrregiao) ~ as.character(nome_mesorregiao),
-  data = estban,
+  data = subset(estban, !is_aggregated(nome_mesorregiao)),
   FUN = unique
 ) |>
   kbl(
