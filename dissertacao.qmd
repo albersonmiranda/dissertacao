@@ -43,9 +43,6 @@ knitr::write_bib(
   file = "config/elementos/packages.bib"
 )
 
-# scripts
-source("scripts/estban/hierarq.R")
-
 # dados
 estban = readRDS("data/estban/estban.rds")
 
@@ -729,11 +726,21 @@ estban |>
 ```
 
 ## Análise exploratória dos dados
-<!-- [ ] TODO: adicionar tabela e mapas de quantidade de agências por município -->
-<!-- [ ] TODO: adicionar mapas de microrregiões por mesorregião -->
-O estado do Espírito Santo
 
-As microrregiões que compõem cada mesorregião são apresentadas na @tbl-microrregioes e os municípios que compõem cada microrregião são apresentados na @tbl-municipios.
+O estado do Espírito Santo está localizado no sudeste brasileiro e é dividido em 78 municípios, que estão agrupados em 4 mesorregiões e 13 microrregiões.
+
+::: {#fig-mapas_es layout-ncol=2}
+
+![Posição no Brasil](img/mapa-brasil.png){#fig-mapa_brasil}
+
+![Micro e mesorregiões](img/mapa-microrregioes.png){#fig-mapa_es}
+
+![Quantidade de agências por município](img/mapa-municipalidades.png){#fig-mapa_municipalidades}
+
+O Estado do Espírito Santo e suas meso e microrregiões.
+:::
+
+As microrregiões que compõem cada mesorregião são apresentadas na @tbl-microrregioes e na @fig-mapa_es. Já os municípios que compõem cada microrregião são apresentados na @tbl-municipios. A @fig-mapa_municipalidades mostra a quantidade de agências por município.
 
 ```{r}
 #| label: tbl-microrregioes
@@ -776,6 +783,8 @@ aggregate(
   column_spec(2, width = "10cm")
 ```
 
+Na amostra selecionada para este trabalho, com exceção dos municípios de Colatina e Cachoeiro de Itapemirim, que contam com 2 agências cada, todos os demais municípios no interior contam com uma única agência. Já na microrregião da capital Vitória, se encontram municípios com múltiplas unidades. Isso pode afetar a decisão de incluir ou não o nível de município na hierarquia.
+
 O tamanho de uma estrutura hierárquica, em termos de observações, é determinada por seu nível mais desagregado. Assim, sendo `r length(unique(estban$ref))` meses e `r length(unique(subset(estban, !is_aggregated(cnpj_agencia))$cnpj_agencia))` agências, a estrutura hierárquica deve contar com `r length(unique(estban$ref))`\times`r length(unique(subset(estban, !is_aggregated(cnpj_agencia))$cnpj_agencia))` $=$ `r scales::number(length(unique(estban$ref)) * length(unique(subset(estban, !is_aggregated(cnpj_agencia))$cnpj_agencia)), big.mark = ".", decimal.mark = ",")` observações. Sendo também uma estrutura agrupada por `r length(unique(subset(estban, !is_aggregated(verbete))$verbete))` verbetes, a quantidade de observações é multiplicada pela quantidade de níveis transversais, totalizando as `r scales::number(length(unique(estban$ref)) * length(unique(subset(estban, !is_aggregated(cnpj_agencia))$cnpj_agencia)) * length(unique(subset(estban, !is_aggregated(verbete))$verbete)), big.mark = ".", decimal.mark = ",")` observações do *dataset* antes da adição dos nós de agregação. Portanto, podemos atestar a completude das séries temporais sem a necessidade de qualquer inspeção adicional.
 
 ```{r skim}
@@ -783,7 +792,7 @@ O tamanho de uma estrutura hierárquica, em termos de observações, é determin
 #| tbl-cap: "Contagem de únicos no dataset ESTBAN"
 
 temp = lapply(
-  estban[sapply(estban, function(x) !is.numeric(x))],
+  subset(estban, !is_aggregated(cnpj_agencia) & !is_aggregated(verbete))[sapply(estban, function(x) !is.numeric(x))],
   unique
 ) |>
   lengths()
@@ -793,7 +802,7 @@ temp |>
   kable_styling(latex_options = c("striped"))
 ```
 
-A série temporal do agregado de crédito no Banestes no Espírito Santo é apresentada na @fig-agregado. Podemos observar tendência de crescimento a partir de 2020, indicando que a série seja não estacionária e que talvez seja interessante adicionar um regressor externo para o período da pandemia, quando foram implementados programas de crédito emergenciais no país.
+A série temporal do agregado de crédito no Banestes no Espírito Santo é apresentada na @fig-agregado. Como frequentemente ocorre em séries temporais de natureza social, a inspeção visual sugere a presença de quebras estruturais na média decorrente de eventos marcantes^[Aqui, destacam-se os períodos de 2008 a 2010, que corresponde à crise financeira global; de 2014 a 2016, que corresponde à crise econômica brasileira, e; a partir de 2020 com a pandemia do Covid-19. Também é sugestivo que a forma como o governo se comporta durante esses eventos pode ter impacto direto no comportamento do crédito.]. Entretanto, não faz parte do escopo deste trabalho analisar o impacto dessas quebras na qualidade da reconciliação.
 
 ```{r}
 #| label: fig-agregado
