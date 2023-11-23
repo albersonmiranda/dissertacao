@@ -729,8 +729,11 @@ estban |>
 ```
 
 ## Análise exploratória dos dados
+<!-- [ ] TODO: adicionar tabela e mapas de quantidade de agências por município -->
+<!-- [ ] TODO: adicionar mapas de microrregiões por mesorregião -->
+O estado do Espírito Santo
 
- As microrregiões que compõem cada mesorregião são apresentadas na @tbl-microrregioes e os municípios que compõem cada microrregião são apresentados na @tbl-municipios.
+As microrregiões que compõem cada mesorregião são apresentadas na @tbl-microrregioes e os municípios que compõem cada microrregião são apresentados na @tbl-municipios.
 
 ```{r}
 #| label: tbl-microrregioes
@@ -738,7 +741,7 @@ estban |>
 
 aggregate(
   as.character(nome_microrregiao) ~ as.character(nome_mesorregiao),
-  data = subset(estban, !is_aggregated(nome_mesorregiao)),
+  data = subset(estban, !is_aggregated(nome_mesorregiao) & !is_aggregated(nome_microrregiao)),
   FUN = unique
 ) |>
   kbl(
@@ -758,7 +761,7 @@ aggregate(
 
 aggregate(
   as.character(nome) ~ as.character(nome_microrregiao),
-  data = estban,
+  data = subset(estban, !is_aggregated(nome) & !is_aggregated(nome_microrregiao)),
   FUN = unique
 ) |>
   kbl(
@@ -773,7 +776,7 @@ aggregate(
   column_spec(2, width = "10cm")
 ```
 
-O tamanho de uma estrutura hierárquica, em termos de observações, é determinada por seu nível mais desagregado. Assim, sendo `r length(unique(estban$ref))` meses e `r length(unique(estban$cnpj_agencia))` agências, a estrutura hierárquica deve contar com `r length(unique(estban$ref))`\times`r length(unique(estban$cnpj_agencia))` $=$ `r scales::number(length(unique(estban$ref)) * length(unique(estban$cnpj_agencia)), big.mark = ".", decimal.mark = ",")` observações. Sendo também uma estrutura agrupada por `r length(unique(estban$verbete))` verbetes, a quantidade de observações é multiplicada pela quantidade de níveis transversais, totalizando `r scales::number(length(unique(estban$ref)) * length(unique(estban$cnpj_agencia)) * length(unique(estban$verbete)), big.mark = ".", decimal.mark = ",")` observações. Como há apenas, `r scales::number(nrow(estban), big.mark = ".", decimal.mark = ",")` observações, podemos concluir que há dados faltantes, originados de agências que foram criadas no período e, portanto, não possuem a série completa desde 2010. Para permitir a estimação, esses dados serão imputados com zero.
+O tamanho de uma estrutura hierárquica, em termos de observações, é determinada por seu nível mais desagregado. Assim, sendo `r length(unique(estban$ref))` meses e `r length(unique(subset(estban, !is_aggregated(cnpj_agencia))$cnpj_agencia))` agências, a estrutura hierárquica deve contar com `r length(unique(estban$ref))`\times`r length(unique(subset(estban, !is_aggregated(cnpj_agencia))$cnpj_agencia))` $=$ `r scales::number(length(unique(estban$ref)) * length(unique(subset(estban, !is_aggregated(cnpj_agencia))$cnpj_agencia)), big.mark = ".", decimal.mark = ",")` observações. Sendo também uma estrutura agrupada por `r length(unique(subset(estban, !is_aggregated(verbete))$verbete))` verbetes, a quantidade de observações é multiplicada pela quantidade de níveis transversais, totalizando as `r scales::number(length(unique(estban$ref)) * length(unique(subset(estban, !is_aggregated(cnpj_agencia))$cnpj_agencia)) * length(unique(subset(estban, !is_aggregated(verbete))$verbete)), big.mark = ".", decimal.mark = ",")` observações do *dataset* antes da adição dos nós de agregação. Portanto, podemos atestar a completude das séries temporais sem a necessidade de qualquer inspeção adicional.
 
 ```{r skim}
 #| label: tbl-estban
@@ -839,6 +842,8 @@ estban |>
     strip.text = element_text(size = 6)
   )
 ```
+
+<!-- TODO: corrigir título da legenda, agrupar as cores e legendas por mesorregião e deixar apenas o ano no eixo x -->
 
 ```{r}
 #| label: fig-micro
