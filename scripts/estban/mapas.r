@@ -102,7 +102,7 @@ plot_municipalidades = municipalidades |>
     values = with(
       cores,
       c(
-        cores$cinza_aux,
+        cinza_aux,
         azul_claro_banestes,
         azul_medio_banestes,
         azul_escuro_aux,

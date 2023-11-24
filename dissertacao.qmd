@@ -31,10 +31,26 @@ pacman::p_load(
   fabletools
 )
 
+# paleta de cores Banestes
+cores = list(
+  azul_banestes = "#0041C4",
+  verde_banestes = "#4FFF00",
+  azul_medio_banestes = "#0D8CFF",
+  azul_claro_banestes = "#82E3FF",
+  azul_escuro_aux = "#002F7A",
+  azul_medio_aux = "#0056C4",
+  azul_claro_aux = "#0079DB",
+  bege_aux = "#E0DB9E",
+  cor_quente_aux = "#991F00",
+  cinza_aux = "#CDD1D1"
+)
+
 # tema ggplot
 tema = theme_classic() +
   theme(
-    text = element_text(family = "serif")
+    text = element_text(family = "serif"),
+    strip.background = element_rect(fill = cores$azul_escuro_aux),
+    strip.text = element_text(color = "white")
   )
 
 # gerar bibliografia de pacotes
@@ -802,7 +818,7 @@ temp |>
   kable_styling(latex_options = c("striped"))
 ```
 
-A série temporal do agregado de crédito no Banestes no Espírito Santo é apresentada na @fig-agregado. Como frequentemente ocorre em séries temporais de natureza social, a inspeção visual sugere a presença de quebras estruturais na média decorrente de eventos marcantes^[Aqui, destacam-se os períodos de 2008 a 2010, que corresponde à crise financeira global; de 2014 a 2016, que corresponde à crise econômica brasileira, e; a partir de 2020 com a pandemia do Covid-19. Também é sugestivo que a forma como o governo se comporta durante esses eventos pode ter impacto direto no comportamento do crédito.]. Entretanto, não faz parte do escopo deste trabalho analisar o impacto dessas quebras na qualidade da reconciliação.
+A série temporal do agregado de crédito no Banestes no Espírito Santo é apresentada na @fig-agregado. Como frequentemente ocorre em séries temporais de natureza social, a inspeção visual sugere a presença de quebras estruturais na média^[Aqui, destacam-se os períodos de 2008 a 2010, que corresponde à crise financeira global; de 2014 a 2016, que corresponde à crise econômica brasileira, e; a partir de 2020 com a pandemia do Covid-19. Também é sugestivo que a forma como o governo se comporta durante esses eventos pode ter impacto direto no comportamento do crédito.]. Essas quebras podem afetar a qualidade das previsões base a serem reconciliadas.
 
 ```{r}
 #| label: fig-agregado
@@ -818,13 +834,13 @@ estban |>
     is_aggregated(verbete)
   ) |>
   ggplot(aes(x = ref, y = saldo)) +
-  geom_line() +
+  geom_line(color = cores$azul_banestes) +
   scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
   labs(x = "", y = "Saldo (em R$ bi)") +
   tema
 ```
 
-A concentração na mesorregião Central Espírito-santense (@fig-meso) pode ser um indicativo de que os elementos das demais regiões tenham menor peso na reconciliação.
+A mesorregião Central Espírito-santense concentra mais crédito do que o somatório das demais regiões (@fig-meso) e a @fig-micro mostra que a microrregião de Vitória é a responsável pela concentração.
 
 ```{r}
 #| label: fig-meso
@@ -840,8 +856,9 @@ estban |>
     is_aggregated(verbete)
   ) |>
   ggplot(aes(x = ref, y = saldo)) +
-  geom_line() +
+  geom_line(color = cores$azul_banestes) +
   scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
+  scale_x_yearmonth(date_labels = "%Y") +
   facet_wrap(~ factor(nome_mesorregiao), scales = "free_y") +
   labs(x = "", y = "Saldo (em R$ bi)") +
   tema +
@@ -859,25 +876,44 @@ estban |>
 #| fig-cap: "Série temporal do agregado de crédito do Banestes por microrregião do ES"
 
 # plot agregado
-estban |>
-  dplyr::filter(
-    is_aggregated(nome),
-    is_aggregated(cnpj_agencia),
-    !is_aggregated(nome_mesorregiao),
-    !is_aggregated(nome_microrregiao),
-    is_aggregated(verbete)
+temp = estban |>
+  subset(
+    is_aggregated(nome)
+    & is_aggregated(cnpj_agencia)
+    & !is_aggregated(nome_mesorregiao)
+    & !is_aggregated(nome_microrregiao)
+    & is_aggregated(verbete)
   ) |>
-  ggplot(aes(x = ref, y = saldo, color = factor(nome_microrregiao))) +
-  geom_line() +
-  scale_y_continuous(labels = scales::number_format(scale = 1 / 1e6)) +
-  facet_wrap(~ factor(nome_mesorregiao), scales = "free_y") +
-  labs(x = "", y = "Saldo (em R$ mi)", color = "mesorregião") +
-  tema +
-  theme(
-    legend.text = element_text(size = 6),
-    legend.title = element_text(size = 6),
-    strip.text = element_text(size = 6)
+  transform(
+    nome_mesorregiao = as.character(nome_mesorregiao),
+    nome_microrregiao = as.character(nome_microrregiao),
+    nome = as.character(nome),
+    cnpj_agencia = as.character(cnpj_agencia),
+    verbete = as.character(verbete)
   )
+
+plots = temp |>
+  by(INDICES = temp$nome_mesorregiao, FUN = function(x) {
+    g = ggplot(x, aes(x = ref, y = saldo, color = factor(nome_microrregiao))) +
+      geom_line() +
+      scale_y_continuous(labels = scales::number_format(scale = 1 / 1e6)) +
+      scale_x_yearmonth(date_labels = "%Y") +
+      scale_color_manual(values = unlist(cores, use.names = FALSE)) +
+      facet_wrap(~ factor(nome_mesorregiao), scales = "free_y") +
+      labs(x = "", y = "Saldo (em R$ mi)", color = "microrregião") +
+      tema +
+      theme(
+        legend.key.size = unit(0.2, "cm"),
+        legend.background = element_rect(fill = alpha("white", 0)),
+        legend.title = element_text(size = 6),
+        legend.text = element_text(size = 6),
+        legend.position = c(0.08, 0.9),
+        legend.justification = c(0.08, 0.9),
+        strip.text = element_text(size = 6),
+      )
+  })
+
+do.call(gridExtra::grid.arrange, c(plots, ncol = 2))
 ```
 
 Analisando o agregado por verbetes, a @fig-verbetes indica que o crescimento é liderado pelas alíneas empréstimos e títulos descontados.
@@ -930,9 +966,9 @@ estban |>
 
 ## Previsões base
 
-Uma vez que o foco deste trabalho é no ganho proporcionado pela reconciliação ótima, as previsões base foram obtidas por meio de métodos básicos para previsão de séries temporais, especificamente modelagem Arima pelo algoritmo de Hyndman-Khandakar [@hyndman_forecasting_2021]. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
+Uma vez que o foco deste trabalho está no incremento de performance proporcionado pela reconciliação ótima sobre um conjunto de previsões base e não na qualidade destas, elas foram obtidas por meio de métodos básicos para previsão de séries temporais, especificamente o suavimento exponencial (ETS) ou modelagem Arima pelo algoritmo de Hyndman-Khandakar [@hyndman_forecasting_2021], sem tratamentos adicionais para *outliers*, quebras estruturais ou transformações. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
 
-[Explicar o refit e adicionar o gráfico de p-valor]
+<!-- TODO: Explicar o refit e adicionar o gráfico de p-valor -->
 
 ## *Design* do experimento
 
