@@ -727,7 +727,7 @@ Esses dados então são organizados de forma hierárquica por estado, mesorregi�
 #| tbl-cap: "Estrutura do dataset"
 
 estban |>
-  tail(12) |>
+  tail(13) |>
   transform(
     saldo = scales::number(
       saldo,
@@ -840,7 +840,7 @@ estban |>
   tema
 ```
 
-A mesorregião Central Espírito-santense concentra mais crédito do que o somatório das demais regiões (@fig-meso) e a @fig-micro mostra que a microrregião de Vitória é a responsável pela concentração.
+Em relação à distribuição, a mesorregião Central Espírito-santense concentra mais crédito do que o somatório das demais regiões (@fig-meso), sendo a microrregião de Vitória a responsável por essa concentração (@fig-micro). Na ótica dos verbetes, o crédito para financiamentos é uma pequena fração do saldo de empréstimos, independentemente da mesorregião (@fig-verbetes e @fig-verbete_meso). 
 
 ```{r}
 #| label: fig-meso
@@ -868,8 +868,6 @@ estban |>
     strip.text = element_text(size = 6)
   )
 ```
-
-<!-- TODO: corrigir título da legenda, agrupar as cores e legendas por mesorregião e deixar apenas o ano no eixo x -->
 
 ```{r}
 #| label: fig-micro
@@ -916,8 +914,6 @@ plots = temp |>
 do.call(gridExtra::grid.arrange, c(plots, ncol = 2))
 ```
 
-Analisando o agregado por verbetes, a @fig-verbetes indica que o crescimento é liderado pelas alíneas empréstimos e títulos descontados.
-
 ```{r}
 #| label: fig-verbetes
 #| fig-cap: "Verbetes no agregado do ES"
@@ -934,6 +930,7 @@ estban |>
   ggplot(aes(x = ref, y = saldo, color = factor(verbete))) +
   geom_line() +
   scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
+  scale_color_manual(values = unlist(cores, use.names = FALSE)) +
   labs(x = "", y = "Saldo (em R$ bi)", color = "Verbete") +
   tema
 ```
@@ -955,6 +952,8 @@ estban |>
   geom_line() +
   facet_wrap(~ factor(nome_mesorregiao), scales = "free_y") +
   scale_y_continuous(labels = scales::number_format(scale = 1 / 1000000)) +
+  scale_x_yearmonth(date_labels = "%Y") +
+  scale_color_manual(values = unlist(cores, use.names = FALSE)) +
   labs(x = "", y = "Saldo (em R$ mi)", color = "Verbete") +
   tema +
   theme(
@@ -966,13 +965,27 @@ estban |>
 
 ## Previsões base
 
-Uma vez que o foco deste trabalho está no incremento de performance proporcionado pela reconciliação ótima sobre um conjunto de previsões base e não na qualidade destas, elas foram obtidas por meio de métodos básicos para previsão de séries temporais, especificamente o suavimento exponencial (ETS) ou modelagem Arima pelo algoritmo de Hyndman-Khandakar [@hyndman_forecasting_2021], sem tratamentos adicionais para *outliers*, quebras estruturais ou transformações. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
+Uma vez que o foco deste trabalho está no incremento de performance proporcionado pela reconciliação ótima sobre um conjunto de previsões base e não na qualidade destas, elas foram obtidas por meio de métodos básicos para previsão de séries temporais, especificamente o algoritmo de Hyndman-Koehler-Snyder-Grose para suavimento exponencial (ETS) [@hyndman_state_2002], sem tratamentos adicionais para *outliers*, quebras estruturais ou transformações. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
 
-<!-- TODO: Explicar o refit e adicionar o gráfico de p-valor -->
+Os modelos foram treinados com dados de 2003 a 2021 e as previsões foram realizadas para o ano de 2022. Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Os resultados são apresentados na @tbl-lb_pvalue. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são ruído branco. Isso sugere que os modelos de previsão base são, em geral, adequados para o propósito deste trabalho.
+
+```{r}
+#| label: tbl-lb_pvalue
+#| tbl-cap: "Resultados do teste de Ljung-box para as previsões base ($\\alpha = 0.05$)"
+
+testes_lb = readRDS("data/estban/previsoes_base/testes_lb.rds") |>
+  transform(h_0 = ifelse(lb_pvalue < 0.05, "rejeita", "não rejeita"))
+
+prop.table(table(testes_lb$h_0)) |>
+  kbl(booktabs = TRUE, col.names = c("Resultado", "Proporção")) |>
+  kable_styling(latex_options = c("striped"))
+```
 
 ## *Design* do experimento
 
 ### Métodos analíticos de reconciliação
+
+<!-- * MARK: Estou aqui -->
 
 Os métodos analíticos de reconciliação utilizados no *benchmark* serão os de nível único *bottom-up* e o *top-down*; os de reconciliação ótima *MinT-OLS*, *MinT-WLS* e *MinT-shrink*. Essa escolha se justifica para que seja possível comparar os métodos de reconciliação ótima com os métodos de nível único, principalmente em relação ao tempo de processamento, que pode revelar um *trade-off* a ser analisado pelo pesquisador.
 

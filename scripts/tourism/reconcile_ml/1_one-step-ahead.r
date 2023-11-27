@@ -31,4 +31,4 @@ preds = fabletools::refit(modelo, new_data, reestimate = FALSE) |> fitted()
 saveRDS(testes_lb, "data/tourism/preds_ml/train/testes_lb.rds")
 saveRDS(preds, "data/tourism/preds_ml/train/preds.rds")
 
-# ! MARK: esse código não executa reestimando por conta de non-stationary seasonal AR part from CSS
+# * MARK: esse código não executa reestimando por conta de non-stationary seasonal AR part from CSS
