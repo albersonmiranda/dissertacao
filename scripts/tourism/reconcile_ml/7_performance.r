@@ -37,7 +37,7 @@ preds = lapply(preds, function(df) {
   df = df |>
     tidyr::pivot_longer(
       cols = -Quarter,
-      names_to = c("State", "Region", "Purpose", "tipo"),
+      names_to = c("State", "Region", "tipo"),
       values_to = "prediction",
       names_sep = "__"
     ) |>
@@ -63,7 +63,6 @@ tourism = tourism |>
   subset(
     !is_aggregated(State)
     & !is_aggregated(Region)
-    & !is_aggregated(Purpose)
   ) |>
   as.data.frame()
 
@@ -75,13 +74,11 @@ tourism$Quarter = as.character(tourism$Quarter)
 tourism = within(tourism, {
   State = as.character(State)
   Region = as.character(Region)
-  Purpose = as.character(Purpose)
 })
 
 # limpando dataframe tourism
 tourism = within(tourism, {
   State = iconv(tolower(gsub("-", " ", State)), "LATIN1", "ASCII//TRANSLIT")
-  Purpose = iconv(tolower(Purpose), "LATIN1", "ASCII//TRANSLIT")
   Region = iconv(tolower(Region), "LATIN1", "ASCII//TRANSLIT")
 })
 
@@ -98,24 +95,22 @@ data = data |>
     key = c(
       "State",
       "Region",
-      "Purpose",
       "modelo"
     ),
     index = Quarter
   ) |>
   fabletools::aggregate_key(
-    (State / Region) * Purpose * modelo,
+    (State / Region) * modelo,
     saldo = sum(Trips),
     prediction = sum(prediction)
   )
 
 # combinações para acurácia
 combinacoes = list(
-  agregado = list("is_aggregated(Purpose) & is_aggregated(Region) & is_aggregated(State) & !is_aggregated(modelo)", c("modelo")), # nolint
-  State = list("is_aggregated(Purpose) & is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("State", "modelo")), # nolint
-  Region = list("is_aggregated(Purpose) & !is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("Region", "State", "modelo")), # nolint
-  Purpose = list("!is_aggregated(Purpose) & is_aggregated(Region) & is_aggregated(State) & !is_aggregated(modelo)", c("Purpose", "modelo")), # nolint
-  bottom = list("!is_aggregated(Purpose) & !is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("Purpose", "Region", "State", "modelo")), # nolint
+  agregado = list("is_aggregated(Region) & is_aggregated(State) & !is_aggregated(modelo)", c("modelo")), # nolint
+  State = list("is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("State", "modelo")), # nolint
+  Region = list("!is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("Region", "State", "modelo")), # nolint
+  bottom = list("!is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("Region", "State", "modelo")), # nolint
   hierarquia = list("!is_aggregated(modelo)", c("modelo")) # nolint
 )
 
