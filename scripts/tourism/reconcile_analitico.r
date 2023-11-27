@@ -20,7 +20,8 @@ modelo = readRDS("data/tourism/previsoes_base/modelo.rds")
 modelo_reconcile = modelo |>
   reconcile(
     mint = min_trace(base, "mint_shrink"),
-    bu = bottom_up(base)
+    bu = bottom_up(base),
+    td = top_down(base, method = "forecast_proportions")
   )
 
 # previsões reconciliadas
@@ -29,11 +30,10 @@ preds = modelo_reconcile |>
 
 # combinações para acurácia
 combinacoes = list(
-  agregado = "is_aggregated(State) & is_aggregated(Region) & is_aggregated(Purpose)", # nolint
-  State = "!is_aggregated(State) & is_aggregated(Region) & is_aggregated(Purpose)", # nolint
-  Region = "!is_aggregated(State) & !is_aggregated(Region) & is_aggregated(Purpose)", # nolint
-  Purpose = "is_aggregated(State) & is_aggregated(Region) & !is_aggregated(Purpose)", # nolint
-  bottom = "!is_aggregated(State) & !is_aggregated(Region) & !is_aggregated(Purpose)", # nolint
+  agregado = "is_aggregated(State) & is_aggregated(Region)", # nolint
+  State = "!is_aggregated(State) & is_aggregated(Region)", # nolint
+  Region = "!is_aggregated(State) & !is_aggregated(Region)", # nolint
+  bottom = "!is_aggregated(State) & !is_aggregated(Region)", # nolint
   hierarquia = "!is.null(.mean)" # nolint
 )
 

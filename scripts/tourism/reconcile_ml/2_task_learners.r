@@ -15,7 +15,7 @@ true_data = readRDS("data/tourism/tourism.rds") |>
   tibble::as_tibble(subset(select = -.model)) |>
   tidyr::pivot_wider(
     id_cols = c("Quarter"),
-    names_from = c("State", "Region", "Purpose"),
+    names_from = c("State", "Region"),
     names_sep = "__",
     values_from = "Trips"
   ) |>
@@ -30,7 +30,7 @@ if (tipo == "one-step-ahead") {
     tibble::as_tibble(subset(select = -.model)) |>
     tidyr::pivot_wider(
       id_cols = c("Quarter"),
-      names_from = c("State", "Region", "Purpose"),
+      names_from = c("State", "Region"),
       names_sep = "__",
       values_from = ".fitted"
     ) |>
@@ -42,7 +42,7 @@ if (tipo == "rolling_forecast") {
     tibble::as_tibble(subset(select = -.model)) |>
     tidyr::pivot_wider(
       id_cols = c("Quarter"),
-      names_from = c("State", "Region", "Purpose"),
+      names_from = c("State", "Region"),
       names_sep = "__",
       values_from = ".mean"
     ) |>
@@ -58,7 +58,7 @@ previsoes_base = readRDS("data/tourism/previsoes_base/previsoes_base.rds") |>
   tibble::as_tibble() |>
   tidyr::pivot_wider(
     id_cols = c("Quarter"),
-    names_from = c("State", "Region", "Purpose"),
+    names_from = c("State", "Region"),
     names_sep = "__",
     values_from = ".mean"
   )

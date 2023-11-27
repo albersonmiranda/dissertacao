@@ -15,20 +15,19 @@ new_data = readRDS("data/tourism/tourism.rds") |>
 # obtendo modelos
 modelo = tourism |>
   fabletools::model(arima = fable::ARIMA(
-    Trips,
-    order_constraint = (p + q <= 2) & (P + Q <= 1) & (constant + d <= 2) & (D == 0),
+    Trips
   ))
 
 # portmanteau tests para autocorrelação
 testes_lb = modelo |>
   fabletools::augment() |>
-  fabletools::features(.innov, feasts::ljung_box, lag = 12)
+  fabletools::features(.innov, feasts::ljung_box, lag = 4)
 
 # previsões 1-step-ahead
-preds = fabletools::refit(modelo, new_data, reestimate = FALSE) |> fitted()
+preds = fabletools::refit(modelo, new_data, reestimate = TRUE) |> fitted()
 
 # save
 saveRDS(testes_lb, "data/tourism/preds_ml/train/testes_lb.rds")
 saveRDS(preds, "data/tourism/preds_ml/train/preds.rds")
 
-# * MARK: esse código não executa reestimando por conta de non-stationary seasonal AR part from CSS
+# * MARK: esse código não executa com reestimate = TRUE por conta de non-stationary seasonal AR part from CSS
