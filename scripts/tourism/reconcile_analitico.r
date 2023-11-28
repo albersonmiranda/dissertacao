@@ -10,8 +10,10 @@ pacman::p_load(
 )
 
 # dados
+tourism_full = readRDS("data/tourism/tourism.rds")
+
 tourism = readRDS("data/tourism/tourism.rds") |>
-  tsibble::filter_index("2017 Q1" ~ "2017 Q4")
+  tsibble::filter_index("2016 Q1" ~ "2017 Q4")
 
 # modelo previsões base
 modelo = readRDS("data/tourism/previsoes_base/modelo.rds")
@@ -20,40 +22,55 @@ modelo = readRDS("data/tourism/previsoes_base/modelo.rds")
 modelo_reconcile = modelo |>
   reconcile(
     mint = min_trace(base, "mint_shrink"),
-    bu = bottom_up(base),
-    td = top_down(base, method = "forecast_proportions")
+    bu = bottom_up(base)
   )
 
 # previsões reconciliadas
 preds = modelo_reconcile |>
-  forecast(h = "1 years")
+  forecast(h = "2 years")
 
 # combinações para acurácia
 combinacoes = list(
-  agregado = "is_aggregated(State) & is_aggregated(Region)", # nolint
-  State = "!is_aggregated(State) & is_aggregated(Region)", # nolint
-  Region = "!is_aggregated(State) & !is_aggregated(Region)", # nolint
+  agregado = "is_aggregated(State) & is_aggregated(Region) & is_aggregated(Purpose)", # nolint
+  state = "!is_aggregated(State) & is_aggregated(Region) & is_aggregated(Purpose)", # nolint
+  region = "!is_aggregated(State) & !is_aggregated(Region) & is_aggregated(Purpose)", # nolint
+  purpose = "is_aggregated(State) & is_aggregated(Region) & !is_aggregated(Purpose)", # nolint
+  bottom = "!is_aggregated(State) & !is_aggregated(Region) & !is_aggregated(Purpose)", # nolint
   hierarquia = "!is.null(.mean)" # nolint
 )
 
 # acurácia
 acuracia = lapply(names(combinacoes), function(nivel) {
   data = preds |>
-    dplyr::filter(!!rlang::parse_expr(combinacoes[[nivel]])) |>
+    dplyr::filter(!!rlang::parse_expr(combinacoes[[nivel]]))
+
+  acuracia = data |>
     fabletools::accuracy(
-      data = tourism,
-      measures = list(mae = fabletools::MAE, rmse = fabletools::RMSE, mape = fabletools::MAPE)
+      data = tourism_full,
+      measures = list(
+        mae = fabletools::MAE,
+        rmse = fabletools::RMSE,
+        mape = fabletools::MAPE,
+        mase = fabletools::MASE,
+        rmsse = fabletools::RMSSE
+      )
     ) |>
     dplyr::group_by(.model) |>
-    dplyr::summarise(rmse = mean(rmse), mae = mean(mae), mape = mean(mape))
+    dplyr::summarise(
+      rmse = mean(rmse),
+      mae = mean(mae),
+      mape = mean(mape),
+      mase = mean(mase),
+      rmsse = mean(rmsse)
+    )
 
-  data$serie = nivel
+  acuracia$serie = nivel
 
-  return(data)
+  return(acuracia)
 })
 
 # agregando dataframes
-acuracia_analiticos = lapply(list("rmse", "mae", "mape"), function(medida) {
+acuracia_analiticos = lapply(list("rmse", "mae", "mape", "mase", "rmsse"), function(medida) {
   do.call("rbind", acuracia)[, c(".model", medida, "serie")] |>
     tidyr::pivot_wider(
       names_from = serie,

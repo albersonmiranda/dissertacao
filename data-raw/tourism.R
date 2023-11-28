@@ -13,7 +13,7 @@ tourism = tsibble::tourism |>
     index = Quarter
   ) |>
   fabletools::aggregate_key(
-    (State / Region),
+    (State / Region) * Purpose,
     Trips = sum(Trips)
   )
 
