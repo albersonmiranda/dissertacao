@@ -8,7 +8,7 @@ library(fabletools)
 tipo = "rolling_forecast"
 
 # juntando predições em um único dataframe
-preds = lapply(c("xgb", "glmnet", "lasso", "ridge"), function(learner) {
+preds = lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge"), function(learner) {
   preds = readRDS(paste0("data/tourism/preds_ml/preds/", tipo, "/preds_", learner, ".RDS"))
   preds = lapply(preds[[1]], function(df) data.table::as.data.table(df) |> subset(select = response))
   preds = do.call(cbind, preds)
@@ -18,7 +18,7 @@ preds = lapply(c("xgb", "glmnet", "lasso", "ridge"), function(learner) {
 })
 
 # nomeando a lista
-names(preds) = c("xgb", "glmnet", "lasso", "ridge")
+names(preds) = c("xgb", "ranger", "glmnet", "lasso", "ridge")
 
 # remover primeiro caractere do nome das colunas
 preds = lapply(preds, function(df) {
@@ -86,7 +86,7 @@ tourism = within(tourism, {
 data = merge(tourism, preds)
 
 # teste se merge foi completo
-nrow(data) == 4 * nrow(tourism)
+nrow(data) == 5 * nrow(tourism)
 
 # agregando
 data = data |>
@@ -110,7 +110,6 @@ combinacoes = list(
   agregado = list("is_aggregated(Region) & is_aggregated(State) & !is_aggregated(modelo)", c("modelo")), # nolint
   State = list("is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("State", "modelo")), # nolint
   Region = list("!is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("Region", "State", "modelo")), # nolint
-  bottom = list("!is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("Region", "State", "modelo")), # nolint
   hierarquia = list("!is_aggregated(modelo)", c("modelo")) # nolint
 )
 

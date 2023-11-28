@@ -59,7 +59,7 @@ search_space = ps(
   # quantidade mínima de observações no nó a ser dividido
   regr.ranger.min.node.size = p_int(lower = 1, upper = 7),
   # número de variáveis candidatas para divisão a cada divsão
-  regr.ranger.mtry = p_int(lower = 2, upper = ncol(dplyr::select(train_data, -tidyselect::matches("true|ref")))),
+  regr.ranger.mtry = p_int(lower = 2, upper = ncol(dplyr::select(train_data, -tidyselect::matches("true|Quarter")))),
   # as observações são selecionadas com ou sem reposição
   regr.ranger.replace = p_lgl(default = TRUE),
   # proporção de observações selecionadas aleatoriamente

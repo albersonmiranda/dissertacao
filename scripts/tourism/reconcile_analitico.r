@@ -33,7 +33,6 @@ combinacoes = list(
   agregado = "is_aggregated(State) & is_aggregated(Region)", # nolint
   State = "!is_aggregated(State) & is_aggregated(Region)", # nolint
   Region = "!is_aggregated(State) & !is_aggregated(Region)", # nolint
-  bottom = "!is_aggregated(State) & !is_aggregated(Region)", # nolint
   hierarquia = "!is.null(.mean)" # nolint
 )
 
