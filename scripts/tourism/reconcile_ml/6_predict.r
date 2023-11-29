@@ -6,9 +6,6 @@ source("scripts/tourism/reconcile_ml/5_train_hp.R")
 # reprodutibilidade
 set.seed(123)
 
-# tipo de previsões treino: one-step-ahead ou rolling_forecast
-tipo = "rolling_forecast"
-
 # convertendo test set para data.table
 new_data = data.table::as.data.table(subset(previsoes_base, select = -xQuarter))
 

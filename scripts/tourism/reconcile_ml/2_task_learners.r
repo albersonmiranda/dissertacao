@@ -7,19 +7,19 @@ pacman::p_load(
   fabletools
 )
 
-# tipo de previsões treino: one-step-ahead ou rolling_forecast
-tipo = "rolling_forecast"
+# tipo de previsões treino: one-step-ahead, rolling_forecast ou fitted_base
+tipo = "fitted_base"
 
 # true data (y_t)
 true_data = readRDS("data/tourism/tourism.rds") |>
   tibble::as_tibble(subset(select = -.model)) |>
   tidyr::pivot_wider(
     id_cols = c("Quarter"),
-    names_from = c("State", "Region"),
+    names_from = c("State", "Region", "Purpose"),
     names_sep = "__",
     values_from = "Trips"
   ) |>
-  subset(Quarter >= tsibble::yearquarter("2008 Q1") & Quarter <= tsibble::yearquarter("2016 Q4"))
+  subset(Quarter >= tsibble::yearquarter("2008 Q1") & Quarter <= tsibble::yearquarter("2015 Q4"))
 
 # add suffix to colnames
 names(true_data) = paste0(names(true_data), "__true")
@@ -49,6 +49,19 @@ if (tipo == "rolling_forecast") {
     cbind(subset(true_data, select = -`Quarter__true`))
 }
 
+if (tipo == "fitted_base") {
+  train_data = readRDS("data/tourism/previsoes_base/fitted_values.rds") |>
+    tibble::as_tibble(subset(select = -.model)) |>
+    tidyr::pivot_wider(
+      id_cols = c("Quarter"),
+      names_from = c("State", "Region", "Purpose"),
+      names_sep = "__",
+      values_from = ".fitted"
+    ) |>
+    subset(Quarter >= tsibble::yearquarter("2008 Q1") & Quarter <= tsibble::yearquarter("2015 Q4")) |>
+    cbind(subset(true_data, select = -`Quarter__true`))
+}
+
 # limpar nomes de colunas
 names(train_data) = gsub("<|>", "", names(train_data))
 names(train_data) = paste0("x", names(train_data))
@@ -58,7 +71,7 @@ previsoes_base = readRDS("data/tourism/previsoes_base/previsoes_base.rds") |>
   tibble::as_tibble() |>
   tidyr::pivot_wider(
     id_cols = c("Quarter"),
-    names_from = c("State", "Region"),
+    names_from = c("State", "Region", "Purpose"),
     names_sep = "__",
     values_from = ".mean"
   )

@@ -13,7 +13,7 @@ preds = lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge"), function(learner)
   preds = lapply(preds[[1]], function(df) data.table::as.data.table(df) |> subset(select = response))
   preds = do.call(cbind, preds)
   # adicionando coluna Quarter
-  preds$Quarter = tsibble::yearquarter(seq(as.Date("2017-01-01"), as.Date("2017-12-01"), by = "quarter"))
+  preds$Quarter = tsibble::yearquarter(seq(as.Date("2016-01-01"), as.Date("2017-12-01"), by = "quarter"))
   return(preds)
 })
 
@@ -37,7 +37,7 @@ preds = lapply(preds, function(df) {
   df = df |>
     tidyr::pivot_longer(
       cols = -Quarter,
-      names_to = c("State", "Region", "tipo"),
+      names_to = c("State", "Region", "Purpose", "tipo"),
       values_to = "prediction",
       names_sep = "__"
     ) |>
@@ -56,13 +56,14 @@ preds = do.call(rbind, preds)
 
 # tourism dataset
 tourism = readRDS("data/tourism/tourism.rds") |>
-  tsibble::filter_index("2017 Q1" ~ "2017 Q4")
+  tsibble::filter_index("2016 Q1" ~ "2017 Q4")
 
 # remover agregados
 tourism = tourism |>
   subset(
     !is_aggregated(State)
     & !is_aggregated(Region)
+    & !is_aggregated(Purpose)
   ) |>
   as.data.frame()
 
@@ -74,6 +75,7 @@ tourism$Quarter = as.character(tourism$Quarter)
 tourism = within(tourism, {
   State = as.character(State)
   Region = as.character(Region)
+  Purpose = as.character(Purpose)
 })
 
 # limpando dataframe tourism
