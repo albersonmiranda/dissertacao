@@ -8,7 +8,7 @@ pacman::p_load(
 )
 
 # tipo de previsões treino: one-step-ahead, rolling_forecast ou fitted_base
-tipo = "fitted_base"
+tipo = "rolling_forecast"
 
 # true data (y_t)
 true_data = readRDS("data/tourism/tourism.rds") |>
@@ -30,7 +30,7 @@ if (tipo == "one-step-ahead") {
     tibble::as_tibble(subset(select = -.model)) |>
     tidyr::pivot_wider(
       id_cols = c("Quarter"),
-      names_from = c("State", "Region"),
+      names_from = c("State", "Region", "Purpose"),
       names_sep = "__",
       values_from = ".fitted"
     ) |>
@@ -42,7 +42,7 @@ if (tipo == "rolling_forecast") {
     tibble::as_tibble(subset(select = -.model)) |>
     tidyr::pivot_wider(
       id_cols = c("Quarter"),
-      names_from = c("State", "Region"),
+      names_from = c("State", "Region", "Purpose"),
       names_sep = "__",
       values_from = ".mean"
     ) |>
