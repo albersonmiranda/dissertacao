@@ -14,7 +14,7 @@ new_data = readRDS("data/tourism/tourism.rds") |>
 
 # obtendo modelos
 modelo = tourism |>
-  fabletools::model(arima = fable::ARIMA(
+  fabletools::model(ets = fable::ETS(
     Trips
   ))
 

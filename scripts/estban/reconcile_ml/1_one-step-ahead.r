@@ -25,5 +25,5 @@ testes_lb = modelo |>
 preds = fabletools::refit(modelo, new_data, reestimate = TRUE) |> fitted()
 
 # save
-saveRDS(testes_lb, "data/estban/preds_ml/train/testes_lb_ets.rds")
+saveRDS(testes_lb, "data/estban/preds_ml/train/testes_lb.rds")
 saveRDS(preds, "data/estban/preds_ml/train/preds.rds")

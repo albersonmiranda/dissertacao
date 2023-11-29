@@ -7,8 +7,8 @@ pacman::p_load(
   fabletools
 )
 
-# tipo de previsões treino: one-step-ahead ou rolling_forecast
-tipo = "one-step-ahead"
+# tipo de previsões treino: one-step-ahead, rolling_forecast ou fitted_base
+tipo = "fitted_base"
 
 # true data (y_t)
 true_data = readRDS("data/estban/estban.rds") |>
@@ -46,6 +46,19 @@ if (tipo == "rolling_forecast") {
       names_sep = "__",
       values_from = ".mean"
     ) |>
+    cbind(subset(true_data, select = -`ref__true`))
+}
+
+if (tipo == "fitted_base") {
+  train_data = readRDS("data/estban/previsoes_base/fitted_values.rds") |>
+    tibble::as_tibble(subset(select = -.model)) |>
+    tidyr::pivot_wider(
+      id_cols = c("ref"),
+      names_from = c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "verbete"),
+      names_sep = "__",
+      values_from = ".fitted"
+    ) |>
+    subset(ref >= tsibble::yearmonth("2013 jan") & ref <= tsibble::yearmonth("2021 dec")) |>
     cbind(subset(true_data, select = -`ref__true`))
 }
 

@@ -1,4 +1,4 @@
-### TAQuarterA E LEARNERS ###
+### TAREFA E LEARNERS ###
 
 
 # meta pacote
