@@ -29,7 +29,12 @@ testes_lb = modelo |>
 # previsões base
 previsoes_base = forecast(modelo, h = "1 years")
 
+# fitted values
+fitted_values = modelo |>
+  fitted()
+
 # save
 saveRDS(modelo, "data/estban/previsoes_base/modelo.rds")
 saveRDS(testes_lb, "data/estban/previsoes_base/testes_lb.rds")
 saveRDS(previsoes_base, "data/estban/previsoes_base/previsoes_base.rds")
+saveRDS(fitted_values, "data/estban/previsoes_base/fitted_values.rds")
