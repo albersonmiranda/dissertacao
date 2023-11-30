@@ -4,7 +4,7 @@
 # pacotes
 library(fabletools)
 
-# tipo de previsões treino: one-step-ahead ou rolling_forecast
+# tipo de previsões treino: one-step-ahead, rolling_forecast ou fitted_base
 tipo = "one-step-ahead"
 
 # juntando predições em um único dataframe
@@ -56,7 +56,7 @@ preds = do.call(rbind, preds)
 
 # estban dataset
 estban = readRDS("data/estban/estban.rds") |>
-  tsibble::filter_index("2022 jan" ~ "2022 dec")
+  subset(ref <= tsibble::yearmonth("2022 dec"))
 
 # remover agregados
 estban = estban |>
@@ -84,17 +84,17 @@ estban = within(estban, {
 
 # limpando dataframe estban
 estban = within(estban, {
-  nome_mesorregiao = iconv(tolower(gsub("-", " ", nome_mesorregiao)), "LATIN1", "ASCII//TRANSLIT")
-  verbete = iconv(tolower(verbete), "LATIN1", "ASCII//TRANSLIT")
-  nome_microrregiao = iconv(tolower(nome_microrregiao), "LATIN1", "ASCII//TRANSLIT")
-  nome = iconv(tolower(nome), "LATIN1", "ASCII//TRANSLIT")
+  nome_mesorregiao = iconv(tolower(gsub("-| ", "_", nome_mesorregiao)), "UTF-8", "ASCII//TRANSLIT")
+  verbete = iconv(tolower(gsub("-| ", "_", verbete)), "UTF-8", "ASCII//TRANSLIT")
+  nome_microrregiao = iconv(tolower(gsub("-| ", "_", nome_microrregiao)), "UTF-8", "ASCII//TRANSLIT")
+  nome = iconv(tolower(gsub("-| ", "_", nome)), "UTF-8", "ASCII//TRANSLIT")
 })
 
 # merge entre estban e preds
-data = merge(estban, preds)
+data = merge(estban, preds, all.x = TRUE)
 
 # teste se merge foi completo
-nrow(data) == 5 * nrow(estban)
+nrow(data) - nrow(estban) == length(unique(estban$cnpj_agencia)) * 2 * 12 * (5 - 1)
 
 # agregando
 data = data |>
@@ -116,6 +116,15 @@ data = data |>
     prediction = sum(prediction)
   )
 
+# adicionando primeiras diferenças
+data = data |>
+  dplyr::group_by(nome_mesorregiao, nome_microrregiao, nome, cnpj_agencia, verbete, modelo) |>
+  dplyr::mutate(
+    diff = abs(tsibble::difference(saldo, lag = 12)),
+    diff_squared = tsibble::difference(saldo, lag = 12)^2
+  ) |>
+  dplyr::ungroup()
+
 # combinações para acurácia
 combinacoes = list(
   agregado = list("is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & is_aggregated(nome_microrregiao) & is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("modelo")), # nolint
@@ -125,29 +134,65 @@ combinacoes = list(
   agencia = list("is_aggregated(verbete) & !is_aggregated(cnpj_agencia) & !is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "modelo")), # nolint
   verbete = list("!is_aggregated(verbete) & is_aggregated(cnpj_agencia) & is_aggregated(nome) & is_aggregated(nome_microrregiao) & is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("verbete", "modelo")), # nolint
   bottom = list("!is_aggregated(verbete) & !is_aggregated(cnpj_agencia) & !is_aggregated(nome) & !is_aggregated(nome_microrregiao) & !is_aggregated(nome_mesorregiao) & !is_aggregated(modelo)", c("verbete", "cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "modelo")), # nolint
-  hierarquia = list("!is_aggregated(modelo)", c("modelo")) # nolint
+  hierarquia = list("!is_aggregated(modelo)", c("verbete", "cnpj_agencia", "nome", "nome_microrregiao", "nome_mesorregiao", "modelo")) # nolint
 )
 
 # acurácia
 data_acc = lapply(names(combinacoes), function(nivel) {
-  data = tsibble::as_tibble(data) |>
+  # filtrando dados
+  temp = tsibble::as_tibble(data) |>
     dplyr::filter(!!rlang::parse_expr(combinacoes[[nivel]][[1]])) |>
     dplyr::mutate(modelo = as.character(modelo)) |>
-    dplyr::group_by_at(dplyr::vars(combinacoes[[nivel]][[2]])) |>
+    dplyr::group_by_at(dplyr::vars(combinacoes[[nivel]][[2]]))
+
+  # calculando diffs para mase e rmsse
+  diffs = temp |>
+    dplyr::filter(modelo == "NA") |>
+    dplyr::summarise(
+      diff = mean(diff, na.rm = TRUE),
+      diff_squared = mean(diff_squared, na.rm = TRUE)
+    ) |>
+    dplyr::select(-modelo)
+
+  # calculando acurácia
+  temp = temp |>
+    dplyr::filter(modelo != "NA") |>
     dplyr::summarise(
       rmse = sqrt(mean((prediction - saldo) ^ 2)),
       mae = mean(abs(prediction - saldo)),
-      mape = mean(abs((prediction - saldo) / saldo))
+      mape = mean(abs((prediction - saldo) / saldo)),
+      mse = mean((prediction - saldo) ^ 2)
+    )
+
+  # merge com diffs
+  if (nivel == "agregado") {
+    temp = dplyr::cross_join(temp, diffs)
+  } else {
+    temp = dplyr::left_join(temp, diffs)
+  }
+
+  # calculando mase e rmsse
+  temp = temp |>
+    dplyr::mutate(
+      mase = mae / diff,
+      rmsse = sqrt(mse / diff_squared)
     ) |>
     dplyr::group_by(modelo) |>
-    dplyr::summarise(rmse = mean(rmse), mae = mean(mae), mape = mean(mape))
-  data$serie = nivel
+    dplyr::summarise(
+      rmse = mean(rmse),
+      mae = mean(mae),
+      mape = mean(mape),
+      mase = mean(mase),
+      rmsse = mean(rmsse)
+    )
+  temp$serie = nivel
 
-  return(data)
+  return(temp)
 })
 
 # agregando dataframes
-acuracia_ml = lapply(list("rmse", "mae", "mape"), function(medida) {
+medidas = c("rmse", "mae", "mape", "mase", "rmsse")
+acuracia_ml = lapply(medidas, function(medida) {
   do.call("rbind", data_acc)[, c("modelo", medida, "serie")] |>
     tidyr::pivot_wider(
       names_from = serie,
@@ -156,3 +201,5 @@ acuracia_ml = lapply(list("rmse", "mae", "mape"), function(medida) {
     as.data.frame(t()) |>
     tibble::as_tibble()
 })
+
+names(acuracia_ml) = medidas

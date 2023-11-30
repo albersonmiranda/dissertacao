@@ -97,7 +97,7 @@ data = data |>
   ) |>
   fabletools::aggregate_key(
     (State / Region) * Purpose * modelo,
-    saldo = sum(Trips),
+    Trips = sum(Trips),
     prediction = sum(prediction)
   )
 
@@ -105,8 +105,8 @@ data = data |>
 data = data |>
   dplyr::group_by(State, Purpose, modelo, Region) |>
   dplyr::mutate(
-    diff = abs(tsibble::difference(saldo)),
-    diff_squared = tsibble::difference(saldo)^2
+    diff = abs(tsibble::difference(Trips, lag = 4)),
+    diff_squared = tsibble::difference(Trips, lag = 4)^2
   ) |>
   dplyr::ungroup()
 
@@ -141,10 +141,10 @@ data_acc = lapply(names(combinacoes), function(nivel) {
   temp = temp |>
     dplyr::filter(modelo != "NA") |>
     dplyr::summarise(
-      rmse = sqrt(mean((prediction - saldo) ^ 2)),
-      mae = mean(abs(prediction - saldo)),
-      mape = mean(abs((prediction - saldo) / saldo)),
-      mse = mean((prediction - saldo) ^ 2)
+      rmse = sqrt(mean((prediction - Trips) ^ 2)),
+      mae = mean(abs(prediction - Trips)),
+      mape = mean(abs((prediction - Trips) / Trips)),
+      mse = mean((prediction - Trips) ^ 2)
     )
 
   # merge com diffs

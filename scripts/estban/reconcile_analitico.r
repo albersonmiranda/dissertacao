@@ -11,7 +11,7 @@ pacman::p_load(
 
 # dados
 estban = readRDS("data/estban/estban.rds") |>
-  tsibble::filter_index("2022 jan" ~ "2022 dec")
+  subset(ref <= tsibble::yearmonth("2022 dec"))
 
 # modelo previsões base
 modelo = readRDS("data/estban/previsoes_base/modelo.rds")
@@ -45,10 +45,22 @@ acuracia = lapply(names(combinacoes), function(nivel) {
     dplyr::filter(!!rlang::parse_expr(combinacoes[[nivel]])) |>
     fabletools::accuracy(
       data = estban,
-      measures = list(mae = fabletools::MAE, rmse = fabletools::RMSE, mape = fabletools::MAPE)
+      measures = list(
+        mae = fabletools::MAE,
+        rmse = fabletools::RMSE,
+        mape = fabletools::MAPE,
+        mase = fabletools::MASE,
+        rmsse = fabletools::RMSSE
+      )
     ) |>
     dplyr::group_by(.model) |>
-    dplyr::summarise(rmse = mean(rmse), mae = mean(mae), mape = mean(mape))
+    dplyr::summarise(
+      rmse = mean(rmse),
+      mae = mean(mae),
+      mape = mean(mape),
+      mase = mean(mase),
+      rmsse = mean(rmsse)
+    )
 
   data$serie = nivel
 
@@ -56,7 +68,8 @@ acuracia = lapply(names(combinacoes), function(nivel) {
 })
 
 # agregando dataframes
-acuracia_analiticos = lapply(list("rmse", "mae", "mape"), function(medida) {
+medidas = c("rmse", "mae", "mape", "mase", "rmsse")
+acuracia_analiticos = lapply(medidas, function(medida) {
   do.call("rbind", acuracia)[, c(".model", medida, "serie")] |>
     tidyr::pivot_wider(
       names_from = serie,
@@ -65,6 +78,8 @@ acuracia_analiticos = lapply(list("rmse", "mae", "mape"), function(medida) {
     as.data.frame(t()) |>
     tibble::as_tibble()
 })
+
+names(acuracia_analiticos) = medidas
 
 # save
 saveRDS(modelo_reconcile, "data/estban/preds_analitico/modelo_reconcile.rds")
