@@ -77,13 +77,6 @@ tourism = within(tourism, {
   Purpose = as.character(Purpose)
 })
 
-# limpando dataframe tourism
-tourism = within(tourism, {
-  State = iconv(tolower(gsub("-", " ", State)), "LATIN1", "ASCII//TRANSLIT")
-  Region = iconv(tolower(Region), "LATIN1", "ASCII//TRANSLIT")
-  # ! TODO: Adicionar Purpose daqui pra baixo
-})
-
 # merge entre tourism e preds
 data = merge(tourism, preds, all.x = TRUE)
 
@@ -97,19 +90,20 @@ data = data |>
     key = c(
       "State",
       "Region",
+      "Purpose",
       "modelo"
     ),
     index = Quarter
   ) |>
   fabletools::aggregate_key(
-    (State / Region) * modelo,
+    (State / Region) * Purpose * modelo,
     saldo = sum(Trips),
     prediction = sum(prediction)
   )
 
 # adicionando primeiras diferenças
 data = data |>
-  dplyr::group_by() |>
+  dplyr::group_by(State, Purpose, modelo, Region) |>
   dplyr::mutate(
     diff = abs(tsibble::difference(saldo)),
     diff_squared = tsibble::difference(saldo)^2
@@ -118,26 +112,54 @@ data = data |>
 
 # combinações para acurácia
 combinacoes = list(
-  agregado = list("is_aggregated(Region) & is_aggregated(State) & !is_aggregated(modelo)", c("modelo")), # nolint
-  State = list("is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("State", "modelo")), # nolint
-  Region = list("!is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("Region", "State", "modelo")), # nolint
-  hierarquia = list("!is_aggregated(modelo)", c("modelo")) # nolint
+  agregado = list("is_aggregated(Purpose) & is_aggregated(Region) & is_aggregated(State) & !is_aggregated(modelo)", c("modelo")), # nolint
+  State = list("is_aggregated(Purpose) & is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("State", "modelo")), # nolint
+  Region = list("is_aggregated(Purpose) & !is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("Region", "State", "modelo")), # nolint
+  Purpose = list("!is_aggregated(Purpose) & is_aggregated(Region) & is_aggregated(State) & !is_aggregated(modelo)", c("Purpose", "modelo")), # nolint
+  bottom = list("!is_aggregated(Purpose) & !is_aggregated(Region) & !is_aggregated(State) & !is_aggregated(modelo)", c("Purpose", "Region", "State", "modelo")), # nolint
+  hierarquia = list("!is_aggregated(modelo)", c("Purpose", "Region", "State", "modelo")) # nolint
 )
 
 # acurácia
 data_acc = lapply(names(combinacoes), function(nivel) {
-  data = tsibble::as_tibble(data) |>
+  # filtrando dados
+  temp = tsibble::as_tibble(data) |>
     dplyr::filter(!!rlang::parse_expr(combinacoes[[nivel]][[1]])) |>
     dplyr::mutate(modelo = as.character(modelo)) |>
-    dplyr::group_by_at(dplyr::vars(combinacoes[[nivel]][[2]])) |>
+    dplyr::group_by_at(dplyr::vars(combinacoes[[nivel]][[2]]))
+
+  # calculando diffs para mase e rmsse
+  diffs = temp |>
+    dplyr::filter(modelo == "NA") |>
+    dplyr::summarise(
+      diff = mean(diff, na.rm = TRUE),
+      diff_squared = mean(diff_squared, na.rm = TRUE)
+    ) |>
+    dplyr::select(-modelo)
+
+  # calculando acurácia
+  temp = temp |>
+    dplyr::filter(modelo != "NA") |>
     dplyr::summarise(
       rmse = sqrt(mean((prediction - saldo) ^ 2)),
       mae = mean(abs(prediction - saldo)),
       mape = mean(abs((prediction - saldo) / saldo)),
-      mase = mae / mean(diff, na.rm = TRUE),
-      rmsse = sqrt(mean((prediction - saldo) ^ 2, na.rm = TRUE) / mean(diff_squared, na.rm = TRUE))
+      mse = mean((prediction - saldo) ^ 2)
+    )
+
+  # merge com diffs
+  if (nivel == "agregado") {
+    temp = dplyr::cross_join(temp, diffs)
+  } else {
+    temp = dplyr::left_join(temp, diffs)
+  }
+
+  # calculando mase e rmsse
+  temp = temp |>
+    dplyr::mutate(
+      mase = mae / diff,
+      rmsse = sqrt(mse / diff_squared)
     ) |>
-    dplyr::filter(modelo != "NA") |>
     dplyr::group_by(modelo) |>
     dplyr::summarise(
       rmse = mean(rmse),
@@ -146,9 +168,9 @@ data_acc = lapply(names(combinacoes), function(nivel) {
       mase = mean(mase),
       rmsse = mean(rmsse)
     )
-  data$serie = nivel
+  temp$serie = nivel
 
-  return(data)
+  return(temp)
 })
 
 # agregando dataframes
