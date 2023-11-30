@@ -70,7 +70,8 @@ acuracia = lapply(names(combinacoes), function(nivel) {
 })
 
 # agregando dataframes
-acuracia_analiticos = lapply(list("rmse", "mae", "mape", "mase", "rmsse"), function(medida) {
+medidas = c("rmse", "mae", "mape", "mase", "rmsse")
+acuracia_analiticos = lapply(medidas, function(medida) {
   do.call("rbind", acuracia)[, c(".model", medida, "serie")] |>
     tidyr::pivot_wider(
       names_from = serie,
@@ -79,6 +80,8 @@ acuracia_analiticos = lapply(list("rmse", "mae", "mape", "mase", "rmsse"), funct
     as.data.frame(t()) |>
     tibble::as_tibble()
 })
+
+names(acuracia_analiticos) = medidas
 
 # save
 saveRDS(modelo_reconcile, "data/tourism/preds_analitico/modelo_reconcile.rds")

@@ -8,7 +8,7 @@ set.seed(123)
 library(fabletools)
 
 # datas fim para janelas de treino
-window_end = tsibble::yearquarter(seq(as.Date("2007-12-01"), as.Date("2016-09-01"), by = "quarter"))
+window_end = tsibble::yearquarter(seq(as.Date("2007-12-01"), as.Date("2015-09-01"), by = "quarter"))
 
 # paralelização
 future::plan("multisession")
@@ -27,7 +27,7 @@ preds_fun = function(x) {
 
     # obtendo predições
     preds = tourism |>
-      fabletools::model(arima = fable::ARIMA(Trips)) |>
+      fabletools::model(ets = fable::ETS(Trips)) |>
       fabletools::forecast(h = 1)
 
     return(preds)
