@@ -1009,3 +1009,5 @@ Esse procedimento será realizado três vezes, uma para cada configuração do m
 # RESULTADOS
 
 [Escrever o *benchmarking* da performance dos métodos de reconciliação]
+
+<!-- ! BUG: Parece ter um erro nos resultados de Spiliotis. Note que tanto em meus resultados de ML (implementados manualmente) quanto os analíticos (utilizando a implementação do {fabletools}, RMSSE < MASE. Mas, em Spiliotis, RMSSE > MASE tanto para ML quanto os analíticos, indicando que possa haver problemas na execução ou nos dados. -->
