@@ -29,7 +29,10 @@ design = benchmark_grid(
     learners$ranger,
     learners$glmnet,
     learners$glmnet_lasso,
-    learners$glmnet_ridge
+    learners$glmnet_ridge,
+    learners$svm,
+    learners$nnet,
+    learners$lightgbm
   ),
   outer_resampling
 )

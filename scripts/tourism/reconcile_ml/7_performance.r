@@ -8,7 +8,7 @@ library(fabletools)
 tipo = "rolling_forecast"
 
 # juntando predições em um único dataframe
-preds = lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge"), function(learner) {
+preds = lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "nnet", "lightgbm"), function(learner) {
   preds = readRDS(paste0("data/tourism/preds_ml/preds/", tipo, "/preds_", learner, ".RDS"))
   preds = lapply(preds[[1]], function(df) data.table::as.data.table(df) |> subset(select = response))
   preds = do.call(cbind, preds)
@@ -18,7 +18,7 @@ preds = lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge"), function(learner)
 })
 
 # nomeando a lista
-names(preds) = c("xgb", "ranger", "glmnet", "lasso", "ridge")
+names(preds) = c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "nnet", "lightgbm")
 
 # remover primeiro caractere do nome das colunas
 preds = lapply(preds, function(df) {

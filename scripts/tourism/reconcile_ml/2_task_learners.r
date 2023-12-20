@@ -104,7 +104,10 @@ learners = list(
   glmnet_lasso = as_learner(pipeline %>>% po("learner", lrn("regr.glmnet"))),
   glmnet_ridge = as_learner(pipeline %>>% po("learner", lrn("regr.glmnet"))),
   xgb = as_learner(pipeline %>>% po("learner", lrn("regr.xgboost"))),
-  ranger = as_learner(pipeline %>>% po("learner", lrn("regr.ranger")))
+  ranger = as_learner(pipeline %>>% po("learner", lrn("regr.ranger"))),
+  nnet = as_learner(pipeline %>>% po("learner", lrn("regr.nnet"))),
+  svm = as_learner(pipeline %>>% po("learner", lrn("regr.svm"))),
+  lightgbm = as_learner(pipeline %>>% po("learner", lrn("regr.lightgbm")))
 )
 
 # ids
@@ -113,3 +116,6 @@ learners$ranger$id = "ranger"
 learners$glmnet$id = "glmnet"
 learners$glmnet_lasso$id = "glmnet_lasso"
 learners$glmnet_ridge$id = "glmnet_ridge"
+learners$nnet$id = "nnet"
+learners$svm$id = "svm"
+learners$lightgbm$id = "lightgbm"

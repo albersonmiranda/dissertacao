@@ -156,7 +156,9 @@ search_space = ps(
   # número de neurônios na camada oculta
   regr.nnet.size = p_int(lower = 1, upper = 20),
   # regularização
-  regr.nnet.decay = p_dbl(lower = 0, upper = 1)
+  regr.nnet.decay = p_dbl(lower = 0, upper = 1),
+  # pesos máximos
+  regr.nnet.MaxNWts = p_int(lower = 10000, upper = 10000)
 )
 
 # tuner
@@ -209,8 +211,6 @@ search_space = ps(
   regr.lightgbm.learning_rate = p_dbl(lower = -4, upper = 0),
   # número de folhas
   regr.lightgbm.num_leaves = p_int(lower = 2, upper = 20),
-  # número de dados em uma folha
-  regr.lightgbm.min_data_in_leaf = p_int(lower = 1, upper = 50),
   # regularização L2
   regr.lightgbm.lambda_l2 = p_dbl(lower = -12, upper = 12),
   # regularização L1
@@ -218,9 +218,9 @@ search_space = ps(
   # subamostragem de colunas
   regr.lightgbm.feature_fraction = p_dbl(lower = 0.1, upper = 1),
   # subamostragem de dados
-  regr.lightgbm.bagging_fraction = p_dbl(lower = 0.1, upper = 1),
+  regr.lightgbm.bagging_fraction = p_dbl(lower = 0.1, upper = 1, depends = regr.lightgbm.boosting %in% c("gbdt", "dart")), #  nolint
   # subamostragem de dados para treinamento de árvore
-  regr.lightgbm.bagging_freq = p_int(lower = 1, upper = 10)
+  regr.lightgbm.bagging_freq = p_int(lower = 1, upper = 10, depends = regr.lightgbm.boosting %in% c("gbdt", "dart")) #  nolint
 )
 
 # transformação
