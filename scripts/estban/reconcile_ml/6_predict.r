@@ -101,20 +101,6 @@ names(preds_svm) = nomes_tasks
 list(preds_svm, svm_time) |>
   saveRDS(paste0("data/estban/preds_ml/preds/", tipo, "/preds_svm.RDS"), compress = FALSE)
 
-# nnet
-ini = Sys.time()
-preds_nnet = lapply(task, function(tarefa) {
-  learners$nnet$train(tarefa)
-  preds = learners$nnet$predict_newdata(newdata = new_data)
-
-  return(preds)
-})
-fim = Sys.time()
-nnet_time = difftime(fim, ini, units = "hours")
-names(preds_nnet) = nomes_tasks
-list(preds_nnet, nnet_time) |>
-  saveRDS(paste0("data/estban/preds_ml/preds/", tipo, "/preds_nnet.RDS"), compress = FALSE)
-
 # lightgbm
 ini = Sys.time()
 preds_lightgbm = lapply(task, function(tarefa) {

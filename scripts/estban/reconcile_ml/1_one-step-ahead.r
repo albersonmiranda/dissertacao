@@ -22,6 +22,9 @@ testes_lb = modelo |>
   fabletools::features(.innov, feasts::ljung_box, lag = 12)
 
 # previsões 1-step-ahead
+# ? Refit significa reajustar o modelo usando os mesmos hiperparâmetros (ex.: ARIMA(2,1,1)),
+# ? mas com outro conjunto de dados. Pode-se optar por usar os mesmos coeficientes (reestimate = FALSE)
+# ? ou estimar novos coeficientes (reestimate = TRUE).
 preds = fabletools::refit(modelo, new_data, reestimate = TRUE) |> fitted()
 
 # save

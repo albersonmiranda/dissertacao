@@ -8,7 +8,7 @@ library(fabletools)
 tipo = "one-step-ahead"
 
 # juntando predições em um único dataframe
-preds = lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "nnet", "lightgbm"), function(learner) {
+preds = lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm"), function(learner) {
   preds = readRDS(paste0("data/estban/preds_ml/preds/", tipo, "/preds_", learner, ".RDS"))
   preds = lapply(preds[[1]], function(df) data.table::as.data.table(df) |> subset(select = response))
   preds = do.call(cbind, preds)
@@ -18,7 +18,7 @@ preds = lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "nnet", "li
 })
 
 # nomeando a lista
-names(preds) = c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "nnet", "lightgbm")
+names(preds) = c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm")
 
 # remover primeiro caractere do nome das colunas
 preds = lapply(preds, function(df) {
@@ -94,7 +94,7 @@ estban = within(estban, {
 data = merge(estban, preds, all.x = TRUE)
 
 # teste se merge foi completo
-nrow(data) - nrow(estban) == length(unique(estban$cnpj_agencia)) * 2 * 12 * (5 - 1)
+nrow(subset(data, !is.na(prediction) & !is_aggregated(cnpj_agencia) & !is_aggregated(verbete) & !is_aggregated(modelo))) == nrow(preds) # nolint
 
 # agregando
 data = data |>
