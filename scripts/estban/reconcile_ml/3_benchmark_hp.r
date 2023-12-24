@@ -179,6 +179,7 @@ svm = auto_tuner(
 )
 
 ## LIGHT GBM ##
+
 # search space
 search_space = ps(
   # número de interações
