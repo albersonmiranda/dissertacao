@@ -149,28 +149,6 @@ glmnet_ridge = auto_tuner(
   terminator = terminator
 )
 
-## NNET ##
-
-# search space
-search_space = ps(
-  # número de neurônios na camada oculta
-  regr.nnet.size = p_int(lower = 1, upper = 20),
-  # regularização
-  regr.nnet.decay = p_dbl(lower = 0, upper = 1),
-  # pesos máximos
-  regr.nnet.MaxNWts = p_int(lower = 10000, upper = 10000)
-)
-
-# tuner
-nnet = auto_tuner(
-  tuner = tuner_grid,
-  learner = learners$nnet,
-  resampling = inner_resampling,
-  measure = measure,
-  search_space = search_space,
-  terminator = terminator
-)
-
 ## SVM ##
 
 # search space
@@ -243,7 +221,6 @@ learners = list(
   glmnet = glmnet,
   glmnet_lasso = glmnet_lasso,
   glmnet_ridge = glmnet_ridge,
-  nnet = nnet,
   svm = svm,
   lightgbm = lightgbm
 )

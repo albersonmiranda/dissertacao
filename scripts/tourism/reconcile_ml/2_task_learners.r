@@ -8,7 +8,7 @@ pacman::p_load(
 )
 
 # tipo de previsões treino: one-step-ahead, rolling_forecast ou fitted_base
-tipo = "rolling_forecast"
+tipo = "fitted_base"
 
 # true data (y_t)
 true_data = readRDS("data/tourism/tourism.rds") |>
@@ -105,7 +105,6 @@ learners = list(
   glmnet_ridge = as_learner(pipeline %>>% po("learner", lrn("regr.glmnet"))),
   xgb = as_learner(pipeline %>>% po("learner", lrn("regr.xgboost"))),
   ranger = as_learner(pipeline %>>% po("learner", lrn("regr.ranger"))),
-  nnet = as_learner(pipeline %>>% po("learner", lrn("regr.nnet"))),
   svm = as_learner(pipeline %>>% po("learner", lrn("regr.svm"))),
   lightgbm = as_learner(pipeline %>>% po("learner", lrn("regr.lightgbm")))
 )
@@ -116,6 +115,5 @@ learners$ranger$id = "ranger"
 learners$glmnet$id = "glmnet"
 learners$glmnet_lasso$id = "glmnet_lasso"
 learners$glmnet_ridge$id = "glmnet_ridge"
-learners$nnet$id = "nnet"
 learners$svm$id = "svm"
 learners$lightgbm$id = "lightgbm"
