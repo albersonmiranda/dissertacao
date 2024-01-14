@@ -967,7 +967,7 @@ estban |>
 
 Uma vez que o foco deste trabalho está no incremento de performance proporcionado pela reconciliação ótima sobre um conjunto de previsões base e não na qualidade destas, elas foram obtidas por meio de métodos básicos para previsão de séries temporais, especificamente o algoritmo de Hyndman-Koehler-Snyder-Grose para suavimento exponencial (ETS) [@hyndman_state_2002], sem tratamentos adicionais para *outliers*, quebras estruturais ou transformações. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
 
-Os modelos foram treinados com dados de 2003 a 2021 e as previsões foram realizadas para o ano de 2022. Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Os resultados são apresentados na @tbl-lb_pvalue. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são ruído branco. Isso sugere que os modelos de previsão base são, em geral, adequados para o propósito deste trabalho.
+Os modelos foram treinados com dados de 2003 a 2021 e as previsões foram realizadas para o ano de 2022. Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Os resultados são apresentados na @tbl-lb_pvalue. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são ruído branco. Isso sugere que os modelos de previsão base são, em sua maior parte, adequados para o propósito deste trabalho.
 
 ```{r}
 #| label: tbl-lb_pvalue
@@ -983,19 +983,16 @@ prop.table(table(testes_lb$h_0)) |>
 
 ## *Design* do experimento
 
-### Métodos analíticos de reconciliação
+O objetivo do experimento consiste em comparar o ganho de desempenho dos métodos de reconciliação em relação às previsões base, ou seja, dada a performance das previsões individuais, o quanto mais precisas elas se tornam ao aplicar um determinado método de reconciliação. Para isso, serão utilizadas a abordagem de nível único *bottom-up*^[Como o *dataset* Estban é agrupado, a desagregação não é única e as abordagem *top-down* e *middle-out* não podem ser aplicadas [@athanasopoulos_forecast_2023].], o método analítico de reconciliação ótima *MinT-Shrink* e os métodos de reconciliação ótima baseados em *machine learning*: *gradient boosting* (*Xgboost* e *LightGBM*), *Random Forest*, *Elastic Net* (Lasso, *Ridge* e *Elastic Net*) e *Support Vector Machines*.
 
-<!-- * MARK: Estou aqui -->
-
-Os métodos analíticos de reconciliação utilizados no *benchmark* serão os de nível único *bottom-up* e o *top-down*; os de reconciliação ótima *MinT-OLS*, *MinT-WLS* e *MinT-shrink*. Essa escolha se justifica para que seja possível comparar os métodos de reconciliação ótima com os métodos de nível único, principalmente em relação ao tempo de processamento, que pode revelar um *trade-off* a ser analisado pelo pesquisador.
-
-### Métodos de reconciliação ótima baseados em aprendizado de máquina
-
-A metodologia para obtenção das previsões reconciliadas por métodos baseados em *machine-learning* será semelhante ao de @spiliotis_hierarchical_2021:
+A metodologia para obtenção das previsões reconciliadas por métodos baseados em *machine-learning* será semelhante ao de @spiliotis_hierarchical_2021 e consiste nos seguintes passos:
 
 1. dividir a amostra em treino e teste;
 1. treinar um modelo de previsão na amostra treino e obter previsões um passo a frente para a amostra teste;
-1. treinar um modelo de *machine learning* para cada série do menor nível da hierarquia, em que os parâmetros são as previsões obtidas no passo 2 e a variável explicada são os valores observados. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos;
+
+![Previsões base](img/modelagem_1.png){#fig-modelagem_1 width=70%}
+
+1. treinar um modelo de *machine learning* para cada série do nível mais desagregado, em que as variáveis são as previsões obtidas no passo 2 e a variável explicada são os valores observados. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos;
 1. obter as previsões base $\hat{y}_t$;
 1. passar as previsões base ao modelo treinado no passo 3 para se obter as previsões reconciliadas para o menor nível da hierarquia;
 1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
