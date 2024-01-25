@@ -22,13 +22,7 @@ names(preds) = c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm")
 
 # remover primeiro caractere do nome das colunas
 preds = lapply(preds, function(df) {
-  names(df) = gsub("^.", "", names(df))
-  return(df)
-})
-
-# renomeando coluna ef para ref
-preds = lapply(preds, function(df) {
-  names(df)[names(df) == "ef"] = "ref"
+  names(df)[names(df) != "ref"] = gsub("^.", "", names(df)[names(df) != "ref"])
   return(df)
 })
 

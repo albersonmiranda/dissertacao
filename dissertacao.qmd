@@ -629,11 +629,13 @@ $$
 \mathbfit{\tilde{y}}_{t+h|t} = \mathbfit{S}(\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{S})^{-1}\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{\hat{y}}_{t+h|t}
 $$ {#eq-mint4}
 
-Assim como 
-
 ## Métodos de reconciliação ótima baseados em aprendizado de máquina
 
-### O método elastic net
+Embora os métodos de ML também sejam utilizados no contexto de previsão de séries temporais, é importante ressaltar que este não é caso. As previsões de séries temporais são realizadas anteriormente, na obtenção das previsões base $\hat{y}_t$. Nada impede que essas previsões sejam obtidas por um modelo de ML, mas isso não é o foco deste trabalho.
+
+A aplicação dos métodos de ML aqui ocorrem na reconciliação, ou seja, na combinação contemporânea, *cross section*, das previsões base que, por sua vez, podem ter sido obtidas através de qualquer método.
+
+### Elastic Net
 
 O *elastic net* [@zou_regularization_2005] é um método de regressão regularizada que combina as normas $L_1$ e $L_2$, as penalidades do *lasso* e do *ridge*, respectivamente. A função objetivo a ser minimizada é dada por
 
@@ -655,6 +657,55 @@ Portanto o *elastic net* é um método de *shrinkage*, uma vez que a penalidade 
 
 Diferentemente dos métodos analíticos estudados, o *elastic net* não possui uma solução fechada. Portanto, é necessário utilizar métodos iterativos para encontrar o valor ótimo de $\mathbfit{\hat{\beta}}$ e @zou_regularization_2005 utilizam validação cruzada $k$-fold para encontrar quais os valores de $\lambda_1$ e $\lambda_2$ que minimizam o resíduo. Nesse sentido, dado a metodologia de processo iterativo envolvendo calibragem de hiperparâmetros e reamostragem, podemos classificar o *elastic net* como um método de *machine learning*.
 
+### Boosting Trees
+
+Como cada uma das diversas implementações de *boosting trees* possui sua teoria adjacente, não é de objetivo deste trabalho detalhar o funcionamento de cada uma delas. Portanto, trabalharemos apenas sua intuição.
+
+Assim como os métodos de floresta aleatória, os métodos de *boosting trees* também são métodos de conjuntos de árvores. A diferença se dá na forma como os modelos são treinados. *Boosting trees* são métodos que combinam as predições de vários modelos fracos parar formar um conjunto — *ensemble*, na definição mais usual, ou comitê (*committee*), na definição de @hastie_elements_2009 — mais complexo e preciso (forte).
+
+Um estimador fraco é aquele que tem desempenho apenas ligeiramente melhor que o acaso. O propósito do *boosting* é produzir uma sequencia de estimadores fracos, cada um deles focado nos erros dos estimadores anteriores. A cada iteração, as observações classificadas incorretamente (no caso de uma tarefa de classificação) ou de maior variância (no caso de uma tarefa de regressão) na iteração anterior têm seu peso aumentado, e vice-versa. Dessa forma, o modelo subsequente formado na próxima iteração é obrigado a se concentrar nas observações onde as iterações anteriores falharam. Isso que significa transformar um conjunto de estimadores fracos em um conjunto forte.
+
+O *gradient boosting* é uma extensão do *boosting* que utiliza o gradiente da função de perda como critério de otimização, de forma que esta se dá na direção em que a função de perda decresce mais rapidamente a cada iteração. Os métodos utilizados neste trabalho são o *XGBoost* [@chen_xgboost_2016] e o *LightGBM* [@ke_lightgbm_2017].
+
+Um das principais diferenças entre os dois métodos é a forma como as árvores são construídas. O *XGBoost* cresce suas árvores de forma *level-wise*, ou seja, cresce todas as folhas do último nível de uma árvore de uma vez, adicionando mais um nível de profundidade completo a cada iteração (@fig-xgboost). Já o *LightGBM* cresce suas árvores de forma *leaf-wise*, ou seja, cresce uma folha por vez, aprofundando a árvore apenas no nó que resulta na maior variação negativa na função de perda (@fig-lightgbm).
+
+::: {#fig-tree-growth layout-ncol=2}
+
+![*level-wise*](img/xgboost.png){#fig-xgboost width=100%}
+
+![*leaf-wise*](img/lightgbm.png){#fig-lightgbm width=100%}
+
+Crescimento de árvores em algoritmos de *boosting*.
+:::
+
+### Random Forest
+
+Florestas aleatórias são um método de aprendizado de máquina que utilizam conjuntos de árvores de decisão descorrelatadas para classificação ou regressão. O método consiste em treinar várias árvores de decisão em subconjuntos aleatórios dos dados de treinamento e, então, combinar suas predições [@hastie_elements_2009]. A aleatoriedade é introduzida de duas formas: na seleção das observações e na seleção das variáveis preditoras.
+
+Seu algoritmo para regressão é simples:
+
+```{=latex}
+\begin{algorithm}
+\caption{An algorithm with caption}\label{alg:two}
+\KwData{$n \geq 0$}
+\KwResult{$y = x^n$}
+$y \gets 1$\;
+$X \gets x$\;
+$N \gets n$\;
+\While{$N \neq 0$}{
+  \eIf{$N$ is even}{
+    $X \gets X \times X$\;
+    $N \gets \frac{N}{2}$
+  }{\If{$N$ is odd}{
+      $y \gets y \times X$\;
+      $N \gets N - 1$\;
+    }
+  }
+}
+\end{algorithm}
+```
+### Support Vector Machines
+
 # METODOLOGIA
 
 Neste capítulo estão contidas explicações sobre os dados e variáveis, sobre o *design* da modelagem e sobre a avaliação dos modelos.
@@ -666,10 +717,6 @@ Os dados usados nesse trabalho são dados terciários obtidos do *datalake* púb
 O que compõe os verbetes de crédito, ou seja, os valores das séries temporais a serem trabalhadas, são os saldos de crédito ativo (empréstimos e financiamentos), que correspondem ao principal mais os juros calculados até 59 dias de atraso^[Não são consideradas crédito ativo as operações de crédito liquidadas ou que tenham sido transferidas para prejuízo. São transferidas para prejuízo as operações de crédito em atraso há mais 6 meses após sua classificação de risco em H, que é a mínima [@conselho_monetario_nacional_resolucao_1999].].
 
 Além das estatísticas bancárias, foram obtidas informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
-
-<!-- TODO: explicar que a metodologia por rolling origin ou refit requer a realização de previsões para dentro da amostra treino e, por isso, eu preciso excluir as agências sem a série completa por conta do risco de não haver observações não nulas o suficiente para a realização dessas previsões -->
-
-<!-- TODO: Explicar que essa é uma vantagem do MinT, que não requer previsões extras. Além disso, pode ser uma alternativa usar os valores ajustados das previsões base, o que permitiria incluir essas agências criadas durante o período -->
 
 Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram selecionados os principais verbetes, que são *empréstimos e títulos descontados* e *financiamentos*, e mantidas apenas as agências atualmente em atividade. Quanto ao período, há dados disponíveis desde 1988. Entretanto, utilizaremos os dados a partir de 2003 pois, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta. Por essa razão, apesar do Banestes contar com 134 agências, foram mantidas apenas as agências com série completa, ou seja, que já estavam em atividade em 2003.
 
@@ -690,18 +737,16 @@ tibble::tribble(
   "cnpj_agencia", "CNPJ da agência bancária",
   "saldo", "Saldo do verbete"
 ) |>
-  kbl(booktabs = TRUE, row.names = FALSE, format = "latex") |>
+  kbl(booktabs = TRUE, row.names = FALSE, format = "latex", caption = "Variáveis do dataset", label = "qdr-variaveis") |>
   kable_styling(latex_options = c("striped"), font_size = 12) |>
   column_spec(2, width = "10cm")
 ```
 
 ```{=latex}
 \begin{quadro}
-  \caption{Variáveis do dataset}\tabularnewline
-  \label{qdr-variaveis}
-
-  \centering\begingroup\fontsize{12}{14}\selectfont
-
+  \caption{\label{tab:qdr-variaveis}Variáveis do dataset}
+  \centering
+  \fontsize{12}{14}\selectfont
   \begin{tabular}[t]{l>{\raggedright\arraybackslash}p{10cm}}
     \toprule
     Variável & Descrição\\
@@ -716,7 +761,6 @@ tibble::tribble(
     \cellcolor{gray!6}{saldo} & \cellcolor{gray!6}{Saldo do verbete}\\
     \bottomrule
   \end{tabular}
-\endgroup{}
 \end{quadro}
 ```
 
@@ -745,18 +789,18 @@ estban |>
 
 O estado do Espírito Santo está localizado no sudeste brasileiro e é dividido em 78 municípios, que estão agrupados em 4 mesorregiões e 13 microrregiões.
 
-::: {#fig-mapas_es layout-ncol=2}
+::: {#fig-mapas-es layout-ncol=2}
 
-![Posição no Brasil](img/mapa-brasil.png){#fig-mapa_brasil}
+![Posição no Brasil](img/mapa-brasil.png){#fig-mapa-brasil}
 
-![Micro e mesorregiões](img/mapa-microrregioes.png){#fig-mapa_es}
+![Micro e mesorregiões](img/mapa-microrregioes.png){#fig-mapa-es}
 
-![Quantidade de agências por município](img/mapa-municipalidades.png){#fig-mapa_municipalidades}
+![Quantidade de agências por município](img/mapa-municipalidades.png){#fig-mapa-municipalidades}
 
 O Estado do Espírito Santo e suas meso e microrregiões.
 :::
 
-As microrregiões que compõem cada mesorregião são apresentadas na @tbl-microrregioes e na @fig-mapa_es. Já os municípios que compõem cada microrregião são apresentados na @tbl-municipios. A @fig-mapa_municipalidades mostra a quantidade de agências por município.
+As microrregiões que compõem cada mesorregião são apresentadas na @tbl-microrregioes e na @fig-mapa-es. Já os municípios que compõem cada microrregião são apresentados na @tbl-municipios. A @fig-mapa-municipalidades mostra a quantidade de agências por município.
 
 ```{r}
 #| label: tbl-microrregioes
@@ -840,7 +884,7 @@ estban |>
   tema
 ```
 
-Em relação à distribuição, a mesorregião Central Espírito-santense concentra mais crédito do que o somatório das demais regiões (@fig-meso), sendo a microrregião de Vitória a responsável por essa concentração (@fig-micro). Na ótica dos verbetes, o crédito para financiamentos é uma pequena fração do saldo de empréstimos, independentemente da mesorregião (@fig-verbetes e @fig-verbete_meso). 
+Em relação à distribuição, a mesorregião Central Espírito-santense concentra mais crédito do que o somatório das demais regiões (@fig-meso), sendo a microrregião de Vitória a responsável por essa concentração (@fig-micro). Na ótica dos verbetes, o crédito para financiamentos é uma pequena fração do saldo de empréstimos, independentemente da mesorregião (@fig-verbetes e @fig-verbete-meso). 
 
 ```{r}
 #| label: fig-meso
@@ -936,7 +980,7 @@ estban |>
 ```
 
 ```{r}
-#| label: fig-verbete_meso
+#| label: fig-verbete-meso
 #| fig-cap: "Verbete por mesorregião do ES"
 
 # plot por mesorregião
@@ -963,14 +1007,16 @@ estban |>
   )
 ```
 
-## Previsões base
+## Previsões base {#sec-previsoes_base}
 
 Uma vez que o foco deste trabalho está no incremento de performance proporcionado pela reconciliação ótima sobre um conjunto de previsões base e não na qualidade destas, elas foram obtidas por meio de métodos básicos para previsão de séries temporais, especificamente o algoritmo de Hyndman-Koehler-Snyder-Grose para suavimento exponencial (ETS) [@hyndman_state_2002], sem tratamentos adicionais para *outliers*, quebras estruturais ou transformações. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
 
-Os modelos foram treinados com dados de 2003 a 2021 e as previsões foram realizadas para o ano de 2022. Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Os resultados são apresentados na @tbl-lb_pvalue. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são ruído branco. Isso sugere que os modelos de previsão base são, em sua maior parte, adequados para o propósito deste trabalho.
+Os modelos foram treinados com dados de 2003 a 2021 e as previsões foram realizadas para o ano de 2022 (@fig-modelagem-1). Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Os resultados são apresentados na @tbl-lb-pvalue. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são ruído branco. Isso sugere que os modelos de previsão base são, em sua maior parte, adequados para o propósito deste trabalho.
+
+![Previsões base](img/modelagem_1.png){#fig-modelagem-1 width=70%}
 
 ```{r}
-#| label: tbl-lb_pvalue
+#| label: tbl-lb-pvalue
 #| tbl-cap: "Resultados do teste de Ljung-box para as previsões base ($\\alpha = 0.05$)"
 
 testes_lb = readRDS("data/estban/previsoes_base/testes_lb.rds") |>
@@ -985,23 +1031,42 @@ prop.table(table(testes_lb$h_0)) |>
 
 O objetivo do experimento consiste em comparar o ganho de desempenho dos métodos de reconciliação em relação às previsões base, ou seja, dada a performance das previsões individuais, o quanto mais precisas elas se tornam ao aplicar um determinado método de reconciliação. Para isso, serão utilizadas a abordagem de nível único *bottom-up*^[Como o *dataset* Estban é agrupado, a desagregação não é única e as abordagem *top-down* e *middle-out* não podem ser aplicadas [@athanasopoulos_forecast_2023].], o método analítico de reconciliação ótima *MinT-Shrink* e os métodos de reconciliação ótima baseados em *machine learning*: *gradient boosting* (*Xgboost* e *LightGBM*), *Random Forest*, *Elastic Net* (Lasso, *Ridge* e *Elastic Net*) e *Support Vector Machines*.
 
-A metodologia para obtenção das previsões reconciliadas por métodos baseados em *machine-learning* será semelhante ao de @spiliotis_hierarchical_2021 e consiste nos seguintes passos:
+A metodologia para obtenção das previsões reconciliadas por métodos baseados em *machine-learning* será semelhante ao de @spiliotis_hierarchical_2021. Ela consiste em:
 
-1. dividir a amostra em treino e teste;
-1. treinar um modelo de previsão na amostra treino e obter previsões um passo a frente para a amostra teste;
+1. Previsão contínua (*rolling forecast*):
+A amostra treino é separada em $p$ subamostras para todas as séries em todos os níveis de agregação, com a primeira separação abrangindo $y_1$ até $Y_Q$, a segunda $y_1$ até $Y_{Q+1}$ e assim sucessivamente até a última separação abrangendo $y_1$ até $Y_{Q+p-1}$. Para cada subamostra foi treinado um modelo (de mesmo algoritmo usado na [seção @sec-previsoes_base]) e obtida previsão um passo a frente. Para este trabalho, a amostra treino foi divida em 50%, com $Q=120$ e $p=108$.
 
-![Previsões base](img/modelagem_1.png){#fig-modelagem_1 width=70%}
+    ![Esquema de modelagem de previsões contínuas](img/modelagem_2.png){#fig-modelagem-2 width=70%}
 
-1. treinar um modelo de *machine learning* para cada série do nível mais desagregado, em que as variáveis são as previsões obtidas no passo 2 e a variável explicada são os valores observados. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos;
-1. obter as previsões base $\hat{y}_t$;
-1. passar as previsões base ao modelo treinado no passo 3 para se obter as previsões reconciliadas para o menor nível da hierarquia;
-1. agregar as previsões reconciliadas para se obter as previsões nos demais níveis hierárquicos.
+1. Treino dos modelos de *machine learning*:
+Para cada série do nível mais desagregado, $y_m$, é treinado um modelo de ML com $n+1$ variáveis, compostas pelas $n$ séries — que incluem todos os níveis de agregação —, mais a própria $y_m$ como *target* (@tbl-modelagem). Cada uma das $n$ séries contam com $p$ previsões obtidas no passo 1. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos.
+    
+1. Reconciliação ótima:
+Com os modelos treinados, passa-se as previsões base obtidas na [seção @sec-previsoes_base] como regressores para se obter as previsões reconciliadas das séries do nível mais desagregado $\tilde{y}_m$.
 
-Esse procedimento será realizado três vezes, uma para cada configuração do método *elastic net*, sendo $\alpha=0$ (*lasso*), $\alpha=1$ (*ridge*) e uma combinação de ambos obtida via reamostragem. Espera-se que todos os três modelos propostos nesse trabalho sejam capazes de superar os métodos analíticos de reconciliação.
+1. Agregação: Assim como nos métodos analíticos de combinação ótima, a obtenção das previsões reconciliadas para os demais níveis de hierárquicos $\tilde{y}_n$ se dá através da agregação  semelhante ao *bottom-up*, mas ao invés de se somar as previsões base $\hat{y}_m$, somam-se as previsões reconciliadas $\tilde{y}_m$.
 
-### Espaço de busca dos hiperparâmetros
+```{r}
+#| label: tbl-modelagem
+#| tbl-cap: "Conjunto de dados para predição dos modelos de ML"
+  tibble::tribble(
+    ~Target, ~`Variável 1`, ~`Variável 2`, ~..., ~`Variável n`,
+    "$y_{1,Q+1}$", "$\\hat{y}_{1,Q+1}$", "$\\hat{y}_{2,Q+1}$", "...", "$\\hat{y}_{n,Q+1}$",
+    "$y_{2,Q+2}$", "$\\hat{y}_{1,Q+2}$", "$\\hat{y}_{2,Q+2}$", "...", "$\\hat{y}_{n,Q+2}$",
+    "...", "...", "...", "...", "...",
+    "$y_{m,Q+p}$", "$\\hat{y}_{1,Q+p}$", "$\\hat{y}_{2,Q+p}$", "...", "$\\hat{y}_{n,Q+p}$"
+  ) |>
+  kbl(booktabs = TRUE, escape = FALSE) |>
+  kable_styling(latex_options = c("striped"))
+```
 
-[Descrever o espaço de hyperparâmetros]
+Dessa forma, essa metodologia é semelhante à aplicada na reconciliação ótima analítica, se afastando principalmente em três pontos: (i) a utilização de algoritmos de ML ao invés de MQG, (ii) a não atribuição de peso de forma obrigatória para todos os nós da hierarquia e (iii) no ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série (@spiliotis_hierarchical_2021).
+
+Um ponto negativo na metodologia proposta por @spiliotis_hierarchical_2021 é o processo de *rolling origin* (passo 1). Esse processo requer a realização de previsões para dentro da amostra treino, o que pode ser um problema para séries temporais com poucas observações. No caso do *dataset* ESTBAN, algumas das agências foram criadas após o período escolhido para o *split* em $Q$ (dezembro/2012), sendo necessário sua exclusão do dataset e invalidando o uso da metodologia para essas unidades. Nesse sentido, o MinT se mostra uma opção mais viável para aplicações no mundo real.
+
+Uma alternativa para permitir o uso dos métodos de ML é substituir o processo de *rolling origin* e usar os valores ajustados dos modelos das previsões base $\hat{y}$ como input para os modelos de ML. Além de permitir a inclusão de agências criadas durante o período, essa abordagem também aumenta o tamanho da amostra treino em $Q$ observações, o que pode melhorar a performance dos modelos de ML. 
+
+## Hiperparâmetros
 
 # RESULTADOS
 
