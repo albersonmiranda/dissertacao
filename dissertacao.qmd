@@ -669,11 +669,11 @@ O *gradient boosting* é uma extensão do *boosting* que utiliza o gradiente da 
 
 Um das principais diferenças entre os dois métodos é a forma como as árvores são construídas. O *XGBoost* cresce suas árvores de forma *level-wise*, ou seja, cresce todas as folhas do último nível de uma árvore de uma vez, adicionando mais um nível de profundidade completo a cada iteração (@fig-xgboost). Já o *LightGBM* cresce suas árvores de forma *leaf-wise*, ou seja, cresce uma folha por vez, aprofundando a árvore apenas no nó que resulta na maior variação negativa na função de perda (@fig-lightgbm).
 
-::: {#fig-tree-growth layout-ncol=2}
+::: {#fig-tree-growth layout-nrow=2}
 
-![*level-wise*](img/xgboost.png){#fig-xgboost width=100%}
+![*level-wise*](img/xgboost.png){#fig-xgboost width=70%}
 
-![*leaf-wise*](img/lightgbm.png){#fig-lightgbm width=100%}
+![*leaf-wise*](img/lightgbm.png){#fig-lightgbm width=70%}
 
 Crescimento de árvores em algoritmos de *boosting*.
 :::
@@ -686,25 +686,24 @@ Seu algoritmo para regressão é simples:
 
 ```{=latex}
 \begin{algorithm}
-\caption{An algorithm with caption}\label{alg:two}
-\KwData{$n \geq 0$}
-\KwResult{$y = x^n$}
-$y \gets 1$\;
-$X \gets x$\;
-$N \gets n$\;
-\While{$N \neq 0$}{
-  \eIf{$N$ is even}{
-    $X \gets X \times X$\;
-    $N \gets \frac{N}{2}$
-  }{\If{$N$ is odd}{
-      $y \gets y \times X$\;
-      $N \gets N - 1$\;
-    }
+\caption{Floresta aleatória para regressão}\label{alg:rf}
+
+\For{$b = 1 \to B$}{
+  1. Toma uma amostra de $Z^*$ de tamanho $N$ dos dados de treino. \\
+  \While{$i < n_{min}$} {
+    a. Seleciona $j$ variáveis aleatoriamente. \\
+    b. Escolhe a melhor variável para \textit{split} dentre $j$. \\
+    c. Divide o nó em dois nós filhas.
   }
 }
+
+Produz um conjunto de árvores $\{T_b\}^B$.
+
 \end{algorithm}
 ```
 ### Support Vector Machines
+
+SVMs são generalizações da ideia de hiperplanos não separáveis e consiste na produção de uma fronteira não linear a partir da construção de uma fornteira linear no espaço de 
 
 # METODOLOGIA
 
@@ -1070,6 +1069,60 @@ Uma alternativa para permitir o uso dos métodos de ML é substituir o processo 
 
 # RESULTADOS
 
-[Escrever o *benchmarking* da performance dos métodos de reconciliação]
+```{r}
+#| tbl-cap: "Acurácia dos métodos analíticos de reconciliação"
+#| label: tbl-results-analiticos
+
+rbind(
+  readRDS("data/estban/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
+  readRDS("data/estban/preds_analitico/acuracia_analiticos.rds")[["mase"]]
+ ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  pack_rows("RMSSE", 1, 3) |>
+  pack_rows("MASE", 4, 6) |>
+  kable_styling(latex_options = c("striped", "scale_down"))
+```
+
+```{r}
+#| tbl-cap: "Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
+#| label: tbl-results-ml-rolling
+
+rbind(
+  readRDS("data/estban/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
+  readRDS("data/estban/preds_ml/preds/rolling_forecast/resumo.RDS")[["mase"]]
+ ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("striped", "scale_down"))
+```
+
+```{r}
+#| tbl-cap: "Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
+#| label: tbl-results-ml-fitted
+
+rbind(
+  readRDS("data/estban/preds_ml/preds/fitted_base/resumo.RDS")[["rmsse"]],
+  readRDS("data/estban/preds_ml/preds/fitted_base/resumo.RDS")[["mase"]]
+ ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("striped", "scale_down"))
+```
+
+```{r}
+#| tbl-cap: "Acurácia dos métodos de ML de reconciliação. Estratégia refit."
+#| label: tbl-results-ml-refit
+
+rbind(
+  readRDS("data/estban/preds_ml/preds/one-step-ahead/resumo.RDS")[["rmsse"]],
+  readRDS("data/estban/preds_ml/preds/one-step-ahead/resumo.RDS")[["mase"]]
+ ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("striped", "scale_down"))
+```
 
 <!-- ! BUG: Parece ter um erro nos resultados de Spiliotis. Note que tanto em meus resultados de ML (implementados manualmente) quanto os analíticos (utilizando a implementação do {fabletools}, RMSSE < MASE em ambos Tourism (que conferem com FPP3) quanto Tourism Monthly. Mas, em Spiliotis, RMSSE > MASE tanto para ML quanto os analíticos, indicando que possa haver problemas na execução ou nos dados. -->

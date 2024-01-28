@@ -203,3 +203,6 @@ acuracia_ml = lapply(medidas, function(medida) {
 })
 
 names(acuracia_ml) = medidas
+
+# export
+saveRDS(acuracia_ml, paste0("data/estban/preds_ml/preds/", tipo, "/resumo.RDS"))
