@@ -136,9 +136,50 @@
 \end{apendicesenv}
 
 % anexos 
-%\begin{anexosenv}
-%\partanexos
-%\end{anexosenv}
+\begin{anexosenv}
+\partanexos
+
+\chapter{CONJUNTO DE HIPERPARÂMETROS} \label{anexo_a}
+
+\begin{table}
+  \caption{\label{tab:tbl-hip-xgboost}Intervalos de hiperparâmetros para \{xgboost\}}
+  \centering
+  \begin{tabular}[t]{llll}
+  \toprule
+  Hiperparâmetro & Descrição & Intervalo & Trafo\\
+  \midrule
+  \cellcolor{gray!6}{nrounds} & \cellcolor{gray!6}{Número de iterações} & \cellcolor{gray!6}{$[1, 5000]$} & \cellcolor{gray!6}{NULL}\\
+  eta & Taxa de aprendizado & $[-4, 0]$ & $10^x$\\
+  \cellcolor{gray!6}{max\_depth} & \cellcolor{gray!6}{Profundidade máxima} & \cellcolor{gray!6}{$[1, 20]$} & \cellcolor{gray!6}{NULL}\\
+  subsample & Subamostra & $[0.1, 1]$ & NULL\\
+  \cellcolor{gray!6}{colsample\_bytree} & \cellcolor{gray!6}{Subamostra de colunas para uma árvore} & \cellcolor{gray!6}{$[0.1, 1]$} & \cellcolor{gray!6}{NULL}\\
+  \addlinespace
+  colsample\_bylevel & Subamostra de colunas por nível de profundidade & $[0.1, 1]$ & NULL\\
+  \cellcolor{gray!6}{lambda} & \cellcolor{gray!6}{Regularização L2} & \cellcolor{gray!6}{$[-10, 10]$} & \cellcolor{gray!6}{$2^x$}\\
+  alpha & Regularização L1 & $[-10, 10]$ & $2^x$\\
+  \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}
+
+  \caption{\label{tab:tbl-hip-ranger}Intervalos de hiperparâmetros para \{ranger\}.}
+  \centering
+  \resizebox{\linewidth}{!}{
+  \begin{tabular}[t]{llll}
+  \toprule
+  Hiperparâmetro & Descrição & Intervalo & Trafo\\
+  \midrule
+  \cellcolor{gray!6}{min.node.size} & \cellcolor{gray!6}{Número mínimo de observações em um nó terminal} & \cellcolor{gray!6}{$[1,7]$} & \cellcolor{gray!6}{$2^x$}\\
+  mtry & Número de variáveis candidatas para split & $[1,)$ & NULL\\
+  \cellcolor{gray!6}{replace} & \cellcolor{gray!6}{Amostragem com reposição} & \cellcolor{gray!6}{\{TRUE, FALSE\}} & \cellcolor{gray!6}{NULL}\\
+  sample.fraction & Fração de observações a serem amostradas & $[0.1, 1]$ & NULL\\
+  \cellcolor{gray!6}{num.trees} & \cellcolor{gray!6}{Número de árvores} & \cellcolor{gray!6}{$[1, 2000]$} & \cellcolor{gray!6}{NULL}\\
+  \bottomrule
+  \end{tabular}}
+\end{table}
+
+\end{anexosenv}
 
 % índice remissivo 
 %\phantompart
