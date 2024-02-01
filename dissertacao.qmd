@@ -689,7 +689,7 @@ Crescimento de árvores em algoritmos de *boosting*.
 
 Floresta aleatória é um método de aprendizado de máquina que utiliza conjuntos de árvores de decisão descorrelatadas^[As árvores de decisão são descorrelatadas no sentido que, ao contrário os métodos de *boosting trees*, a próxima árvore não é construída com base na iteração anterior (processo de fortalecimento).] para classificação ou regressão. O método consiste em treinar várias árvores de decisão em subconjuntos aleatórios dos dados de treinamento e, então, combinar suas predições [@hastie_elements_2009]. A aleatoriedade é introduzida de duas formas: na seleção das observações e na seleção das variáveis preditoras.
 
-Seu algoritmo para regressão é simples e a ideia geral é, para cada árvore de decisão, particionar recursivamente nós de tamanho $N$ em dois nós filhos de forma a aumentar a complexidade do modelo e minimizar a função de custo. Se a próxima partição de um nó resultar em um ou ambos nós filhos de tamanho menor que um mínimo estabelecido via hiperparâmetro, a partição é interrompida (Algoritmo \ref{alg-rf}).
+A intuição para seu algoritmo para regressão é simples e a ideia geral é, para cada árvore de decisão, particionar recursivamente nós de tamanho $N$ em dois nós filhos de forma a aumentar a complexidade do modelo e minimizar a função de custo. Se a próxima partição de um nó resultar em um ou ambos nós filhos de tamanho menor que um mínimo estabelecido via hiperparâmetro, a partição é interrompida (Algoritmo \ref{alg-rf}).
 
 ```{=latex}
 \begin{algorithm}
@@ -723,7 +723,63 @@ $$\hat{f}(x) = \frac{1}{B}\sum_{b=1}^B T_b(x)$$
 
 ### Support Vector Machines
 
-SVMs são generalizações da ideia de hiperplanos não separáveis e consistem na produção de uma fronteira não linear a partir da construção de uma fronteira linear...
+A intuição do métodos de SVMs é mais facilmente compreendida a partir de uma tarefa de classificação de duas classes. Nesse caso, o objetivo é encontrar um hiperplano (i.e. um sub-espaço de dimensão $n-1$) que separe as classes de forma que a margem entre o hiperplano e os pontos de cada classe seja a maior possível. Então, dado um conjunto de $N$ pares de observações e suas respectivas classes, $\{(x_i, y_i)\}_{i=1}^N$, em que $x_i \in \mathbb{R}^p$ e $y_i \in \{-1, 1\}$, queremos encontrar o hiperplano definido por 
+
+$$
+\{x: f(x) = x^T\beta + \beta_0 = 0\}
+$$
+
+\noindent sendo $f(x)$ a distância ortogonal entre $x$ e o hiperplano $f(x) = x^T\beta + \beta_0 = 0$, e $M$ a margem entre as classes, definida como a distância ortogonal entre os pontos mais próximos de cada classe e o hiperplano [@hastie_elements_2009]. Portanto, o problema de otimização é dado por
+
+$$
+\begin{aligned}
+& \underset{\beta, \beta_0}{\text{max}}
+& & M \\
+& \text{sujeito a}
+& & y_i(x_i^T\beta + \beta_0) \geq M, \quad i = 1, ..., N
+\end{aligned}
+$$ {#eq-svm}
+
+Quando pode-se encontrar um hiperplano com $y_if(x_i) > 0 \quad \forall i$, tem-se o caso da construção de uma solução única para um hiperplano entre duas classes perfeitamente separadas pela maior margem possível (@fig-svm1).
+
+::: {#fig-svm layout-nrow=2}
+
+![Hiperplano entre duas classes perfeitamente separáveis.](img/svm1.png){#fig-svm1 width=40%}
+
+![Hiperplano entre duas classes não separáveis.](img/svm2.png){#fig-svm2 width=40%}
+
+*Support vector classifiers*. Fonte: @hastie_elements_2009.
+:::
+
+Entretanto, no mundo real, dificilmente um problema de classificação será linearmente separável. Paara contornar esse obstáculo, é possível introduzir variáveis de folga $\xi_i \geq 0$ para cada observação (@fig-svm2), de forma que a restrição se torne
+
+$$
+y_i(x_i^T\beta + \beta_0) \geq M(1 - \xi_i), \quad i = 1, ..., N
+$$ {#eq-svm2}
+
+\noindent e a função objetivo se torne
+
+$$
+\min{||\beta||} \quad \text{sujeito a}
+\left\{
+  \begin{aligned}
+    &\quad y_i(x_i^T\beta + \beta_0) \geq M(1 - \xi_i) \quad \forall i, \\
+    &\quad \xi_i \geq 0, \sum{\xi_i} \leq \text{constante}
+  \end{aligned}
+\right\}
+$$ {#eq-svm3}
+
+Para estender essa ideia para problemas de regressão, é necessário introduzir uma função de perda $\epsilon$-insensível, que penaliza apenas os erros maiores que $\epsilon$, de forma que os erros menores são ignorados durante a otimização, assim como as observações localizadas no lado correto do hiperplano são ignoradas no problema de classificação. A função objetivo se torna
+
+$$
+\min{||\beta||} \quad \text{sujeito a}
+\left\{
+  \begin{aligned}
+    &\quad |y_i - x_i^T\beta - \beta_0| \leq \epsilon \quad \forall i, \\
+    &\quad \sum{|\beta_j|} \leq \text{constante}
+  \end{aligned}
+\right\}
+$$ {#eq-svm4}
 
 # METODOLOGIA
 
@@ -764,7 +820,7 @@ tibble::tribble(
 ```
 
 ```{=latex}
-\begin{table}
+\begin{quadro}
 
   \caption{\label{tab:qdr-variaveis}Variáveis do dataset}
   \centering
@@ -783,7 +839,7 @@ tibble::tribble(
   \cellcolor{gray!6}{saldo} & \cellcolor{gray!6}{Saldo do verbete}\\
   \bottomrule
   \end{tabular}
-\end{table}
+\end{quadro}
 ```
 
 Esses dados então são organizados de forma hierárquica por estado, mesorregião, microrregião, município e agência bancária; e, de forma agrupada, por verbete. Isso significa que, para cada nó de agregação, são adicionadas mais três observações ao *dataset*: duas para cada verbete e a terceira para a soma de ambos. Com a estrutura hierárquica e agrupada, o conjunto alcança `r scales::number(nrow(estban))` observações. Por fim, o *dataset* adquiriu a estrutura apresentada na @tbl-dataset.
@@ -1153,11 +1209,17 @@ Um ponto negativo na metodologia proposta por @spiliotis_hierarchical_2021 é o 
 
 Nesses casos, uma alternativa para permitir o uso dos métodos de ML é substituir o processo de *rolling origin* e usar os valores ajustados dos modelos das previsões base $\hat{y}$ como input para os modelos de ML. Além de permitir a inclusão de séries incompletas — agências criadas durante o período, no caso do *dataset* Estban —, essa abordagem também aumenta o tamanho da amostra treino em $Q$ observações, o que pode melhorar a performance dos modelos de ML. Chamaremos essa estratégia de *fitted base forecasts*.
 
-Outra possibilidade de substituição do passo 1, caso as séries sejam de tamanho suficiente, é o processo de reajuste. Esse processo consiste no reajuste de um modelo para um novo conjunto de dados, conservando os hiperparâmetros originais porém reestimando os coeficientes (e.g., treina-se um modelo autoregressivo AR($p$) de coeficientes $\phi_p$ e então passa-se um novo conjunto de dados fora da amostra, mantendo o hiperparâmetro $p$ e reestimando $\phi_p$, obtendo novos valores ajustados). Utiliza-se então os valores reajustados para treinar os modelos de ML. Nessa estratégia, doravante denominada de *refit*, os modelos foram treinados até $Q$ e então reajustados para $Q+p$.
+Outra possibilidade de substituição do passo 1, caso as séries sejam de tamanho suficiente, é o processo de reajuste. Esse processo consiste no reajuste de um modelo para um novo conjunto de dados, conservando os hiperparâmetros originais porém reestimando os coeficientes (e.g., treina-se um modelo autoregressivo AR($p$) de coeficientes $\phi_p$ e então passa-se um novo conjunto de dados fora da amostra, mantendo o hiperparâmetro $p$ e reestimando $\phi_p$, obtendo novos valores ajustados). Utiliza-se então os valores reajustados para treinar os modelos de ML. Nessa estratégia, doravante denominada de *refit*, os modelos foram treinados até $Q$ e então reajustados para $Q+p$. Uma restrição dessa abordagem é que, fixados os hiperparâmetros anteriores, não necessariamente todos modelos alcançarão convergência no reajuste de seus coeficientes para o novo conjunto de dados.
 
 ## Otimização de hiperparâmetros
 
-A maior parte dos métodos de *machine learning* são altamente parametrizáveis, sendo sua performance de generalização (para fora da amostra) sensível à escolha de seus hiperparâmetros. Quando disponível, os hiperparâmetros a serem otimizados e seus intervalos seguiram a recomendação em @bischl_hyperparameter_2021. Os conjuntos de hiperparâmetros e seus intervalos são apresentados no Anexo \ref{anexo_a}.
+A maior parte dos métodos de *machine learning* são altamente parametrizáveis, sendo sua performance de generalização (para fora da amostra) sensível à escolha de seus hiperparâmetros. Quando disponível, os hiperparâmetros a serem otimizados e seus espaços de busca seguiram a recomendação em @bischl_hyperparameter_2021.
+
+Os conjuntos de hiperparâmetros e seus intervalos são apresentados no Anexo \ref{anexo_a}. Para a otimização, foram utilizadas dois calibradores: (i) busca em grade (com resolução de 10 combinações), mais custoso em tempo de processamento, para os métodos com menor quantidade de hiperparâmetros a serem otimizados, e (ii) otimização bayesiana (na configuração padrão do pacote {mlr3MBO}), mais eficiente para os métodos com maior quantidade de hiperparâmetros. A estratégia de reamostragem utilizada foi a validação cruzada *k-fold* com $k=10$.
+
+A otimização bayesiana foi usada em todos os métodos, exceto no *elastic net*, uma vez que apenas um (no caso do *lasso* e *ridge*) ou dois hiperparâmetros foram otimizados. A medida de performance utilizada para a otimização foi a raiz do erro quadrático médio (*root mean squared error* — RMSE).
+
+Por fim, cada modelo foi calibrado individualmente, ou seja, cada agência possui um conjunto de hiperparâmetros otimizados para cada um dos 7 métodos de ML empregados para reconciliação ótima.
 
 ```{r, include = FALSE, eval = FALSE}
 
@@ -1165,10 +1227,10 @@ tibble::tribble(
   ~Hiperparâmetro, ~Descrição, ~Intervalo, ~Trafo,
   "nrounds", "Número de iterações", "$[1, 5000]$", NULL,
   "eta", "Taxa de aprendizado", "$[-4, 0]$", "$10^x$",
-  "max_depth", "Profundidade máxima", "$[1, 20]$", NULL,
+  "max\\_depth", "Profundidade máxima", "$[1, 20]$", NULL,
   "subsample", "Subamostra", "$[0.1, 1]$", NULL,
-  "colsample_bytree", "Subamostra de colunas para uma árvore", "$[0.1, 1]$", NULL,
-  "colsample_bylevel", "Subamostra de colunas por nível de profundidade", "$[0.1, 1]$", NULL,
+  "colsample\\_bytree", "Subamostra de colunas para uma árvore", "$[0.1, 1]$", NULL,
+  "colsample\\_bylevel", "Subamostra de colunas por nível de profundidade", "$[0.1, 1]$", NULL,
   "lambda", "Regularização L2", "$[-10, 10]$", "$2^x$",
   "alpha", "Regularização L1", "$[-10, 10]$", "$2^x$"
 ) |>
@@ -1177,7 +1239,31 @@ tibble::tribble(
     escape = FALSE,
     format = "latex",
     label = "tbl-hip-xgboost",
-    caption = "Intervalos de hiperparâmetros para \\{xgboost\\}."
+    caption = "Intervalos de hiperparâmetros para \\{xgboost\\}"
+  ) |>
+  kable_styling(latex_options = c("striped"))
+```
+
+```{r, include = FALSE, eval = FALSE}
+
+tibble::tribble(
+  ~Hiperparâmetro, ~Descrição, ~Intervalo, ~Trafo,
+  "num\\_iterations", "Número de iterações", "$[1, 1000]$", NULL,
+  "boosting", "Algoritmo de boosting", "\\{gbdt, dart, goss\\}", NULL,
+  "learning\\_rate", "Taxa de aprendizado", "$[-4, 0]$", "$10^x$",
+  "num\\_leaves", "Número de folhas", "$[2, 20]$", NULL,
+  "lambda\\_l1", "Regularização L1", "$[-12, 12]$", "$2^x$",
+  "lambda\\_l2", "Regularização L2", "$[-12, 12]$", "$2^x$",
+  "feature\\_fraction", "Subamostra de colunas", "$[0.1, 1]$", NULL,
+  "bagging\\_fraction", "Subamostra de linhas", "$[0.1, 1]$", NULL,
+  "bagging\\_freq", "Frequência de amostragem", "$[1, 10]$", NULL
+) |>
+  kbl(
+    booktabs = TRUE,
+    escape = FALSE,
+    format = "latex",
+    label = "tbl-hip-lightgbm",
+    caption = "Intervalos de hiperparâmetros para \\{lightgbm\\}"
   ) |>
   kable_styling(latex_options = c("striped"))
 ```
@@ -1190,23 +1276,90 @@ tibble::tribble(
   "mtry", "Número de variáveis candidatas para split", "$[1,)$", NULL,
   "replace", "Amostragem com reposição", "\\{TRUE, FALSE\\}", NULL,
   "sample.fraction", "Fração de observações a serem amostradas", "$[0.1, 1]$", NULL,
-  "num.trees", "Número de árvores", "$[1, 2000]$", NULL,
+  "num.trees", "Número de árvores", "$[1, 2000]$", NULL
 ) |>
   kbl(
     booktabs = TRUE,
     escape = FALSE,
     format = "latex",
     label = "tbl-hip-ranger",
-    caption = "Intervalos de hiperparâmetros para \\{ranger\\}."
+    caption = "Intervalos de hiperparâmetros para \\{ranger\\}"
   ) |>
   kable_styling(latex_options = c("striped", "scale_down"))
 ```
 
+```{r, include = FALSE, eval = FALSE}
+
+tibble::tribble(
+  ~Hiperparâmetro, ~Descrição, ~Intervalo, ~Trafo,
+  "cost", "Custo de $\\xi$", "$[0, 1]$", "$2^x$",
+  "kernel", "Kernel", "\\{linear, polynomial, radial, sigmoid\\}", NULL,
+  "degree", "Grau do polinômio", "$[1, 5]$", NULL,
+  "gamma", "Influência amostral", "$[-12, 12]$", "$2^x$",
+  "type", "Tipo de SVM", "\\{eps-regression\\}", NULL
+) |>
+  kbl(
+    booktabs = TRUE,
+    escape = FALSE,
+    format = "latex",
+    label = "tbl-hip-svm",
+    caption = "Intervalos de hiperparâmetros para \\{e1071\\} (svm)"
+  ) |>
+  kable_styling(latex_options = c("striped"))
+```
+
+```{r, include = FALSE, eval = FALSE}
+
+tibble::tribble(
+  ~Hiperparâmetro, ~Descrição, ~Intervalo, ~Trafo,
+  "alpha", "Mix entre lasso e ridge", "$[0, 1]$", NULL,
+  "lambda", "Regularização", "$[-12, 12]$", "$2^x$"
+) |>
+  kbl(
+    booktabs = TRUE,
+    escape = FALSE,
+    format = "latex",
+    label = "tbl-hip-glmnet",
+    caption = "Intervalos de hiperparâmetros para \\{glmnet\\}"
+  ) |>
+  kable_styling(latex_options = c("striped"))
+```
+
 # RESULTADOS
 
+## ESTBAN
+
 ```{r}
-#| tbl-cap: "Acurácia dos métodos analíticos de reconciliação"
-#| label: tbl-results-analiticos
+#| tbl-cap: "Resultados Estban: Tempo de processamento dos métodos de ML (em horas)"
+#| label: tbl-estban-tempo-ml
+
+# obtendo tempo de processamento
+tempo = lapply(c("one-step-ahead", "fitted_base", "rolling_forecast"), function(tipo) {
+  lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm"), function(learner) {
+    preds = readRDS(paste0("data/estban/preds_ml/preds/", tipo, "/preds_", learner, ".RDS"))[[2]]
+    return(preds)
+  })
+})
+
+# juntando predições em um único dataframe
+tempo = do.call(rbind, tempo)
+
+# convertendo colunas para numérico
+tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
+
+# nomeando df
+colnames(tempo) = c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm")
+rownames(tempo) = c("refit", "fitted base", "rolling forecast")
+
+# tabela
+tempo |>
+  kbl(booktabs = TRUE, digits = 1) |>
+  kable_styling(latex_options = c("striped"))
+```
+
+```{r}
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos analíticos de reconciliação"
+#| label: tbl-estban-results-analiticos
 
 rbind(
   readRDS("data/estban/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
@@ -1219,8 +1372,8 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
-#| label: tbl-results-ml-rolling
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
+#| label: tbl-estban-results-ml-rolling
 
 rbind(
   readRDS("data/estban/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
@@ -1233,8 +1386,8 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
-#| label: tbl-results-ml-fitted
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
+#| label: tbl-estban-results-ml-fitted
 
 rbind(
   readRDS("data/estban/preds_ml/preds/fitted_base/resumo.RDS")[["rmsse"]],
@@ -1247,8 +1400,8 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Acurácia dos métodos de ML de reconciliação. Estratégia refit."
-#| label: tbl-results-ml-refit
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia refit."
+#| label: tbl-estban-results-ml-refit
 
 rbind(
   readRDS("data/estban/preds_ml/preds/one-step-ahead/resumo.RDS")[["rmsse"]],
@@ -1258,6 +1411,78 @@ rbind(
   pack_rows("RMSSE", 1, 7) |>
   pack_rows("MASE", 8, 14) |>
   kable_styling(latex_options = c("striped", "scale_down"))
+```
+
+## TOURISM
+
+```{r}
+#| tbl-cap: "Resultados Tourism: Tempo de processamento dos métodos de ML (em horas)"
+#| label: tbl-tourism-tempo-ml
+
+# obtendo tempo de processamento
+tempo = lapply(c("fitted_base", "rolling_forecast"), function(tipo) {
+  lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm"), function(learner) {
+    preds = readRDS(paste0("data/tourism/preds_ml/preds/", tipo, "/preds_", learner, ".RDS"))[[2]]
+    return(preds)
+  })
+})
+
+# juntando predições em um único dataframe
+tempo = do.call(rbind, tempo)
+
+# convertendo colunas para numérico
+tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
+
+# nomeando df
+colnames(tempo) = c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm")
+rownames(tempo) = c("fitted base", "rolling forecast")
+
+# tabela
+tempo |>
+  kbl(booktabs = TRUE, digits = 1) |>
+  kable_styling(latex_options = c("striped"))
+```
+
+```{r}
+#| tbl-cap: "Resultados Tourism: Acurácia dos métodos analíticos de reconciliação"
+#| label: tbl-tourism-results-analiticos
+
+rbind(
+  readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
+  readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["mase"]]
+ ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  pack_rows("RMSSE", 1, 3) |>
+  pack_rows("MASE", 4, 6) |>
+  kable_styling(latex_options = c("striped"))
+```
+
+```{r}
+#| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
+#| label: tbl-tourism-results-ml-rolling
+
+rbind(
+  readRDS("data/tourism/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
+  readRDS("data/tourism/preds_ml/preds/rolling_forecast/resumo.RDS")[["mase"]]
+ ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("striped"))
+```
+
+```{r}
+#| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
+#| label: tbl-tourism-results-ml-fitted
+
+rbind(
+  readRDS("data/tourism/preds_ml/preds/fitted_base/resumo.RDS")[["rmsse"]],
+  readRDS("data/tourism/preds_ml/preds/fitted_base/resumo.RDS")[["mase"]]
+ ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("striped"))
 ```
 
 <!-- ! BUG: Parece ter um erro nos resultados de Spiliotis. Note que tanto em meus resultados de ML (implementados manualmente) quanto os analíticos (utilizando a implementação do {fabletools}, RMSSE < MASE em ambos Tourism (que conferem com FPP3) quanto Tourism Monthly. Mas, em Spiliotis, RMSSE > MASE tanto para ML quanto os analíticos, indicando que possa haver problemas na execução ou nos dados. -->
