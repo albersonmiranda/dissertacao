@@ -55,7 +55,16 @@ tema = theme_classic() +
 
 # gerar bibliografia de pacotes
 knitr::write_bib(
-  c(.packages(), "basedosdados"),
+  c(
+    .packages(),
+    "basedosdados",
+    "mlr3",
+    "xgboost",
+    "e1071",
+    "ranger",
+    "lightgbm",
+    "glmnet"
+  ),
   file = "config/elementos/packages.bib"
 )
 
@@ -119,9 +128,9 @@ Uma terceira possibilidade é a *reconciliação ótima*. Ela é uma abordagem q
 
 Atualmente, os métodos analíticos baseados na minimização do traço da matriz da variância-covariância dos erros, desenvolvidos em  @wickramasuriya_optimal_2019, são os mais populares na literatura da reconciliação ótima. Esses métodos divergem apenas na forma da qual se dá o relacionamento entre os diferentes elementos da hierarquia: se os erros de previsão são descorrelacionados e equivariantes ao longo de toda estrutura (MQO), o que é impossível em séries temporais hierárquicas; se os erros são descorrelacionados e equivariantes apenas dentro do mesmo nível hierárquico (MQP estrutural); se os erros são descorrelacionados mas ponderados pela variância da série (MQP); ou se são correlacionados e variantes ao longo de toda a estrutura (estimadores *MinT Sample* e *MinT Shrink*).
 
-Entretanto, tais métodos são sujeitos a uma série de restrições, como as do MCLR, e têm sua capacidade preditiva reduzida quando suas hipóteses são violadas. Em previsões de séries temporais, o objetivo na maioria dos casos é prever valores futuros com a maior acurácia possível. Em vista disso, métodos de *machine learning* são mais gerais, no sentido de permitir parâmetros não lineares e poderem aproximar virtualmente qualquer função. Além disso, são focados na capacidade preditiva, muitas vezes em detrimento da explicativa. Espera-se, portanto, que esses métodos alcancem melhor performance no problema da reconciliação ótima, justificando a pesquisa e atenção ao tema. Nesse sentido, trabalhos como @spiliotis_hierarchical_2021 desenvolvem métodos de reconciliação ótima de séries temporais utilizando algoritmos de *machine learning*, especificamente o *XGBoost* e *Random Forest*, obtendo resultados superiores aos métodos analíticos tradicionais, especialmente quando as séries não possuem características semelhantes.
+Entretanto, tais métodos são sujeitos a uma série de restrições, como as do MCLR, e têm sua capacidade preditiva reduzida quando suas hipóteses são violadas. Em previsões de séries temporais, o objetivo na maioria dos casos é prever valores futuros com a maior acurácia possível. Em vista disso, métodos de *machine learning* são mais gerais, no sentido de permitir parâmetros não lineares e poderem aproximar virtualmente qualquer função. Além disso, são focados na capacidade preditiva, muitas vezes em detrimento da explicativa. Espera-se, portanto, que esses métodos alcancem melhor performance no problema da reconciliação ótima, justificando a pesquisa e atenção ao tema. Nesse sentido, trabalhos como @spiliotis_hierarchical_2021 desenvolvem métodos de reconciliação ótima de séries temporais utilizando algoritmos de *machine learning*, especificamente o *gradient boosting*, particularmente o *XGBoost*, e *Random Forest*, obtendo resultados superiores aos métodos analíticos tradicionais, especialmente quando as séries não possuem características semelhantes.
 
-Tomando como ponto de partida as conclusões de @spiliotis_hierarchical_2021, este trabalho busca continuar e extender a exploração de métodos de *machine learning* para a tarefa de reconciliação ótima, especificamente o *elastic net*, verificando se sua performance se mantêm superior à dos métodos analíticos em um contexto de séries temporais financeiras de alta dimensionalidade.
+Tomando como ponto de partida as conclusões de @spiliotis_hierarchical_2021, este trabalho busca continuar e estender a exploração de métodos de *machine learning* para a tarefa de reconciliação ótima, especificamente os métodos de regressão regularizada lasso, ridge e *elastic net*, e *support vector machine* (SVM), além de outra implementação de *gradient boosting*, o *LightGBM*, verificando se sua performance se mantêm superior à dos métodos analíticos em um contexto de séries temporais financeiras de alta dimensionalidade.
 
 ## Objetivos
 
@@ -129,11 +138,9 @@ O objetivo geral da dissertação é estudar o problema da reconciliação ótim
 
 Os objetivos específicos são:
 
-1. Aplicar o método *elastic net* para reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas e atestar sua validade em dados de alta dimensionalidade;
+1. Aplicar os métodos *elastic net*, SVM, *gradient boosting* e *random forest* para reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas e atestar sua validade em dados financeiros de alta dimensionalidade;
 1. Comparar a performance, em termos de funções de custo e tempo de processamento, do método *elastic net* nas configurações $\alpha=0$ (*lasso*), $\alpha=1$ (*ridge*) e uma combinação de ambos obtida via reamostragem;
-1. Comparar a performance, em termos de funções de custo e tempo de processamento, do método *elastic net* com os métodos analíticos *bottom-up*, *top-down* e *MinT Shrink*;
-1. Comparar a performance, em termos de funções de custo e tempo de processamento, das estratégias de reamostragem validação cruzada $k$*-fold* e *holdout* para o método *elastic net*;
-1. Verificar se a aplicação de regressão regularizada resulta em algum padrão reconhecível na estrutura (e.g., se a regularização tende a favorecer os coeficientes de séries temporais que compartilham o mesmo nó pai ou, em outras palavras, se tende a zerar os coeficientes de séries temporais que não compartilham o mesmo nó pai na hierarquia);
+1. Comparar a performance, em termos de funções de custo e tempo de processamento, dos métodos de *machine learning* contra os métodos analíticos *bottom-up* e *MinT Shrink*;
 
 ## Outline da dissertação
 
@@ -657,11 +664,11 @@ Portanto o *elastic net* é um método de *shrinkage*, uma vez que a penalidade 
 
 Diferentemente dos métodos analíticos estudados, o *elastic net* não possui uma solução fechada. Portanto, é necessário utilizar métodos iterativos para encontrar o valor ótimo de $\mathbfit{\hat{\beta}}$ e @zou_regularization_2005 utilizam validação cruzada $k$-fold para encontrar quais os valores de $\lambda_1$ e $\lambda_2$ que minimizam o resíduo. Nesse sentido, dado a metodologia de processo iterativo envolvendo calibragem de hiperparâmetros e reamostragem, podemos classificar o *elastic net* como um método de *machine learning*.
 
-### Boosting Trees
+### Gradient Boosting
 
-Como cada uma das diversas implementações de *boosting trees* possui sua teoria adjacente, não é de objetivo deste trabalho detalhar o funcionamento de cada uma delas. Portanto, trabalharemos apenas sua intuição.
+Como cada uma das diversas implementações de *gradient boosting* possui sua teoria adjacente, e não é de objetivo deste trabalho detalhar o funcionamento de cada uma delas, trabalharemos apenas sua intuição.
 
-Assim como os métodos de floresta aleatória, os métodos de *boosting trees* também são métodos de conjuntos de árvores. A diferença se dá na forma como os modelos são treinados. *Boosting trees* são métodos que combinam as predições de vários modelos fracos parar formar um conjunto — *ensemble*, na definição mais usual, ou comitê (*committee*), na definição de @hastie_elements_2009 — mais complexo e preciso (forte).
+Assim como os métodos de floresta aleatória, os métodos de *gradient boosting* também são métodos de conjuntos de árvores. A diferença se dá na forma como os modelos são treinados. *Gradient boosting* são métodos que combinam as predições de vários modelos fracos parar formar um conjunto — *ensemble*, na definição mais usual, ou comitê (*committee*), na definição de @hastie_elements_2009 quando usado para classificação — mais complexo e preciso (forte).
 
 Um estimador fraco é aquele que tem desempenho apenas ligeiramente melhor que o acaso. O propósito do *boosting* é produzir uma sequencia de estimadores fracos, cada um deles focado nos erros dos estimadores anteriores. A cada iteração, as observações classificadas incorretamente (no caso de uma tarefa de classificação) ou de maior variância (no caso de uma tarefa de regressão) na iteração anterior têm seu peso aumentado, e vice-versa. Dessa forma, o modelo subsequente formado na próxima iteração é obrigado a se concentrar nas observações onde as iterações anteriores falharam. Isso que significa transformar um conjunto de estimadores fracos em um conjunto forte.
 
@@ -680,34 +687,105 @@ Crescimento de árvores em algoritmos de *boosting*.
 
 ### Random Forest
 
-Florestas aleatórias são um método de aprendizado de máquina que utilizam conjuntos de árvores de decisão descorrelatadas para classificação ou regressão. O método consiste em treinar várias árvores de decisão em subconjuntos aleatórios dos dados de treinamento e, então, combinar suas predições [@hastie_elements_2009]. A aleatoriedade é introduzida de duas formas: na seleção das observações e na seleção das variáveis preditoras.
+Floresta aleatória é um método de aprendizado de máquina que utiliza conjuntos de árvores de decisão descorrelatadas^[As árvores de decisão são descorrelatadas no sentido que, ao contrário os métodos de *boosting trees*, a próxima árvore não é construída com base na iteração anterior (processo de fortalecimento).] para classificação ou regressão. O método consiste em treinar várias árvores de decisão em subconjuntos aleatórios dos dados de treinamento e, então, combinar suas predições [@hastie_elements_2009]. A aleatoriedade é introduzida de duas formas: na seleção das observações e na seleção das variáveis preditoras.
 
-Seu algoritmo para regressão é simples:
+A intuição para seu algoritmo para regressão é simples e a ideia geral é, para cada árvore de decisão, particionar recursivamente nós de tamanho $N$ em dois nós filhos de forma a aumentar a complexidade do modelo e minimizar a função de custo. Se a próxima partição de um nó resultar em um ou ambos nós filhos de tamanho menor que um mínimo estabelecido via hiperparâmetro, a partição é interrompida (Algoritmo \ref{alg-rf}).
 
 ```{=latex}
 \begin{algorithm}
-\caption{Floresta aleatória para regressão}\label{alg:rf}
+\caption{Floresta aleatória para regressão}\label{alg-rf}
 
+${T_1, T_2, ..., T_b}$ é uma floresta aleatória de $B$ árvores de decisão. \\
+\BlankLine
+$i \in \mathbb{N}$ é a quantidade de observações em um nó. \\
+\BlankLine
+$n_{min} \in \mathbb{N}$ é o número mínimo de observações em um nó. \\
+\BlankLine
 \For{$b = 1 \to B$}{
-  1. Toma uma amostra de $Z^*$ de tamanho $N$ dos dados de treino. \\
+  1. Toma uma amostra de tamanho $N$ dos dados de treino. \\
   \While{$i < n_{min}$} {
     a. Seleciona $j$ variáveis aleatoriamente. \\
     b. Escolhe a melhor variável para \textit{split} dentre $j$. \\
-    c. Divide o nó em dois nós filhas.
+    c. Divide o nó em dois nós filhos. \\
+    \If{Nenhum dos nós filhos tem $i < n_{min}$} {
+      d. Repete os passos a-c para cada nó filho.
+    }
   }
 }
-
-Produz um conjunto de árvores $\{T_b\}^B$.
+\BlankLine
+2. Produz um conjunto de árvores $\{T_b\}_1^B$.
+\BlankLine
+3. Realiza a predição para cada árvore $T_b$ em um ponto $x$ e calcula a média das predições:
+$$\hat{f}(x) = \frac{1}{B}\sum_{b=1}^B T_b(x)$$
 
 \end{algorithm}
 ```
+
 ### Support Vector Machines
 
-SVMs são generalizações da ideia de hiperplanos não separáveis e consiste na produção de uma fronteira não linear a partir da construção de uma fornteira linear no espaço de 
+A intuição do métodos de SVMs é mais facilmente compreendida a partir de uma tarefa de classificação de duas classes. Nesse caso, o objetivo é encontrar um hiperplano (i.e. um sub-espaço de dimensão $n-1$) que separe as classes de forma que a margem entre o hiperplano e os pontos de cada classe seja a maior possível. Então, dado um conjunto de $N$ pares de observações e suas respectivas classes, $\{(x_i, y_i)\}_{i=1}^N$, em que $x_i \in \mathbb{R}^p$ e $y_i \in \{-1, 1\}$, queremos encontrar o hiperplano definido por 
+
+$$
+\{x: f(x) = x^T\beta + \beta_0 = 0\}
+$$
+
+\noindent sendo $f(x)$ a distância ortogonal entre $x$ e o hiperplano $f(x) = x^T\beta + \beta_0 = 0$, e $M$ a margem entre as classes, definida como a distância ortogonal entre os pontos mais próximos de cada classe e o hiperplano [@hastie_elements_2009]. Portanto, o problema de otimização é dado por
+
+$$
+\begin{aligned}
+& \underset{\beta, \beta_0}{\text{max}}
+& & M \\
+& \text{sujeito a}
+& & y_i(x_i^T\beta + \beta_0) \geq M, \quad i = 1, ..., N
+\end{aligned}
+$$ {#eq-svm}
+
+Quando pode-se encontrar um hiperplano com $y_if(x_i) > 0 \quad \forall i$, tem-se o caso da construção de uma solução única para um hiperplano entre duas classes perfeitamente separadas pela maior margem possível (@fig-svm1).
+
+::: {#fig-svm layout-nrow=2}
+
+![Hiperplano entre duas classes perfeitamente separáveis.](img/svm1.png){#fig-svm1 width=40%}
+
+![Hiperplano entre duas classes não separáveis.](img/svm2.png){#fig-svm2 width=40%}
+
+*Support vector classifiers*. Fonte: @hastie_elements_2009.
+:::
+
+Entretanto, no mundo real, dificilmente um problema de classificação será linearmente separável. Paara contornar esse obstáculo, é possível introduzir variáveis de folga $\xi_i \geq 0$ para cada observação (@fig-svm2), de forma que a restrição se torne
+
+$$
+y_i(x_i^T\beta + \beta_0) \geq M(1 - \xi_i), \quad i = 1, ..., N
+$$ {#eq-svm2}
+
+\noindent e a função objetivo se torne
+
+$$
+\min{||\beta||} \quad \text{sujeito a}
+\left\{
+  \begin{aligned}
+    &\quad y_i(x_i^T\beta + \beta_0) \geq M(1 - \xi_i) \quad \forall i, \\
+    &\quad \xi_i \geq 0, \sum{\xi_i} \leq \text{constante}
+  \end{aligned}
+\right\}
+$$ {#eq-svm3}
+
+Para estender essa ideia para problemas de regressão, é necessário introduzir uma função de perda $\epsilon$-insensível, que penaliza apenas os erros maiores que $\epsilon$, de forma que os erros menores são ignorados durante a otimização, assim como as observações localizadas no lado correto do hiperplano são ignoradas no problema de classificação. A função objetivo se torna
+
+$$
+\min{||\beta||} \quad \text{sujeito a}
+\left\{
+  \begin{aligned}
+    &\quad |y_i - x_i^T\beta - \beta_0| \leq \epsilon \quad \forall i, \\
+    &\quad \sum{|\beta_j|} \leq \text{constante}
+  \end{aligned}
+\right\}
+$$ {#eq-svm4}
 
 # METODOLOGIA
 
 Neste capítulo estão contidas explicações sobre os dados e variáveis, sobre o *design* da modelagem e sobre a avaliação dos modelos.
+
+O *software* usado foi o R [@R-base]. As previsões base e os métodos de reconciliação analíticos foram realizados com o pacote {fable} [@R-fable] e suas extensões. Já metodologia de *machine learning* (reamostragem, otimização de hiperparâmetros, treino e predição) foi executada com o pacote {mlr3} [@R-mlr3] e suas extensões. As implementações do XGBoost e LightGBM foram realizadas com seus pacotes homônimos {xgboost} [@R-xgboost] e {ligthgbm} [@R-lightgbm], do Elastic Net com o pacote {glmnet} [@R-glmnet], a do Random Forest com o pacote {ranger} [@R-ranger] e a do SVM com o pacote {e1071} [@R-e1071].
 
 ## Dados e variáveis
 
@@ -719,7 +797,7 @@ Além das estatísticas bancárias, foram obtidas informações de regiões, mes
 
 Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram selecionados os principais verbetes, que são *empréstimos e títulos descontados* e *financiamentos*, e mantidas apenas as agências atualmente em atividade. Quanto ao período, há dados disponíveis desde 1988. Entretanto, utilizaremos os dados a partir de 2003 pois, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta. Por essa razão, apesar do Banestes contar com 134 agências, foram mantidas apenas as agências com série completa, ou seja, que já estavam em atividade em 2003.
 
-Por fim, as variáveis mantidas no *dataset* foram as descritas no Quadro \ref{qdr-variaveis}. Dessa forma, temos séries mensais de saldos de créditos de `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia)))` agências bancárias, distribuídas por `r with(subset(estban, !is_aggregated(nome)), length(unique(nome)))` municípios, a partir de `r format(min(estban$ref), "%B de %Y")`, totalizando `r scales::number(nrow(subset(estban, !is_aggregated(cnpj_agencia) & !is_aggregated(verbete))), big.mark = ".", decimal.mark = ",")` observações.
+Por fim, as variáveis mantidas no *dataset* foram as descritas no Quadro \ref{tab:qdr-variaveis}. Dessa forma, temos séries mensais de saldos de créditos de `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia)))` agências bancárias, distribuídas por `r with(subset(estban, !is_aggregated(nome)), length(unique(nome)))` municípios, a partir de `r format(min(estban$ref), "%B de %Y")`, totalizando `r scales::number(nrow(subset(estban, !is_aggregated(cnpj_agencia) & !is_aggregated(verbete))), big.mark = ".", decimal.mark = ",")` observações.
 
 ```{r}
 #| tbl-cap: "Variáveis do dataset"
@@ -729,11 +807,11 @@ Por fim, as variáveis mantidas no *dataset* foram as descritas no Quadro \ref{q
 tibble::tribble(
   ~Variável, ~Descrição,
   "ref", "Data de referência do relatório ESTBAN",
-  "nome_mesorregiao", "Nome da mesorregião do ES",
-  "nome_microrregiao", "Nome da microrregião do ES",
+  "nome mesorregiao", "Nome da mesorregião do ES",
+  "nome microrregiao", "Nome da microrregião do ES",
   "verbete", "Descrição da rubrica do balancete",
   "nome", "Nome do município",
-  "cnpj_agencia", "CNPJ da agência bancária",
+  "cnpj agencia", "CNPJ da agência bancária",
   "saldo", "Saldo do verbete"
 ) |>
   kbl(booktabs = TRUE, row.names = FALSE, format = "latex", caption = "Variáveis do dataset", label = "qdr-variaveis") |>
@@ -743,22 +821,23 @@ tibble::tribble(
 
 ```{=latex}
 \begin{quadro}
+
   \caption{\label{tab:qdr-variaveis}Variáveis do dataset}
   \centering
   \fontsize{12}{14}\selectfont
   \begin{tabular}[t]{l>{\raggedright\arraybackslash}p{10cm}}
-    \toprule
-    Variável & Descrição\\
-    \midrule
-    \cellcolor{gray!6}{ref} & \cellcolor{gray!6}{Data de referência do relatório ESTBAN}\\
-    nome\_mesorregiao & Nome da mesorregião do ES\\
-    \cellcolor{gray!6}{nome\_microrregiao} & \cellcolor{gray!6}{Nome da microrregião do ES}\\
-    verbete & Descrição da rubrica do balancete\\
-    \cellcolor{gray!6}{nome} & \cellcolor{gray!6}{Nome do município}\\
-    \addlinespace
-    cnpj\_agencia & CNPJ da agência bancária\\
-    \cellcolor{gray!6}{saldo} & \cellcolor{gray!6}{Saldo do verbete}\\
-    \bottomrule
+  \toprule
+  Variável & Descrição\\
+  \midrule
+  \cellcolor{gray!6}{ref} & \cellcolor{gray!6}{Data de referência do relatório  ESTBAN}\\
+  nome mesorregiao & Nome da mesorregião do ES\\
+  \cellcolor{gray!6}{nome microrregiao} & \cellcolor{gray!6}{Nome da microrregião   do ES}\\
+  verbete & Descrição da rubrica do balancete\\
+  \cellcolor{gray!6}{nome} & \cellcolor{gray!6}{Nome do município}\\
+  \addlinespace
+  cnpj agencia & CNPJ da agência bancária\\
+  \cellcolor{gray!6}{saldo} & \cellcolor{gray!6}{Saldo do verbete}\\
+  \bottomrule
   \end{tabular}
 \end{quadro}
 ```
@@ -772,9 +851,27 @@ Esses dados então são organizados de forma hierárquica por estado, mesorregi�
 estban |>
   tail(13) |>
   transform(
+    # switch decimal e big mark
     saldo = scales::number(
       saldo,
       big.mark = ".", decimal.mark = ","
+    ),
+    # substitui "_" por espaço em todas as colunas
+    verbete = gsub("_", " ", verbete),
+    municipio = gsub("_", " ", nome),
+    microrregiao = gsub("_", " ", nome_microrregiao),
+    mesorregiao = gsub("_", " ", nome_mesorregiao),
+    agencia = cnpj_agencia
+  ) |>
+  subset(
+    select = c(
+      ref,
+      mesorregiao,
+      microrregiao,
+      municipio,
+      agencia,
+      verbete,
+      saldo
     )
   ) |>
   kbl(
@@ -808,8 +905,14 @@ As microrregiões que compõem cada mesorregião são apresentadas na @tbl-micro
 aggregate(
   as.character(nome_microrregiao) ~ as.character(nome_mesorregiao),
   data = subset(estban, !is_aggregated(nome_mesorregiao) & !is_aggregated(nome_microrregiao)),
-  FUN = unique
+  FUN = function(x) paste(unique(x), collapse = ", ")
 ) |>
+  #substituir "_" por espaço
+  transform(
+    nome_mesorregiao = gsub("_", " ", `as.character(nome_mesorregiao)`),
+    nome_microrregiao = gsub("_", " ", `as.character(nome_microrregiao)`)
+  ) |>
+  subset(select = c(nome_mesorregiao, nome_microrregiao)) |>
   kbl(
     booktabs = TRUE,
     row.names = FALSE,
@@ -828,8 +931,14 @@ aggregate(
 aggregate(
   as.character(nome) ~ as.character(nome_microrregiao),
   data = subset(estban, !is_aggregated(nome) & !is_aggregated(nome_microrregiao)),
-  FUN = unique
+  FUN = function(x) paste(unique(x), collapse = ", ")
 ) |>
+  # substituir "_" por espaço
+  transform(
+    nome_microrregiao = gsub("_", " ", `as.character(nome_microrregiao)`),
+    nome = gsub("_", " ", `as.character(nome)`)
+  ) |>
+  subset(select = c(nome_microrregiao, nome)) |>
   kbl(
     booktabs = TRUE,
     row.names = FALSE,
@@ -856,7 +965,10 @@ temp = lapply(
 ) |>
   lengths()
 
-temp |>
+ # substituir "_" por espaço
+names(temp) = gsub("_", " ", names(temp))
+
+temp |>  
   kbl(booktabs = TRUE, col.names = "Únicos") |>
   kable_styling(latex_options = c("striped"))
 ```
@@ -898,6 +1010,14 @@ estban |>
     is_aggregated(nome_microrregiao),
     is_aggregated(verbete)
   ) |>
+  # substituir "_" por espaço
+  transform(
+    nome_mesorregiao = gsub("_", " ", nome_mesorregiao),
+    nome_microrregiao = gsub("_", " ", nome_microrregiao),
+    nome = gsub("_", " ", nome),
+    cnpj_agencia = gsub("_", " ", cnpj_agencia),
+    verbete = gsub("_", " ", verbete)
+  ) |>
   ggplot(aes(x = ref, y = saldo)) +
   geom_line(color = cores$azul_banestes) +
   scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
@@ -924,6 +1044,14 @@ temp = estban |>
     & !is_aggregated(nome_mesorregiao)
     & !is_aggregated(nome_microrregiao)
     & is_aggregated(verbete)
+  ) |>
+  # substituir "_" por espaço
+  transform(
+    nome_mesorregiao = gsub("_", " ", nome_mesorregiao),
+    nome_microrregiao = gsub("_", " ", nome_microrregiao),
+    nome = gsub("_", " ", nome),
+    cnpj_agencia = gsub("_", " ", cnpj_agencia),
+    verbete = gsub("_", " ", verbete)
   ) |>
   transform(
     nome_mesorregiao = as.character(nome_mesorregiao),
@@ -970,6 +1098,14 @@ estban |>
     is_aggregated(nome_microrregiao),
     !is_aggregated(verbete)
   ) |>
+  # substituir "_" por espaço
+  transform(
+    nome_mesorregiao = gsub("_", " ", nome_mesorregiao),
+    nome_microrregiao = gsub("_", " ", nome_microrregiao),
+    nome = gsub("_", " ", nome),
+    cnpj_agencia = gsub("_", " ", cnpj_agencia),
+    verbete = gsub("_", " ", verbete)
+  ) |>
   ggplot(aes(x = ref, y = saldo, color = factor(verbete))) +
   geom_line() +
   scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
@@ -990,6 +1126,14 @@ estban |>
     !is_aggregated(nome_mesorregiao),
     is_aggregated(nome_microrregiao),
     !is_aggregated(verbete)
+  ) |>
+  # substituir "_" por espaço
+  transform(
+    nome_mesorregiao = gsub("_", " ", nome_mesorregiao),
+    nome_microrregiao = gsub("_", " ", nome_microrregiao),
+    nome = gsub("_", " ", nome),
+    cnpj_agencia = gsub("_", " ", cnpj_agencia),
+    verbete = gsub("_", " ", verbete)
   ) |>
   ggplot(aes(x = ref, y = saldo, color = factor(verbete))) +
   geom_line() +
@@ -1061,17 +1205,161 @@ Com os modelos treinados, passa-se as previsões base obtidas na [seção @sec-p
 
 Dessa forma, essa metodologia é semelhante à aplicada na reconciliação ótima analítica, se afastando principalmente em três pontos: (i) a utilização de algoritmos de ML ao invés de MQG, (ii) a não atribuição de peso de forma obrigatória para todos os nós da hierarquia e (iii) no ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série (@spiliotis_hierarchical_2021).
 
-Um ponto negativo na metodologia proposta por @spiliotis_hierarchical_2021 é o processo de *rolling origin* (passo 1). Esse processo requer a realização de previsões para dentro da amostra treino, o que pode ser um problema para séries temporais com poucas observações. No caso do *dataset* ESTBAN, algumas das agências foram criadas após o período escolhido para o *split* em $Q$ (dezembro/2012), sendo necessário sua exclusão do dataset e invalidando o uso da metodologia para essas unidades. Nesse sentido, o MinT se mostra uma opção mais viável para aplicações no mundo real.
+Um ponto negativo na metodologia proposta por @spiliotis_hierarchical_2021 é o processo de *rolling origin* (passo 1). Esse processo requer a realização de previsões para dentro da amostra treino, o que pode ser um problema para séries temporais com poucas observações ou de série incompleta. No caso do *dataset* Estban, algumas das agências foram criadas após o período escolhido para o *split* em $Q$ (dezembro/2012), sendo necessário sua exclusão do dataset e invalidando o uso da metodologia para essas unidades. Nesse sentido, o MinT se mostra uma opção mais viável para aplicações no mundo real.
 
-Uma alternativa para permitir o uso dos métodos de ML é substituir o processo de *rolling origin* e usar os valores ajustados dos modelos das previsões base $\hat{y}$ como input para os modelos de ML. Além de permitir a inclusão de agências criadas durante o período, essa abordagem também aumenta o tamanho da amostra treino em $Q$ observações, o que pode melhorar a performance dos modelos de ML. 
+Nesses casos, uma alternativa para permitir o uso dos métodos de ML é substituir o processo de *rolling origin* e usar os valores ajustados dos modelos das previsões base $\hat{y}$ como input para os modelos de ML. Além de permitir a inclusão de séries incompletas — agências criadas durante o período, no caso do *dataset* Estban —, essa abordagem também aumenta o tamanho da amostra treino em $Q$ observações, o que pode melhorar a performance dos modelos de ML. Chamaremos essa estratégia de *fitted base forecasts*.
 
-## Hiperparâmetros
+Outra possibilidade de substituição do passo 1, caso as séries sejam de tamanho suficiente, é o processo de reajuste. Esse processo consiste no reajuste de um modelo para um novo conjunto de dados, conservando os hiperparâmetros originais porém reestimando os coeficientes (e.g., treina-se um modelo autoregressivo AR($p$) de coeficientes $\phi_p$ e então passa-se um novo conjunto de dados fora da amostra, mantendo o hiperparâmetro $p$ e reestimando $\phi_p$, obtendo novos valores ajustados). Utiliza-se então os valores reajustados para treinar os modelos de ML. Nessa estratégia, doravante denominada de *refit*, os modelos foram treinados até $Q$ e então reajustados para $Q+p$. Uma restrição dessa abordagem é que, fixados os hiperparâmetros anteriores, não necessariamente todos modelos alcançarão convergência no reajuste de seus coeficientes para o novo conjunto de dados.
+
+## Otimização de hiperparâmetros
+
+A maior parte dos métodos de *machine learning* são altamente parametrizáveis, sendo sua performance de generalização (para fora da amostra) sensível à escolha de seus hiperparâmetros. Quando disponível, os hiperparâmetros a serem otimizados e seus espaços de busca seguiram a recomendação em @bischl_hyperparameter_2021.
+
+Os conjuntos de hiperparâmetros e seus intervalos são apresentados no Anexo \ref{anexo_a}. Para a otimização, foram utilizadas dois calibradores: (i) busca em grade (com resolução de 10 combinações), mais custoso em tempo de processamento, para os métodos com menor quantidade de hiperparâmetros a serem otimizados, e (ii) otimização bayesiana (na configuração padrão do pacote {mlr3MBO}), mais eficiente para os métodos com maior quantidade de hiperparâmetros. A estratégia de reamostragem utilizada foi a validação cruzada *k-fold* com $k=10$.
+
+A otimização bayesiana foi usada em todos os métodos, exceto no *elastic net*, uma vez que apenas um (no caso do *lasso* e *ridge*) ou dois hiperparâmetros foram otimizados. A medida de performance utilizada para a otimização foi a raiz do erro quadrático médio (*root mean squared error* — RMSE).
+
+Por fim, cada modelo foi calibrado individualmente, ou seja, cada agência possui um conjunto de hiperparâmetros otimizados para cada um dos 7 métodos de ML empregados para reconciliação ótima.
+
+```{r, include = FALSE, eval = FALSE}
+
+tibble::tribble(
+  ~Hiperparâmetro, ~Descrição, ~Intervalo, ~Trafo,
+  "nrounds", "Número de iterações", "$[1, 5000]$", NULL,
+  "eta", "Taxa de aprendizado", "$[-4, 0]$", "$10^x$",
+  "max\\_depth", "Profundidade máxima", "$[1, 20]$", NULL,
+  "subsample", "Subamostra", "$[0.1, 1]$", NULL,
+  "colsample\\_bytree", "Subamostra de colunas para uma árvore", "$[0.1, 1]$", NULL,
+  "colsample\\_bylevel", "Subamostra de colunas por nível de profundidade", "$[0.1, 1]$", NULL,
+  "lambda", "Regularização L2", "$[-10, 10]$", "$2^x$",
+  "alpha", "Regularização L1", "$[-10, 10]$", "$2^x$"
+) |>
+  kbl(
+    booktabs = TRUE,
+    escape = FALSE,
+    format = "latex",
+    label = "tbl-hip-xgboost",
+    caption = "Intervalos de hiperparâmetros para \\{xgboost\\}"
+  ) |>
+  kable_styling(latex_options = c("striped"))
+```
+
+```{r, include = FALSE, eval = FALSE}
+
+tibble::tribble(
+  ~Hiperparâmetro, ~Descrição, ~Intervalo, ~Trafo,
+  "num\\_iterations", "Número de iterações", "$[1, 1000]$", NULL,
+  "boosting", "Algoritmo de boosting", "\\{gbdt, dart, goss\\}", NULL,
+  "learning\\_rate", "Taxa de aprendizado", "$[-4, 0]$", "$10^x$",
+  "num\\_leaves", "Número de folhas", "$[2, 20]$", NULL,
+  "lambda\\_l1", "Regularização L1", "$[-12, 12]$", "$2^x$",
+  "lambda\\_l2", "Regularização L2", "$[-12, 12]$", "$2^x$",
+  "feature\\_fraction", "Subamostra de colunas", "$[0.1, 1]$", NULL,
+  "bagging\\_fraction", "Subamostra de linhas", "$[0.1, 1]$", NULL,
+  "bagging\\_freq", "Frequência de amostragem", "$[1, 10]$", NULL
+) |>
+  kbl(
+    booktabs = TRUE,
+    escape = FALSE,
+    format = "latex",
+    label = "tbl-hip-lightgbm",
+    caption = "Intervalos de hiperparâmetros para \\{lightgbm\\}"
+  ) |>
+  kable_styling(latex_options = c("striped"))
+```
+
+```{r, include = FALSE, eval = FALSE}
+
+tibble::tribble(
+  ~Hiperparâmetro, ~Descrição, ~Intervalo, ~Trafo,
+  "min.node.size", "Número mínimo de observações em um nó terminal", "$[1,7]$", "$2^x$",
+  "mtry", "Número de variáveis candidatas para split", "$[1,)$", NULL,
+  "replace", "Amostragem com reposição", "\\{TRUE, FALSE\\}", NULL,
+  "sample.fraction", "Fração de observações a serem amostradas", "$[0.1, 1]$", NULL,
+  "num.trees", "Número de árvores", "$[1, 2000]$", NULL
+) |>
+  kbl(
+    booktabs = TRUE,
+    escape = FALSE,
+    format = "latex",
+    label = "tbl-hip-ranger",
+    caption = "Intervalos de hiperparâmetros para \\{ranger\\}"
+  ) |>
+  kable_styling(latex_options = c("striped", "scale_down"))
+```
+
+```{r, include = FALSE, eval = FALSE}
+
+tibble::tribble(
+  ~Hiperparâmetro, ~Descrição, ~Intervalo, ~Trafo,
+  "cost", "Custo de $\\xi$", "$[0, 1]$", "$2^x$",
+  "kernel", "Kernel", "\\{linear, polynomial, radial, sigmoid\\}", NULL,
+  "degree", "Grau do polinômio", "$[1, 5]$", NULL,
+  "gamma", "Influência amostral", "$[-12, 12]$", "$2^x$",
+  "type", "Tipo de SVM", "\\{eps-regression\\}", NULL
+) |>
+  kbl(
+    booktabs = TRUE,
+    escape = FALSE,
+    format = "latex",
+    label = "tbl-hip-svm",
+    caption = "Intervalos de hiperparâmetros para \\{e1071\\} (svm)"
+  ) |>
+  kable_styling(latex_options = c("striped"))
+```
+
+```{r, include = FALSE, eval = FALSE}
+
+tibble::tribble(
+  ~Hiperparâmetro, ~Descrição, ~Intervalo, ~Trafo,
+  "alpha", "Mix entre lasso e ridge", "$[0, 1]$", NULL,
+  "lambda", "Regularização", "$[-12, 12]$", "$2^x$"
+) |>
+  kbl(
+    booktabs = TRUE,
+    escape = FALSE,
+    format = "latex",
+    label = "tbl-hip-glmnet",
+    caption = "Intervalos de hiperparâmetros para \\{glmnet\\}"
+  ) |>
+  kable_styling(latex_options = c("striped"))
+```
 
 # RESULTADOS
 
+## ESTBAN
+
 ```{r}
-#| tbl-cap: "Acurácia dos métodos analíticos de reconciliação"
-#| label: tbl-results-analiticos
+#| tbl-cap: "Resultados Estban: Tempo de processamento dos métodos de ML (em horas)"
+#| label: tbl-estban-tempo-ml
+
+# obtendo tempo de processamento
+tempo = lapply(c("one-step-ahead", "fitted_base", "rolling_forecast"), function(tipo) {
+  lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm"), function(learner) {
+    preds = readRDS(paste0("data/estban/preds_ml/preds/", tipo, "/preds_", learner, ".RDS"))[[2]]
+    return(preds)
+  })
+})
+
+# juntando predições em um único dataframe
+tempo = do.call(rbind, tempo)
+
+# convertendo colunas para numérico
+tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
+
+# nomeando df
+colnames(tempo) = c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm")
+rownames(tempo) = c("refit", "fitted base", "rolling forecast")
+
+# tabela
+tempo |>
+  kbl(booktabs = TRUE, digits = 1) |>
+  kable_styling(latex_options = c("striped"))
+```
+
+```{r}
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos analíticos de reconciliação"
+#| label: tbl-estban-results-analiticos
 
 rbind(
   readRDS("data/estban/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
@@ -1084,8 +1372,8 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
-#| label: tbl-results-ml-rolling
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
+#| label: tbl-estban-results-ml-rolling
 
 rbind(
   readRDS("data/estban/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
@@ -1098,8 +1386,8 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
-#| label: tbl-results-ml-fitted
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
+#| label: tbl-estban-results-ml-fitted
 
 rbind(
   readRDS("data/estban/preds_ml/preds/fitted_base/resumo.RDS")[["rmsse"]],
@@ -1112,8 +1400,8 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Acurácia dos métodos de ML de reconciliação. Estratégia refit."
-#| label: tbl-results-ml-refit
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia refit."
+#| label: tbl-estban-results-ml-refit
 
 rbind(
   readRDS("data/estban/preds_ml/preds/one-step-ahead/resumo.RDS")[["rmsse"]],
@@ -1123,6 +1411,78 @@ rbind(
   pack_rows("RMSSE", 1, 7) |>
   pack_rows("MASE", 8, 14) |>
   kable_styling(latex_options = c("striped", "scale_down"))
+```
+
+## TOURISM
+
+```{r}
+#| tbl-cap: "Resultados Tourism: Tempo de processamento dos métodos de ML (em horas)"
+#| label: tbl-tourism-tempo-ml
+
+# obtendo tempo de processamento
+tempo = lapply(c("fitted_base", "rolling_forecast"), function(tipo) {
+  lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm"), function(learner) {
+    preds = readRDS(paste0("data/tourism/preds_ml/preds/", tipo, "/preds_", learner, ".RDS"))[[2]]
+    return(preds)
+  })
+})
+
+# juntando predições em um único dataframe
+tempo = do.call(rbind, tempo)
+
+# convertendo colunas para numérico
+tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
+
+# nomeando df
+colnames(tempo) = c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm")
+rownames(tempo) = c("fitted base", "rolling forecast")
+
+# tabela
+tempo |>
+  kbl(booktabs = TRUE, digits = 1) |>
+  kable_styling(latex_options = c("striped"))
+```
+
+```{r}
+#| tbl-cap: "Resultados Tourism: Acurácia dos métodos analíticos de reconciliação"
+#| label: tbl-tourism-results-analiticos
+
+rbind(
+  readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
+  readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["mase"]]
+ ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  pack_rows("RMSSE", 1, 3) |>
+  pack_rows("MASE", 4, 6) |>
+  kable_styling(latex_options = c("striped"))
+```
+
+```{r}
+#| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
+#| label: tbl-tourism-results-ml-rolling
+
+rbind(
+  readRDS("data/tourism/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
+  readRDS("data/tourism/preds_ml/preds/rolling_forecast/resumo.RDS")[["mase"]]
+ ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("striped"))
+```
+
+```{r}
+#| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
+#| label: tbl-tourism-results-ml-fitted
+
+rbind(
+  readRDS("data/tourism/preds_ml/preds/fitted_base/resumo.RDS")[["rmsse"]],
+  readRDS("data/tourism/preds_ml/preds/fitted_base/resumo.RDS")[["mase"]]
+ ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("striped"))
 ```
 
 <!-- ! BUG: Parece ter um erro nos resultados de Spiliotis. Note que tanto em meus resultados de ML (implementados manualmente) quanto os analíticos (utilizando a implementação do {fabletools}, RMSSE < MASE em ambos Tourism (que conferem com FPP3) quanto Tourism Monthly. Mas, em Spiliotis, RMSSE > MASE tanto para ML quanto os analíticos, indicando que possa haver problemas na execução ou nos dados. -->

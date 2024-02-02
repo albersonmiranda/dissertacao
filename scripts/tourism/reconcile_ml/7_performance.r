@@ -5,7 +5,7 @@
 library(fabletools)
 
 # tipo de previsões treino: one-step-ahead, rolling_forecast ou fitted_base
-tipo = "rolling_forecast"
+tipo = "fitted_base"
 
 # juntando predições em um único dataframe
 preds = lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm"), function(learner) {
@@ -186,3 +186,6 @@ acuracia_ml = lapply(medidas, function(medida) {
 })
 
 names(acuracia_ml) = medidas
+
+# export
+saveRDS(acuracia_ml, paste0("data/tourism/preds_ml/preds/", tipo, "/resumo.RDS"))

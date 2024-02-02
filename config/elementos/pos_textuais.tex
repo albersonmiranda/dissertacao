@@ -136,9 +136,105 @@
 \end{apendicesenv}
 
 % anexos 
-%\begin{anexosenv}
-%\partanexos
-%\end{anexosenv}
+\begin{anexosenv}
+\partanexos
+
+\chapter{CONJUNTO DE HIPERPARÂMETROS} \label{anexo_a}
+
+\begin{table}
+
+  \caption{\label{tab:tbl-hip-xgboost}Intervalos de hiperparâmetros para \{xgboost\}}
+  \centering
+  \begin{tabular}[t]{llll}
+  \toprule
+  Hiperparâmetro & Descrição & Intervalo & Trafo\\
+  \midrule
+  \cellcolor{gray!6}{nrounds} & \cellcolor{gray!6}{Número de iterações} & \cellcolor{gray!6}{$[1, 5000]$} & \cellcolor{gray!6}{NULL}\\
+  eta & Taxa de aprendizado & $[-4, 0]$ & $10^x$\\
+  \cellcolor{gray!6}{max\_depth} & \cellcolor{gray!6}{Profundidade máxima} & \cellcolor{gray!6}{$[1, 20]$} & \cellcolor{gray!6}{NULL}\\
+  subsample & Subamostra & $[0.1, 1]$ & NULL\\
+  \cellcolor{gray!6}{colsample\_bytree} & \cellcolor{gray!6}{Subamostra de colunas para uma árvore} & \cellcolor{gray!6}{$[0.1, 1]$} & \cellcolor{gray!6}{NULL}\\
+  \addlinespace
+  colsample\_bylevel & Subamostra de colunas por nível de profundidade & $[0.1, 1]$ & NULL\\
+  \cellcolor{gray!6}{lambda} & \cellcolor{gray!6}{Regularização L2} & \cellcolor{gray!6}{$[-10, 10]$} & \cellcolor{gray!6}{$2^x$}\\
+  alpha & Regularização L1 & $[-10, 10]$ & $2^x$\\
+  \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}
+
+  \caption{\label{tab:tbl-hip-lightgbm}Intervalos de hiperparâmetros para \{lightgbm\}}
+  \centering
+  \begin{tabular}[t]{llll}
+  \toprule
+  Hiperparâmetro & Descrição & Intervalo & Trafo\\
+  \midrule
+  \cellcolor{gray!6}{num\_iterations} & \cellcolor{gray!6}{Número de iterações} & \cellcolor{gray!6}{$[1, 1000]$} & \cellcolor{gray!6}{NULL}\\
+  boosting & Algoritmo de boosting & \{gbdt, dart, goss\} & NULL\\
+  \cellcolor{gray!6}{learning\_rate} & \cellcolor{gray!6}{Taxa de aprendizado} & \cellcolor{gray!6}{$[-4, 0]$} & \cellcolor{gray!6}{$10^x$}\\
+  num\_leaves & Número de folhas & $[2, 20]$ & NULL\\
+  \cellcolor{gray!6}{lambda\_l1} & \cellcolor{gray!6}{Regularização L1} & \cellcolor{gray!6}{$[-12, 12]$} & \cellcolor{gray!6}{$2^x$}\\
+  \addlinespace
+  lambda\_l2 & Regularização L2 & $[-12, 12]$ & $2^x$\\
+  \cellcolor{gray!6}{feature\_fraction} & \cellcolor{gray!6}{Subamostra de colunas} & \cellcolor{gray!6}{$[0.1, 1]$} & \cellcolor{gray!6}{NULL}\\
+  bagging\_fraction & Subamostra de linhas & $[0.1, 1]$ & NULL\\
+  \cellcolor{gray!6}{bagging\_freq} & \cellcolor{gray!6}{Frequência de amostragem} & \cellcolor{gray!6}{$[1, 10]$} & \cellcolor{gray!6}{NULL}\\
+  \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}
+
+  \caption{\label{tab:tbl-hip-ranger}Intervalos de hiperparâmetros para \{ranger\}}
+  \centering
+  \resizebox{\linewidth}{!}{
+  \begin{tabular}[t]{llll}
+  \toprule
+  Hiperparâmetro & Descrição & Intervalo & Trafo\\
+  \midrule
+  \cellcolor{gray!6}{min.node.size} & \cellcolor{gray!6}{Número mínimo de observações em um nó terminal} & \cellcolor{gray!6}{$[1,7]$} & \cellcolor{gray!6}{$2^x$}\\
+  mtry & Número de variáveis candidatas para split & $[1,)$ & NULL\\
+  \cellcolor{gray!6}{replace} & \cellcolor{gray!6}{Amostragem com reposição} & \cellcolor{gray!6}{\{TRUE, FALSE\}} & \cellcolor{gray!6}{NULL}\\
+  sample.fraction & Fração de observações a serem amostradas & $[0.1, 1]$ & NULL\\
+  \cellcolor{gray!6}{num.trees} & \cellcolor{gray!6}{Número de árvores} & \cellcolor{gray!6}{$[1, 2000]$} & \cellcolor{gray!6}{NULL}\\
+  \bottomrule
+  \end{tabular}}
+\end{table}
+
+\begin{table}
+
+  \caption{\label{tab:tbl-hip-svm}Intervalos de hiperparâmetros para \{e1071\} (svm)
+  }
+  \centering
+  \begin{tabular}[t]{llll}
+  \toprule
+  Hiperparâmetro & Descrição & Intervalo & Trafo\\
+  \midrule
+  \cellcolor{gray!6}{cost} & \cellcolor{gray!6}{Custo de $\xi$} & \cellcolor{gray!6}{$[0, 1]$} & \cellcolor{gray!6}{$2^x$}\\
+  kernel & Kernel & \{linear, polynomial, radial, sigmoid\} & NULL\\
+  \cellcolor{gray!6}{degree} & \cellcolor{gray!6}{Grau do polinômio} & \cellcolor{gray!6}{$[1, 5]$} & \cellcolor{gray!6}{NULL}\\
+  gamma & Influência amostral & $[-12, 12]$ & $2^x$\\
+  \cellcolor{gray!6}{type} & \cellcolor{gray!6}{Tipo de SVM} & \cellcolor{gray!6}{\{eps-regression\}} & \cellcolor{gray!6}{NULL}\\
+  \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}
+
+  \caption{\label{tab:tbl-hip-glmnet}Intervalos de hiperparâmetros para \{glmnet\}}
+  \centering
+  \begin{tabular}[t]{llll}
+  \toprule
+  Hiperparâmetro & Descrição & Intervalo & Trafo\\
+  \midrule
+  \cellcolor{gray!6}{alpha} & \cellcolor{gray!6}{Mix entre lasso e ridge} & \cellcolor{gray!6}{$[0, 1]$} & \cellcolor{gray!6}{NULL}\\
+  lambda & Regularização & $[-12, 12]$ & $2^x$\\
+  \bottomrule
+  \end{tabular}
+\end{table}
+
+\end{anexosenv}
 
 % índice remissivo 
 %\phantompart
