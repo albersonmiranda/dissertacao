@@ -1327,7 +1327,154 @@ tibble::tribble(
 
 # RESULTADOS
 
+As tabelas a seguir apresentam os resultados obtidos para o experimento. Para fins de comparação, além do *dataset* de interesse, o ESTBAN, o experimento foi executado também para o *dataset* TOURISM, disponível no pacote {tsibble} [@R-tsibble], e seus resultados reportados na [seção @sec-tourism].
+
+As @tbl-estban-results-analiticos e @tbl-tourism-results-analiticos contém as medidas de acurácia RMSSE e MASE para os métodos analíticos de reconciliação ótima BU (*bottom-up*) e MinT, e para as previsões base, ou seja, sem aplicar qualquer método de reconciliação. A primeira coluna especifica o método utilizado, enquanto as demais colunas apresentam a média da performance em cada nível de agregação.
+
+As @tbl-estban-results-ml-rolling, @tbl-estban-results-ml-fitted, @tbl-estban-results-ml-refit, @tbl-tourism-results-ml-rolling e @tbl-tourism-results-ml-fitted reportam as medidas de acurácia para os métodos de reconciliação ótima baseados em *machine learning*. Já as @tbl-estban-tempo-ml e @tbl-tourism-tempo-ml reportam o tempo de processamento para as etapas de calibragem, treino e predição desses métodos^[Os métodos analíticos não tiveram seu tempo de processamento medidos porque executam quase que instantaneamente, já sinalizando uma vantagem para esses métodos.].
+
 ## ESTBAN
+
+As colunas "agregado", "mesorregiao", "microrregiao", "municipio" e "agencia", fazem referência à estrutura hierárquica, ou seja, tratam o verbete de forma agregada. Já as colunas "verbete", "bottom" e "hierarquia", incluem também a estrutura agrupada, tratando o verbete de forma desagregada. Detalhadamente:
+
+- Agregado: performance do método para a série que representa o total, com os verbetes agregados, (@fig-agregado).
+- Mesorregião: a média das performances do método para as séries do agregado de cada mesorregião, com os verbetes agregados (@fig-meso).
+- Microrregião: a média das performances do método para as séries do agregado de cada microrregião, com os verbetes agregados (@fig-micro).
+- Município: a média das performances do método para as séries do agregado de cada município, com os verbetes agregados.
+- Agência: a média das performances do método para as séries de cada agência, com os verbetes agregados.
+- Verbete: a média das performances do método para as séries de cada verbete, para o total da hierarquia (@fig-verbetes).
+- Bottom: a média das performances do método para as séries do nível mais desagregado, ou seja, verbete por agência.
+- Hierarquia: a média das performances do método para todas as séries, agregadas e desagregadas.
+
+Para o *dataset* ESTBAN, não houve uma combinação de método e estratégia que fosse consistentemente melhor ao longo de todos os níveis de agregação. Portanto, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador^[Por exemplo, se o objetivo é a elaboração de *guidance*, o pesquisador deve preferir o método e estratégia que geram as  previsões mais precisas para o nível agregado. Já para elaboração de metas individuais, os níveis individuais ou regionais são preferíveis.].
+
+Em termos de RMSSE, o *elastic net* na estratégia *refit* (@tbl-estban-results-ml-refit) se mostrou a melhor opção para a estimação do agregado, com 89% de ganho de performance sobre o MinT (@tbl-estban-results-analiticos). Já para o nível mais desagregado (*bottom*), o MinT foi o melhor método, com RMSSE de 0.63, seguido de perto pelo *lasso* na estratégia *refit*, com RMSSE de 0.68.
+
+Os resultados se mostraram bastante sensíveis à estratégia utilizada. Na métrica RMSS, nenhum método utilizando as estratégias *rolling forecast* e *fitted base* foram capazes de superar o MinT em qualquer nível de agregação, enquanto na estratégia *refit* os métodos de ML mostraram ganhos de performance com os métodos SVM e nas três configurações do *elastic net*.
+
+Já em termos de MASE, além da estratégia *refit*, que do nível de município acima, permaneceu gerando as melhores previsões, a estratégia *rolling forecast* também foi capaz de superar o MinT
+
+Em geral, os métodos baseados em árvore, além de requererem maior tempo de processamento, 
+
+Foi sempre possível encontrar uma combinação de método e estratégia que superassem os métodos analíticos de reconciliação ótima.
+
+```{r}
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos analíticos de reconciliação"
+#| label: tbl-estban-results-analiticos
+
+rbind(
+  readRDS("data/estban/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
+  readRDS("data/estban/preds_analitico/acuracia_analiticos.rds")[["mase"]]
+ ) |>
+  # substituindo "glmnet" por "elastic net"
+  transform(
+    .model = ifelse(.model == "glmnet", "elastic net", .model)
+  ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
+  pack_rows("RMSSE", 1, 3) |>
+  pack_rows("MASE", 4, 6) |>
+  kable_styling(latex_options = c("striped", "scale_down")) |>
+  # microrregião
+  column_spec(
+    4,
+    bold = c(F, T, F, F, T, F)
+  ) |>
+  # município
+  column_spec(
+    5,
+    bold = c(T, F, F, T, F, F)
+  ) |>
+  # agência
+  column_spec(
+    6,
+    bold = c(F, F, T, T, F, F)
+  ) |>
+  # verbete
+  column_spec(
+    7,
+    bold = c(F, F, T, F, F, T)
+  ) |>
+  # bottom
+  column_spec(
+    8,
+    bold = c(F, F, T, F, T, F)
+  ) |>
+  # hierarquia
+  column_spec(
+    9,
+    bold = c(F, F, T, F, F, T)
+  )
+```
+
+```{r}
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
+#| label: tbl-estban-results-ml-rolling
+
+rbind(
+  readRDS("data/estban/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
+  readRDS("data/estban/preds_ml/preds/rolling_forecast/resumo.RDS")[["mase"]]
+ ) |>
+ # substituindo "glmnet" por "elastic net"
+  transform(
+    modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("striped", "scale_down")) |>
+  # agregado
+  column_spec(
+    2,
+    underline = c(F, F, F, F, F, F, F, F, T, F, F, F, F, F)
+  )
+```
+
+```{r}
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
+#| label: tbl-estban-results-ml-fitted
+
+rbind(
+  readRDS("data/estban/preds_ml/preds/fitted_base/resumo.RDS")[["rmsse"]],
+  readRDS("data/estban/preds_ml/preds/fitted_base/resumo.RDS")[["mase"]]
+ ) |>
+ # substituindo "glmnet" por "elastic net"
+  transform(
+    modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("striped", "scale_down"))
+```
+
+```{r}
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia refit."
+#| label: tbl-estban-results-ml-refit
+
+rbind(
+  readRDS("data/estban/preds_ml/preds/one-step-ahead/resumo.RDS")[["rmsse"]],
+  readRDS("data/estban/preds_ml/preds/one-step-ahead/resumo.RDS")[["mase"]]
+ ) |>
+  # substituindo "glmnet" por "elastic net"
+  transform(
+    modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("striped", "scale_down")) |>
+  # agregado
+  column_spec(
+    2,
+    bold = c(T, F, F, F, F, F, F, T, F, F, F, F, F, F),
+    underline = c(F, T, F, F, T, F, F, F, T, F, F, T, F, F)
+  ) |>
+  # mesorregião
+  column_spec(
+    3,
+    bold = c(F, T, F, F, F, F, F, F, T, F, F, F, F, F)
+  )
+```
 
 ```{r}
 #| tbl-cap: "Resultados Estban: Tempo de processamento dos métodos de ML (em horas)"
@@ -1348,72 +1495,115 @@ tempo = do.call(rbind, tempo)
 tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
 
 # nomeando df
-colnames(tempo) = c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm")
+colnames(tempo) = c("xgb", "ranger", "elastic net", "lasso", "ridge", "svm", "lightgbm")
 rownames(tempo) = c("refit", "fitted base", "rolling forecast")
 
 # tabela
 tempo |>
-  kbl(booktabs = TRUE, digits = 1) |>
+  kbl(booktabs = TRUE, digits = 3) |>
   kable_styling(latex_options = c("striped"))
 ```
 
+## TOURISM {#sec-tourism}
+
+Para que acurácia dos métodos analíticos para o dataset TOURISM pudesse ser reproduzida conforme reportada originalmente em @hyndman_forecasting_2021, as previsões base e as previsões obtidas no passo 1 do experimento foram realizadas através do algoritmo de Hyndman-Khandakar para modelagem Arima automática.
+
 ```{r}
-#| tbl-cap: "Resultados Estban: Acurácia dos métodos analíticos de reconciliação"
-#| label: tbl-estban-results-analiticos
+#| tbl-cap: "Resultados Tourism: Acurácia dos métodos analíticos de reconciliação"
+#| label: tbl-tourism-results-analiticos
 
 rbind(
-  readRDS("data/estban/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
-  readRDS("data/estban/preds_analitico/acuracia_analiticos.rds")[["mase"]]
+  readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
+  readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["mase"]]
  ) |>
-  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+ # substituindo "glmnet" por "elastic net"
+  transform(
+    .model = ifelse(.model == "glmnet", "elastic net", .model)
+  ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 3) |>
   pack_rows("MASE", 4, 6) |>
-  kable_styling(latex_options = c("striped", "scale_down"))
+  kable_styling(latex_options = c("striped")) |>
+  # bottom
+  column_spec(
+    6,
+    bold = c(F, F, T, F, F, T)
+  ) |>
+  # hierarquia
+  column_spec(
+    7,
+    bold = c(F, F, T, F, F, T)
+  )
 ```
 
 ```{r}
-#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
-#| label: tbl-estban-results-ml-rolling
+#| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
+#| label: tbl-tourism-results-ml-rolling
 
 rbind(
-  readRDS("data/estban/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
-  readRDS("data/estban/preds_ml/preds/rolling_forecast/resumo.RDS")[["mase"]]
+  readRDS("data/tourism/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
+  readRDS("data/tourism/preds_ml/preds/rolling_forecast/resumo.RDS")[["mase"]]
  ) |>
-  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+ # substituindo "glmnet" por "elastic net"
+  transform(
+    modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 7) |>
   pack_rows("MASE", 8, 14) |>
-  kable_styling(latex_options = c("striped", "scale_down"))
+  kable_styling(latex_options = c("striped")) |>
+  # agregado
+  column_spec(
+    2,
+    bold = c(F, F, F, F, F, T, F, F, F, F, F, F, T, F),
+    underline = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
+  ) |>
+  # state
+  column_spec(
+    3,
+    bold = c(F, F, F, F, F, T, F, F, F, F, F, F, T, F),
+    underline = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
+  ) |>
+  # purpose
+  column_spec(
+    5,
+    bold = c(F, F, F, F, F, T, F, F, F, F, F, F, T, F),
+    underline = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
+  )
 ```
 
 ```{r}
-#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
-#| label: tbl-estban-results-ml-fitted
+#| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
+#| label: tbl-tourism-results-ml-fitted
 
 rbind(
-  readRDS("data/estban/preds_ml/preds/fitted_base/resumo.RDS")[["rmsse"]],
-  readRDS("data/estban/preds_ml/preds/fitted_base/resumo.RDS")[["mase"]]
+  readRDS("data/tourism/preds_ml/preds/fitted_base/resumo.RDS")[["rmsse"]],
+  readRDS("data/tourism/preds_ml/preds/fitted_base/resumo.RDS")[["mase"]]
  ) |>
+ # substituindo "glmnet" por "elastic net"
+  transform(
+    modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
   kbl(booktabs = TRUE, format = "latex", digits = 2) |>
   pack_rows("RMSSE", 1, 7) |>
   pack_rows("MASE", 8, 14) |>
-  kable_styling(latex_options = c("striped", "scale_down"))
+  kable_styling(latex_options = c("striped")) |>
+  # state
+  column_spec(
+    3,
+    underline = c(F, F, F, F, T, T, F, F, F, F, F, T, T, F)
+  ) |>
+  # region
+  column_spec(
+    4,
+    bold = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
+  ) |>
+  # purpose
+  column_spec(
+    5,
+    underline = c(F, F, F, F, F, F, F, F, F, F, F, T, F, F)
+  )
 ```
-
-```{r}
-#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia refit."
-#| label: tbl-estban-results-ml-refit
-
-rbind(
-  readRDS("data/estban/preds_ml/preds/one-step-ahead/resumo.RDS")[["rmsse"]],
-  readRDS("data/estban/preds_ml/preds/one-step-ahead/resumo.RDS")[["mase"]]
- ) |>
-  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
-  pack_rows("RMSSE", 1, 7) |>
-  pack_rows("MASE", 8, 14) |>
-  kable_styling(latex_options = c("striped", "scale_down"))
-```
-
-## TOURISM
 
 ```{r}
 #| tbl-cap: "Resultados Tourism: Tempo de processamento dos métodos de ML (em horas)"
@@ -1434,54 +1624,12 @@ tempo = do.call(rbind, tempo)
 tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
 
 # nomeando df
-colnames(tempo) = c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm")
+colnames(tempo) = c("xgb", "ranger", "elastic net", "lasso", "ridge", "svm", "lightgbm")
 rownames(tempo) = c("fitted base", "rolling forecast")
 
 # tabela
 tempo |>
-  kbl(booktabs = TRUE, digits = 1) |>
-  kable_styling(latex_options = c("striped"))
-```
-
-```{r}
-#| tbl-cap: "Resultados Tourism: Acurácia dos métodos analíticos de reconciliação"
-#| label: tbl-tourism-results-analiticos
-
-rbind(
-  readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
-  readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["mase"]]
- ) |>
-  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
-  pack_rows("RMSSE", 1, 3) |>
-  pack_rows("MASE", 4, 6) |>
-  kable_styling(latex_options = c("striped"))
-```
-
-```{r}
-#| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
-#| label: tbl-tourism-results-ml-rolling
-
-rbind(
-  readRDS("data/tourism/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
-  readRDS("data/tourism/preds_ml/preds/rolling_forecast/resumo.RDS")[["mase"]]
- ) |>
-  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
-  pack_rows("RMSSE", 1, 7) |>
-  pack_rows("MASE", 8, 14) |>
-  kable_styling(latex_options = c("striped"))
-```
-
-```{r}
-#| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
-#| label: tbl-tourism-results-ml-fitted
-
-rbind(
-  readRDS("data/tourism/preds_ml/preds/fitted_base/resumo.RDS")[["rmsse"]],
-  readRDS("data/tourism/preds_ml/preds/fitted_base/resumo.RDS")[["mase"]]
- ) |>
-  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
-  pack_rows("RMSSE", 1, 7) |>
-  pack_rows("MASE", 8, 14) |>
+  kbl(booktabs = TRUE, digits = 3) |>
   kable_styling(latex_options = c("striped"))
 ```
 
