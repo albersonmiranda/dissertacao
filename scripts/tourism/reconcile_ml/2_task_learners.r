@@ -97,7 +97,7 @@ task = lapply(target, function(y_m) {
 })
 
 # pipeline
-pipeline = po("encode", method = "treatment", affect_columns = selector_type("factor"))
+pipeline = po("imputehist", affect_columns = selector_type("numeric"))
 
 # learners
 learners = list(
