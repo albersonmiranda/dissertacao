@@ -1356,6 +1356,8 @@ Para os níveis ao topo da hierarquia, os métodos de ML se mostraram a melhor o
 
 Os resultados se mostraram bastante sensíveis à estratégia utilizada. Na métrica RMSS, nenhum método utilizando as estratégias *rolling forecast* e *fitted base* foi capaz de superar o MinT em qualquer nível de agregação, enquanto na estratégia *refit* os métodos de ML mostraram ganhos de performance com os métodos SVM e nas três configurações do *elastic net*.
 
+Em geral, as medidas RMSSE e MASE se mostraram bastante correlacionadas, com os métodos que obtiveram melhor performance em uma métrica também obtendo melhor performance na outra. A exceção foi para o método *lasso* na estratégia *rolling forecast*, que obteve performance melhor que o MinT, em termos de MASE, para o nível agregado, sendo o único resultado positivo para a estratégia *rolling forecast*.
+
 ```{r}
 #| tbl-cap: "Resultados Estban: Acurácia dos métodos analíticos de reconciliação"
 #| label: tbl-estban-results-analiticos
@@ -1504,9 +1506,7 @@ tempo |>
 
 ## TOURISM {#sec-tourism}
 
-O *dataset* TOURISM consiste na quantidade trimestral de pernoites em visitas na na Austrália, de 1998 a 2016. A estrutura é hierárquica e agrupada, composta por 3 níveis hierárquicos — *State* (Estados), *Region* (Regiões) e total —, e agrupado por *Purpose* (Propósito).
-
-Em relação às estratégias de ML, o *refit* não pôde ser aplicado, uma vez que ao menos uma série não pôde ser estimada 
+O *dataset* TOURISM consiste na quantidade trimestral de pernoites em visitas na Austrália entre 1998 e 2016. A estrutura é hierárquica e agrupada, composta por 3 níveis hierárquicos — *State* (Estados), *Region* (Regiões) e total —, e agrupado por *Purpose* (Propósito).
 
 Assim como no *dataset* ESTBAN, aqui também não houve uma combinação de método e estratégia que fosse consistentemente melhor ao longo de todos os níveis de agregação. Entretanto, uma tendência pode foi observada em ambos *datasets*, com os métodos de ML se mostrando a melhor opção para estimação nos níveis ao topo da hierarquia, enquanto os métodos analíticos se mostram melhor opção para os níveis ao fundo da hierarquia.
 
@@ -1636,3 +1636,7 @@ tempo |>
 ```
 
 <!-- ! BUG: Parece ter um erro nos resultados de Spiliotis. Note que tanto em meus resultados de ML (implementados manualmente) quanto os analíticos (utilizando a implementação do {fabletools}, RMSSE < MASE em ambos Tourism (que conferem com FPP3) quanto Tourism Monthly. Mas, em Spiliotis, RMSSE > MASE tanto para ML quanto os analíticos, indicando que possa haver problemas na execução ou nos dados. -->
+
+# CONCLUSÃO {-}
+
+Neste trabalho, foi apresentado um experimento de reconciliação ótima para hierarquias temporais, utilizando métodos analíticos e de *machine learning* com o objetivo de obter previsões . Os resultados obtidos indicam que a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador. Em geral, os métodos de ML se mostraram a melhor opção para estimação nos níveis ao topo da hierarquia, enquanto os métodos analíticos se mostram melhor opção para os níveis ao fundo da hierarquia.
