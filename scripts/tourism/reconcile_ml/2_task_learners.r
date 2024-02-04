@@ -8,7 +8,7 @@ pacman::p_load(
 )
 
 # tipo de previsões treino: one-step-ahead, rolling_forecast ou fitted_base
-tipo = "fitted_base"
+tipo = "one-step-ahead"
 
 # true data (y_t)
 true_data = readRDS("data/tourism/tourism.rds") |>
@@ -34,6 +34,7 @@ if (tipo == "one-step-ahead") {
       names_sep = "__",
       values_from = ".fitted"
     ) |>
+    subset(Quarter >= tsibble::yearquarter("2008 Q1") & Quarter <= tsibble::yearquarter("2015 Q4")) |>
     cbind(subset(true_data, select = -`Quarter__true`))
 }
 

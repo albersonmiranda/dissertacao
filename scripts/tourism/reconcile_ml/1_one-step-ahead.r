@@ -21,7 +21,7 @@ modelo = tourism |>
 # portmanteau tests para autocorrelação
 testes_lb = modelo |>
   fabletools::augment() |>
-  fabletools::features(.innov, feasts::ljung_box, lag = 4)
+  fabletools::features(.innov, feasts::ljung_box, lag = 8)
 
 # previsões 1-step-ahead
 preds = fabletools::refit(modelo, new_data, reestimate = TRUE) |> fitted()
