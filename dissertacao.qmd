@@ -1333,9 +1333,13 @@ As @tbl-estban-results-analiticos e @tbl-tourism-results-analiticos contém as m
 
 As @tbl-estban-results-ml-rolling, @tbl-estban-results-ml-fitted, @tbl-estban-results-ml-refit, @tbl-tourism-results-ml-rolling e @tbl-tourism-results-ml-fitted reportam as medidas de acurácia para os métodos de reconciliação ótima baseados em *machine learning*. Já as @tbl-estban-tempo-ml e @tbl-tourism-tempo-ml reportam o tempo de processamento para as etapas de calibragem, treino e predição desses métodos^[Os métodos analíticos não tiveram seu tempo de processamento medidos porque executam quase que instantaneamente, já sinalizando uma vantagem para esses métodos.].
 
+Em geral, os métodos baseados em árvore, além de requererem maior tempo de processamento devido a sua complexidade no espaço de hiperparâmetros, também tenderam a perder qualidade de performance conforme suas previsões são agregadas para formação dos níveis superiores da hierarquia. Contrariamente, os métodos de regressão regularizada e o SVM se mostraram mais robustos à agregação.
+
+Nas tabelas a seguir, **negrito** indica a melhor performance entre os métodos para aquele determinado nível de agregação, e \underline{sublinhado} indica que aquele método de ML superou o método analítico de melhor performance naquele nível de agregação.
+
 ## ESTBAN
 
-As colunas "agregado", "mesorregiao", "microrregiao", "municipio" e "agencia", fazem referência à estrutura hierárquica, ou seja, tratam o verbete de forma agregada. Já as colunas "verbete", "bottom" e "hierarquia", incluem também a estrutura agrupada, tratando o verbete de forma desagregada. Detalhadamente:
+Nos reportes para o *dataset* ESTBAN estão incluídas as médias de performance para cada nível hierárquico e agrupado. As colunas "agregado", "mesorregiao", "microrregiao", "municipio" e "agencia", fazem referência à estrutura hierárquica, ou seja, tratam o verbete de forma agregada. Já as colunas "verbete", "bottom" e "hierarquia", incluem também a estrutura agrupada, tratando o verbete de forma desagregada. Detalhadamente:
 
 - Agregado: performance do método para a série que representa o total, com os verbetes agregados, (@fig-agregado).
 - Mesorregião: a média das performances do método para as séries do agregado de cada mesorregião, com os verbetes agregados (@fig-meso).
@@ -1346,17 +1350,11 @@ As colunas "agregado", "mesorregiao", "microrregiao", "municipio" e "agencia", f
 - Bottom: a média das performances do método para as séries do nível mais desagregado, ou seja, verbete por agência.
 - Hierarquia: a média das performances do método para todas as séries, agregadas e desagregadas.
 
-Para o *dataset* ESTBAN, não houve uma combinação de método e estratégia que fosse consistentemente melhor ao longo de todos os níveis de agregação. Portanto, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador^[Por exemplo, se o objetivo é a elaboração de *guidance*, o pesquisador deve preferir o método e estratégia que geram as  previsões mais precisas para o nível agregado. Já para elaboração de metas individuais, os níveis individuais ou regionais são preferíveis.].
+Para o *dataset* ESTBAN, não houve uma combinação de método e estratégia que fosse consistentemente melhor ao longo de todos os níveis de agregação. Portanto, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador^[Se o objetivo é a elaboração de *guidance*, por exemplo, o pesquisador deve preferir o método e estratégia que geram as  previsões mais precisas para o nível agregado. Já para elaboração de metas individuais, os níveis individuais ou regionais podem ser preferíveis.].
 
-Em termos de RMSSE, o *elastic net* na estratégia *refit* (@tbl-estban-results-ml-refit) se mostrou a melhor opção para a estimação do agregado, com 89% de ganho de performance sobre o MinT (@tbl-estban-results-analiticos). Já para o nível mais desagregado (*bottom*), o MinT foi o melhor método, com RMSSE de 0.63, seguido de perto pelo *lasso* na estratégia *refit*, com RMSSE de 0.68.
+Para os níveis ao topo da hierarquia, os métodos de ML se mostraram a melhor opção para estimação. No nível agregado, o *elastic net* na estratégia *refit* (@tbl-estban-results-ml-refit) se mostrou a melhor opção para a estimação do agregado, com 89% de ganho de performance sobre o MinT (@tbl-estban-results-analiticos), em termos de RMSSE. Da mesma forma, para o nível de mesorregião, o *elastic net* na configuração *lasso* obteve a melhor performance, performando 7% melhor que BU. Por outro lado, tanto nos níveis hierárquicos abaixo, quanto nos níveis agrupados, os métodos de ML não foram capazes de superar os métodos analíticos.
 
-Os resultados se mostraram bastante sensíveis à estratégia utilizada. Na métrica RMSS, nenhum método utilizando as estratégias *rolling forecast* e *fitted base* foram capazes de superar o MinT em qualquer nível de agregação, enquanto na estratégia *refit* os métodos de ML mostraram ganhos de performance com os métodos SVM e nas três configurações do *elastic net*.
-
-Já em termos de MASE, além da estratégia *refit*, que do nível de município acima, permaneceu gerando as melhores previsões, a estratégia *rolling forecast* também foi capaz de superar o MinT
-
-Em geral, os métodos baseados em árvore, além de requererem maior tempo de processamento, 
-
-Foi sempre possível encontrar uma combinação de método e estratégia que superassem os métodos analíticos de reconciliação ótima.
+Os resultados se mostraram bastante sensíveis à estratégia utilizada. Na métrica RMSS, nenhum método utilizando as estratégias *rolling forecast* e *fitted base* foi capaz de superar o MinT em qualquer nível de agregação, enquanto na estratégia *refit* os métodos de ML mostraram ganhos de performance com os métodos SVM e nas três configurações do *elastic net*.
 
 ```{r}
 #| tbl-cap: "Resultados Estban: Acurácia dos métodos analíticos de reconciliação"
@@ -1506,7 +1504,11 @@ tempo |>
 
 ## TOURISM {#sec-tourism}
 
-Para que acurácia dos métodos analíticos para o dataset TOURISM pudesse ser reproduzida conforme reportada originalmente em @hyndman_forecasting_2021, as previsões base e as previsões obtidas no passo 1 do experimento foram realizadas através do algoritmo de Hyndman-Khandakar para modelagem Arima automática.
+O *dataset* TOURISM consiste na quantidade trimestral de pernoites em visitas na na Austrália, de 1998 a 2016. A estrutura é hierárquica e agrupada, composta por 3 níveis hierárquicos — *State* (Estados), *Region* (Regiões) e total —, e agrupado por *Purpose* (Propósito).
+
+Em relação às estratégias de ML, o *refit* não pôde ser aplicado, uma vez que ao menos uma série não pôde ser estimada 
+
+Assim como no *dataset* ESTBAN, aqui também não houve uma combinação de método e estratégia que fosse consistentemente melhor ao longo de todos os níveis de agregação. Entretanto, uma tendência pode foi observada em ambos *datasets*, com os métodos de ML se mostrando a melhor opção para estimação nos níveis ao topo da hierarquia, enquanto os métodos analíticos se mostram melhor opção para os níveis ao fundo da hierarquia.
 
 ```{r}
 #| tbl-cap: "Resultados Tourism: Acurácia dos métodos analíticos de reconciliação"
