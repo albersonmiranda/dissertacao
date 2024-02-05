@@ -144,7 +144,7 @@ Os objetivos específicos são:
 
 ## Outline da dissertação
 
-[Escrever *outline* da dissertação]
+Neste estudo, foram conduzidos experimentos de reconciliação ótima para séries temporais hierárquicas e agrupadas, visando melhorar a precisão nas previsões de saldos de empréstimos e financiamentos do Banco do Estado do Espírito Santo. Além dos métodos analíticos tradicionais, foram exploradas abordagens de *machine learning*, incluindo floresta aleatória, gradient boosting, *elastic net* e *support vector machines*. O trabalho propôs duas estratégias alternativas para a reconciliação ótima baseada em ML. Os resultados revelaram que a escolha do método e estratégia depende do nível hierárquico, onde a combinação correta pode exibir até 89% de ganho de performance nos níveis mais agregados. No entanto, para níveis inferiores, os métodos analíticos, destacadamente o MinT foram mais eficazes.
 
 # REVISÃO DE LITERATURA
 
@@ -1637,6 +1637,23 @@ tempo |>
 
 <!-- ! BUG: Parece ter um erro nos resultados de Spiliotis. Note que tanto em meus resultados de ML (implementados manualmente) quanto os analíticos (utilizando a implementação do {fabletools}, RMSSE < MASE em ambos Tourism (que conferem com FPP3) quanto Tourism Monthly. Mas, em Spiliotis, RMSSE > MASE tanto para ML quanto os analíticos, indicando que possa haver problemas na execução ou nos dados. -->
 
-# CONCLUSÃO {-}
+# CONCLUSÃO
 
-Neste trabalho, foi apresentado um experimento de reconciliação ótima para hierarquias temporais, utilizando métodos analíticos e de *machine learning* com o objetivo de obter previsões . Os resultados obtidos indicam que a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador. Em geral, os métodos de ML se mostraram a melhor opção para estimação nos níveis ao topo da hierarquia, enquanto os métodos analíticos se mostram melhor opção para os níveis ao fundo da hierarquia.
+Neste trabalho, foram apresentados experimentos de reconciliação ótima para séries temporais hierárquicas e agrupadas, utilizando métodos analíticos e de *machine learning* com o objetivo de obter coerência e ganhos de acurácia nas previsões de saldos de empréstimos e financiamentos do Banco do Estado do Espírito Santo. Pesquisas anteriores já haviam mostrado que a reconciliação ótima pode trazer ganhos de acurácia, e que métodos de *machine learning* podem ser competitivos em relação aos métodos analíticos.
+
+Este trabalho trouxe, além dos métodos de floresta aleatória e *gradient boosting* já trabalhados em @spiliotis_hierarchical_2021, o método de regressão regularizada *elastic net* e o *support vector machines*, além de avaliar outro método de *gradient boosting*, o *lightGBM*. Paralelamente, este trabalho propôs duas estratégias alternativas para a metodologia de reconciliação ótima baseada em *machine learning* proposta originalmente em @spiliotis_hierarchical_2021.
+
+Os resultados obtidos para o *dataset* ESTBAN mostraram, primeiramente, que não houve uma combinação de método e estratégia que obtivesse melhor performance de maneira consistente ao longo de todos os níveis hierárquicos. Dessa forma, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador. Para os níveis ao topo da hierarquia, a combinação correta de método e estratégia de estimação (*elastic net* + *refit*) gerou até 89% de ganho de performance no nível mais agregado, permitindo à instituição financeira maior precisão para tomada de decisão e planejamento estratégico, além de sinalizar maior confiança nas estimativas comunicadas ao mercado e aos investidores. Por outro lado, para os níveis inferiores na estrutura hierárquica, os métodos analíticos se mostraram a melhor escolha. Isso sugere que, com o objetivo de elaboração de metas individuais — seja para as agências ou superintendências regionais —, os métodos analíticos ainda são preferíveis.
+
+Os restultados para o *dataset* ESTBAN também mostram que o resultado da reconciliação ótima é sensível à estratégia utilizada. Apenas na estratégia *refit* que os ganhos de performance foram observados, enquanto nas estratégias *rolling forecast* e *fitted base* os métodos de ML não foram capazes de superar os métodos analíticos.
+
+O mesmo padrão em relação à performance ao logo dos níveis de agregação pôde ser observado no *dataset* TOURISM. Foi possível encontrar uma combinação de método de ML e estratégia capaz de superar os métodos analíticos para os níveis mais agregados, mas não para os níveis mais desagregados. Nesse *dataset*, os métodos de ML superaram os analíticos em todos os níveis de agregação, exceto no mais desagregado, com os métodos *support vector machines* e *elastic net* liderando a performance tanto nas estratégias *rolling forecast* quanto *fitted base*.
+
+Contrariamente aos resultados de @spiliotis_hierarchical_2021, em ambos *datasets*, os métodos de ML baseados em árvore de decisão (*XGBoost*, *ranger* e *lightGBM*) não foram capazes de superar os métodos analíticos em nenhum nível de agregação.
+
+Para pesquisas futuras, pode-se investigar se a performance dos diferentes métodos e estratégias estão relacionadas às características das séries temporais, por exemplo:
+
+- Os efeitos do ruído de previsão: se os diferentes métodos e estratégias exibem aumento ou deterioração de performance quando as previsões individuais são mais ou menos ruidosas (i.e. se a variância do erro das previsões individuais é maior ou menor).
+- Os efeitos de correlação entre as séries: se os métodos e estratégias exibem aumento ou deterioração de performance quando as séries temporais no menor nível hierárquico são mais ou menos correlacionadas.
+- Os efeitos de componentes sazonais: se os métodos e estratégias exibem aumento ou deterioração de performance quando as séries temporais do menor nível hierárquico possuem ou não componentes sazonais.
+- Os efeitos do tamanho da hierarquia: verificar se os métodos e estratégias exibem aumento ou deterioração de performance quando a hierarquia é mais ou menos profunda (i.e. possui mais ou menos níveis hierárquicos).
