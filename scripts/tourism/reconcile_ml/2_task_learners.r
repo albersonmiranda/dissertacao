@@ -34,7 +34,6 @@ if (tipo == "one-step-ahead") {
       names_sep = "__",
       values_from = ".fitted"
     ) |>
-    subset(Quarter >= tsibble::yearquarter("2008 Q1") & Quarter <= tsibble::yearquarter("2015 Q4")) |>
     cbind(subset(true_data, select = -`Quarter__true`))
 }
 

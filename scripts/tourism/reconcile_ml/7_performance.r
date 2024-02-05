@@ -5,7 +5,7 @@
 library(fabletools)
 
 # tipo de previsões treino: one-step-ahead, rolling_forecast ou fitted_base
-tipo = "fitted_base"
+tipo = "one-step-ahead"
 
 # juntando predições em um único dataframe
 preds = lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm"), function(learner) {
