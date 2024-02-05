@@ -1608,11 +1608,44 @@ rbind(
 ```
 
 ```{r}
+#| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia refit."
+#| label: tbl-tourism-results-ml-refit
+
+rbind(
+  readRDS("data/tourism/preds_ml/preds/one-step-ahead/resumo.RDS")[["rmsse"]],
+  readRDS("data/tourism/preds_ml/preds/one-step-ahead/resumo.RDS")[["mase"]]
+ ) |>
+ # substituindo "glmnet" por "elastic net"
+  transform(
+    modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("striped")) |>
+  # state
+  column_spec(
+    3,
+    underline = c(F, F, F, F, T, T, F, F, F, F, F, T, T, F)
+  ) |>
+  # region
+  column_spec(
+    4,
+    bold = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
+  ) |>
+  # purpose
+  column_spec(
+    5,
+    underline = c(F, F, F, F, F, F, F, F, F, F, F, T, F, F)
+  )
+```
+
+```{r}
 #| tbl-cap: "Resultados Tourism: Tempo de processamento dos métodos de ML (em horas)"
 #| label: tbl-tourism-tempo-ml
 
 # obtendo tempo de processamento
-tempo = lapply(c("fitted_base", "rolling_forecast"), function(tipo) {
+tempo = lapply(c("fitted_base", "rolling_forecast", "one-step-ahead"), function(tipo) {
   lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm"), function(learner) {
     preds = readRDS(paste0("data/tourism/preds_ml/preds/", tipo, "/preds_", learner, ".RDS"))[[2]]
     return(preds)
@@ -1627,7 +1660,7 @@ tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
 
 # nomeando df
 colnames(tempo) = c("xgb", "ranger", "elastic net", "lasso", "ridge", "svm", "lightgbm")
-rownames(tempo) = c("fitted base", "rolling forecast")
+rownames(tempo) = c("fitted base", "rolling forecast", "refit")
 
 # tabela
 tempo |>
