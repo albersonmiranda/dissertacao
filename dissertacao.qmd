@@ -1632,24 +1632,9 @@ rbind(
     modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
   ) |>
   kbl(booktabs = TRUE, format = "latex", digits = 2) |>
-  pack_rows("RMSSE", 1, 7) |>
-  pack_rows("MASE", 8, 14) |>
-  kable_styling(latex_options = c("striped")) |>
-  # state
-  column_spec(
-    3,
-    underline = c(F, F, F, F, T, T, F, F, F, F, F, T, T, F)
-  ) |>
-  # region
-  column_spec(
-    4,
-    bold = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
-  ) |>
-  # purpose
-  column_spec(
-    5,
-    underline = c(F, F, F, F, F, F, F, F, F, F, F, T, F, F)
-  )
+  pack_rows("RMSSE", 1, 3) |>
+  pack_rows("MASE", 4, 6) |>
+  kable_styling(latex_options = c("striped"))
 ```
 
 ```{r}
