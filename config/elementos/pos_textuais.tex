@@ -6,7 +6,362 @@
 \partapendices
 
 % Apêndice A
-\chapter{DEMONSTRAÇÕES} \label{apendice_a}
+\chapter{MÉTODOS DE RECONCILIAÇÃO ÓTIMA}\label{apendice_metodos_reconciliacao}
+
+\section{Métodos analíticos de reconciliação
+ótima}\label{muxe9todos-analuxedticos-de-reconciliauxe7uxe3o-uxf3tima}
+
+Os métodos analíticos de reconciliação ótima são aqueles que estimam a
+matriz de reconciliação, \(\mathbfit{G}\), através de regressão linear.
+Isso resulta na redefinição das previsões do nível mais desagregado como
+uma combinação linear\footnote{Por essa razão, esses métodos são também
+  chamados de métodos de combinação.} das previsões de todos os
+elementos de todos os níveis da hierarquia, utilizando, assim, toda a
+informação disponível.
+
+O estado-da-arte para esse tipo de método é o \emph{MinT}
+\autocite{wickramasuriya_optimal_2019}. Nele, o objetivo é minimizar o
+erro das previsões reconciliadas:
+
+\begin{equation}\phantomsection\label{eq-mint1}{
+\mathbfit{\tilde{e}}_{t+h|t} = \mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}
+}\end{equation}
+
+Essa equação pode ser reescrita como
+\(\mathbfit{\tilde{e}}_t = \mathbfit{SG\hat{e}}_t\), que tem variância
+dada por\footnote{Ver demonstração \ref{proposicao3}.}
+
+\begin{equation}\phantomsection\label{eq-mint2}{
+\text{Var}[\mathbfit{\tilde{e}}] = \mathbfit{SG\hat{W}}_{t+h|t}\mathbfit{G'S'}
+}\end{equation}
+
+\noindent em que \(\mathbfit{\hat{W}}_{t+h|t}\) é a matriz de
+variância-covariância dos erros de previsão base.
+
+A abordagem consiste então em se obter um valor de \(\mathbfit{G}\) que
+minimize o traço de
+\(\text{Var}[\mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}]\). Isso
+resultaria no melhor (variância mínima) estimador linear não
+viesado\footnote{A ausência de viés é garantida pela
+  \nameref{proposicao1}.} \autocite{wickramasuriya_optimal_2019}.
+
+\begin{equation}\phantomsection\label{eq-mint3}{
+\mathbfit{G} = (\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{S})^{-1}\mathbfit{S'\hat{W}}^\dagger_{t+h|t}
+}\end{equation}
+
+\noindent em que \(\mathbfit{\hat{W}}^\dagger_{t+h|t}\) é a inversa
+generalizada de Moore-Penrose para
+\(\mathbfit{\hat{W}}_{t+h|t}\)\footnote{A necessidade da inversa
+  generalizada aqui é trivial, uma vez que a inversa regular, do tipo
+  \(\mathbfit{A}^{-1}\), requer matriz quadrada, o que não acontece no
+  caso de séries temporais hierárquicas, uma vez que, necessariamente,
+  tem-se \(n>m\) (\(n=m+\text{número de nós de agregação}\)). Além
+  disso, \(\mathbfit{\hat{W}}\) é posto incompleto (ver demonstração
+  \ref{proposicao4}).}. Essa formulação corresponde a um problema de
+regressão por mínimos quadradados generalizados, considerando
+\(\mathbfit{S}\) como a matriz de preditores e \(\mathbfit{G}\) os
+coeficientes a serem estimados. Consequentemente, as previsões ótimas
+reconciliadas são dadas por
+
+\begin{equation}\phantomsection\label{eq-mint4}{
+\mathbfit{\tilde{y}}_{t+h|t} = \mathbfit{S}(\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{S})^{-1}\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{\hat{y}}_{t+h|t}
+}\end{equation}
+
+\section{Métodos de reconciliação ótima baseados em aprendizado de
+máquina}\label{muxe9todos-de-reconciliauxe7uxe3o-uxf3tima-baseados-em-aprendizado-de-muxe1quina}
+
+Embora os métodos de ML também sejam utilizados no contexto de previsão
+de séries temporais, é importante ressaltar que este não é caso. As
+previsões de séries temporais são realizadas anteriormente, na obtenção
+das previsões base \(\hat{y}_t\). Nada impede que essas previsões sejam
+obtidas por um modelo de ML, mas isso não é o foco deste trabalho.
+
+A aplicação dos métodos de ML aqui ocorrem na reconciliação, ou seja, na
+combinação contemporânea, \emph{cross section}, das previsões base que,
+por sua vez, podem ter sido obtidas através de qualquer método.
+
+\subsection{Elastic Net}\label{elastic-net}
+
+O \emph{elastic net} \autocite{zou_regularization_2005} é um método de
+regressão regularizada que combina as normas \(L_1\) e \(L_2\), as
+penalidades do \emph{lasso} e do \emph{ridge}, respectivamente. A função
+objetivo a ser minimizada é dada por
+
+\begin{equation}\phantomsection\label{eq-elastic_net}{
+L(\lambda_1, \lambda_2, \mathbfit{\beta}) = |\mathbf{y} - \mathbf{X}\mathbfit{\beta}|^2 + \lambda_2|\mathbfit{\beta}|^2 + \lambda_1|\mathbfit{\beta}|_1
+}\end{equation}
+
+\noindent em que \(\lambda_1\) e \(\lambda_2\) são os parâmetros de
+regularização e \(\mathbfit{\beta}\) é o vetor de coeficientes a serem
+estimados. A solução para essa função objetivo é dada por\footnote{Sob o
+  valor otimizado ainda é aplicada correção de escala na forma
+  \((1+\lambda_2)\mathbfit{\hat{\beta}}\). Ver
+  \textcite{zou_regularization_2005}.}
+
+\begin{equation}\phantomsection\label{eq-elastic_net_solution}{
+\mathbfit{\hat{\beta}} = \arg \min_{\mathbfit{\beta}} |\mathbf{y}-\mathbf{X}\mathbfit{\beta}|^2 \text{, sujeito a } (1-\alpha)|\mathbfit{\beta}|_1 + \alpha|\mathbfit{\beta}|^2 \leq t
+}\end{equation}
+
+\noindent com \(\alpha = \frac{\lambda_2}{\lambda_1 + \lambda_2}\) e
+\(t \in \mathbb{R}^+\).
+
+A função \((1-\alpha)|\mathbfit{\beta}|_1 + \alpha|\mathbfit{\beta}|^2\)
+é a penalidade \emph{elastic net}, uma combinação das penalidades
+\emph{lasso} e \emph{ridge}. O parâmetro \(\alpha\) controla a mistura
+das duas penalidades, incluindo os casos extremos. Note que
+\(\alpha = 0 \implies \lambda_2 = 0\), resultando em uma penalidade
+exclusivamente \emph{lasso}, enquanto
+\(\alpha = 1 \implies \lambda_1 = 0\), e a penalidade é apenas do tipo
+\emph{ridge}.
+
+Portanto o \emph{elastic net} é um método de \emph{shrinkage}, uma vez
+que a penalidade \emph{ridge} reduz o tamanho dos coeficientes, e de
+\emph{seleção de variáveis}, uma vez que a penalidade \emph{lasso} tende
+a anular os coeficientes de variáveis irrelevantes. Essas propriedades
+são desejáveis para a reconciliação de séries temporais, uma vez que a
+estrutura hierárquica pode conter séries insignificantes para a previsão
+de outras séries.
+
+Diferentemente dos métodos analíticos estudados, o \emph{elastic net}
+não possui uma solução fechada. Portanto, é necessário utilizar métodos
+iterativos para encontrar o valor ótimo de \(\mathbfit{\hat{\beta}}\) e
+\textcite{zou_regularization_2005} utilizam validação cruzada \(k\)-fold
+para encontrar quais os valores de \(\lambda_1\) e \(\lambda_2\) que
+minimizam o resíduo. Nesse sentido, dado a metodologia de processo
+iterativo envolvendo calibragem de hiperparâmetros e reamostragem,
+podemos classificar o \emph{elastic net} como um método de \emph{machine
+learning}.
+
+\subsection{Gradient Boosting}\label{gradient-boosting}
+
+Como cada uma das diversas implementações de \emph{gradient boosting}
+possui sua teoria adjacente, e não é de objetivo deste trabalho detalhar
+o funcionamento de cada uma delas, trabalharemos apenas sua intuição.
+
+Assim como os métodos de floresta aleatória, os métodos de
+\emph{gradient boosting} também são métodos de conjuntos de árvores. A
+diferença se dá na forma como os modelos são treinados. \emph{Gradient
+boosting} são métodos que combinam as predições de vários modelos fracos
+parar formar um conjunto --- \emph{ensemble}, na definição mais usual,
+ou comitê (\emph{committee}), na definição de
+\textcite{hastie_elements_2009} quando usado para classificação --- mais
+complexo e preciso (forte).
+
+Um estimador fraco é aquele que tem desempenho apenas ligeiramente
+melhor que o acaso. O propósito do \emph{boosting} é produzir uma
+sequencia de estimadores fracos, cada um deles focado nos erros dos
+estimadores anteriores. A cada iteração, as observações classificadas
+incorretamente (no caso de uma tarefa de classificação) ou de maior
+variância (no caso de uma tarefa de regressão) na iteração anterior têm
+seu peso aumentado, e vice-versa. Dessa forma, o modelo subsequente
+formado na próxima iteração é obrigado a se concentrar nas observações
+onde as iterações anteriores falharam. Isso que significa transformar um
+conjunto de estimadores fracos em um conjunto forte.
+
+O \emph{gradient boosting} é uma extensão do \emph{boosting} que utiliza
+o gradiente da função de perda como critério de otimização, de forma que
+esta se dá na direção em que a função de perda decresce mais rapidamente
+a cada iteração. Os métodos utilizados neste trabalho são o
+\emph{XGBoost} \autocite{chen_xgboost_2016} e o \emph{LightGBM}
+\autocite{ke_lightgbm_2017}.
+
+Um das principais diferenças entre os dois métodos é a forma como as
+árvores são construídas. O \emph{XGBoost} cresce suas árvores de forma
+\emph{level-wise}, ou seja, cresce todas as folhas do último nível de
+uma árvore de uma vez, adicionando mais um nível de profundidade
+completo a cada iteração (Figura~\ref{fig-xgboost}). Já o
+\emph{LightGBM} cresce suas árvores de forma \emph{leaf-wise}, ou seja,
+cresce uma folha por vez, aprofundando a árvore apenas no nó que resulta
+na maior variação negativa na função de perda
+(Figura~\ref{fig-lightgbm}).
+
+\begin{figure}
+
+\begin{minipage}{\linewidth}
+
+\centering{
+
+\includegraphics[width=0.7\textwidth,height=\textheight]{img/xgboost.png}
+
+}
+
+\subcaption{\label{fig-xgboost}\emph{level-wise}}
+
+\end{minipage}%
+\newline
+\begin{minipage}{\linewidth}
+
+\centering{
+
+\includegraphics[width=0.7\textwidth,height=\textheight]{img/lightgbm.png}
+
+}
+
+\subcaption{\label{fig-lightgbm}\emph{leaf-wise}}
+
+\end{minipage}%
+
+\caption{\label{fig-tree-growth}Crescimento de árvores em algoritmos de
+\emph{boosting}.}
+
+\end{figure}%
+
+\subsection{Random Forest}\label{random-forest}
+
+Floresta aleatória é um método de aprendizado de máquina que utiliza
+conjuntos de árvores de decisão descorrelatadas\footnote{As árvores de
+  decisão são descorrelatadas no sentido que, ao contrário os métodos de
+  \emph{boosting trees}, a próxima árvore não é construída com base na
+  iteração anterior (processo de fortalecimento).} para classificação ou
+regressão. O método consiste em treinar várias árvores de decisão em
+subconjuntos aleatórios dos dados de treinamento e, então, combinar suas
+predições \autocite{hastie_elements_2009}. A aleatoriedade é introduzida
+de duas formas: na seleção das observações e na seleção das variáveis
+preditoras.
+
+A intuição para seu algoritmo para regressão é simples e a ideia geral
+é, para cada árvore de decisão, particionar recursivamente nós de
+tamanho \(N\) em dois nós filhos de forma a aumentar a complexidade do
+modelo e minimizar a função de custo. Se a próxima partição de um nó
+resultar em um ou ambos nós filhos de tamanho menor que um mínimo
+estabelecido via hiperparâmetro, a partição é interrompida (Algoritmo
+\ref{alg-rf}).
+
+\begin{algorithm}
+\caption{Floresta aleatória para regressão}\label{alg-rf}
+
+${T_1, T_2, ..., T_b}$ é uma floresta aleatória de $B$ árvores de decisão. \\
+\BlankLine
+$i \in \mathbb{N}$ é a quantidade de observações em um nó. \\
+\BlankLine
+$n_{min} \in \mathbb{N}$ é o número mínimo de observações em um nó. \\
+\BlankLine
+\For{$b = 1 \to B$}{
+  1. Toma uma amostra de tamanho $N$ dos dados de treino. \\
+  \While{$i < n_{min}$} {
+    a. Seleciona $j$ variáveis aleatoriamente. \\
+    b. Escolhe a melhor variável para \textit{split} dentre $j$. \\
+    c. Divide o nó em dois nós filhos. \\
+    \If{Nenhum dos nós filhos tem $i < n_{min}$} {
+      d. Repete os passos a-c para cada nó filho.
+    }
+  }
+}
+\BlankLine
+2. Produz um conjunto de árvores $\{T_b\}_1^B$.
+\BlankLine
+3. Realiza a predição para cada árvore $T_b$ em um ponto $x$ e calcula a média das predições:
+$$\hat{f}(x) = \frac{1}{B}\sum_{b=1}^B T_b(x)$$
+
+\end{algorithm}
+
+\subsection{Support Vector Machines}\label{support-vector-machines}
+
+A intuição do métodos de SVMs é mais facilmente compreendida a partir de
+uma tarefa de classificação de duas classes. Nesse caso, o objetivo é
+encontrar um hiperplano (i.e.~um sub-espaço de dimensão \(n-1\)) que
+separe as classes de forma que a margem entre o hiperplano e os pontos
+de cada classe seja a maior possível. Então, dado um conjunto de \(N\)
+pares de observações e suas respectivas classes,
+\(\{(x_i, y_i)\}_{i=1}^N\), em que \(x_i \in \mathbb{R}^p\) e
+\(y_i \in \{-1, 1\}\), queremos encontrar o hiperplano definido por
+
+\[
+\{x: f(x) = x^T\beta + \beta_0 = 0\}
+\]
+
+\noindent sendo \(f(x)\) a distância ortogonal entre \(x\) e o
+hiperplano \(f(x) = x^T\beta + \beta_0 = 0\), e \(M\) a margem entre as
+classes, definida como a distância ortogonal entre os pontos mais
+próximos de cada classe e o hiperplano \autocite{hastie_elements_2009}.
+Portanto, o problema de otimização é dado por
+
+\begin{equation}\phantomsection\label{eq-svm}{
+\begin{aligned}
+& \underset{\beta, \beta_0}{\text{max}}
+& & M \\
+& \text{sujeito a}
+& & y_i(x_i^T\beta + \beta_0) \geq M, \quad i = 1, ..., N
+\end{aligned}
+}\end{equation}
+
+Quando pode-se encontrar um hiperplano com
+\(y_if(x_i) > 0 \quad \forall i\), tem-se o caso da construção de uma
+solução única para um hiperplano entre duas classes perfeitamente
+separadas pela maior margem possível (Figura~\ref{fig-svm1}).
+
+\begin{figure}
+
+\begin{minipage}{\linewidth}
+
+\centering{
+
+\includegraphics[width=0.4\textwidth,height=\textheight]{img/svm1.png}
+
+}
+
+\subcaption{\label{fig-svm1}Hiperplano entre duas classes perfeitamente
+separáveis.}
+
+\end{minipage}%
+\newline
+\begin{minipage}{\linewidth}
+
+\centering{
+
+\includegraphics[width=0.4\textwidth,height=\textheight]{img/svm2.png}
+
+}
+
+\subcaption{\label{fig-svm2}Hiperplano entre duas classes não
+separáveis.}
+
+\end{minipage}%
+
+\caption{\label{fig-svm}\emph{Support vector classifiers}. Fonte:
+\textcite{hastie_elements_2009}.}
+
+\end{figure}%
+
+Entretanto, no mundo real, dificilmente um problema de classificação
+será linearmente separável. Paara contornar esse obstáculo, é possível
+introduzir variáveis de folga \(\xi_i \geq 0\) para cada observação
+(Figura~\ref{fig-svm2}), de forma que a restrição se torne
+
+\begin{equation}\phantomsection\label{eq-svm2}{
+y_i(x_i^T\beta + \beta_0) \geq M(1 - \xi_i), \quad i = 1, ..., N
+}\end{equation}
+
+\noindent e a função objetivo se torne
+
+\begin{equation}\phantomsection\label{eq-svm3}{
+\min{||\beta||} \quad \text{sujeito a}
+\left\{
+  \begin{aligned}
+    &\quad y_i(x_i^T\beta + \beta_0) \geq M(1 - \xi_i) \quad \forall i, \\
+    &\quad \xi_i \geq 0, \sum{\xi_i} \leq \text{constante}
+  \end{aligned}
+\right\}
+}\end{equation}
+
+Para estender essa ideia para problemas de regressão, é necessário
+introduzir uma função de perda \(\epsilon\)-insensível, que penaliza
+apenas os erros maiores que \(\epsilon\), de forma que os erros menores
+são ignorados durante a otimização, assim como as observações
+localizadas no lado correto do hiperplano são ignoradas no problema de
+classificação. A função objetivo se torna
+
+\begin{equation}\phantomsection\label{eq-svm4}{
+\min{||\beta||} \quad \text{sujeito a}
+\left\{
+  \begin{aligned}
+    &\quad |y_i - x_i^T\beta - \beta_0| \leq \epsilon \quad \forall i, \\
+    &\quad \sum{|\beta_j|} \leq \text{constante}
+  \end{aligned}
+\right\}
+}\end{equation}
+
+\chapter{DEMONSTRAÇÕES} \label{apendice_demonstracoes}
 
 % proposição 1
 \begin{proposition}[condição de ausência de viés em $\mathbfit{\tilde{y}}$]
@@ -133,13 +488,8 @@
   Pela equação \eqref{eq:ap_a_4_1}, segue que $\mathbfit{\tilde{e}}$ é posto incompleto. Da mesma forma, $pos(\mathbfit{\tilde{e}\tilde{e}'}) \leq min(pos(\mathbfit{\tilde{e}}), pos(\mathbfit{\tilde{e}'}))$. Portanto, $\mathbfit{\hat{W}}$ é posto incompleto.
 \end{proof}
 
-\end{apendicesenv}
-
-% anexos 
-\begin{anexosenv}
-\partanexos
-
-\chapter{CONJUNTO DE HIPERPARÂMETROS} \label{anexo_a}
+% apêndice B
+\chapter{CONJUNTO DE HIPERPARÂMETROS} \label{apendice_hiperparametros}
 
 \begin{table}
 
@@ -234,7 +584,15 @@
   \end{tabular}
 \end{table}
 
-\end{anexosenv}
+\end{apendicesenv}
+
+% anexos 
+%\begin{anexosenv}
+%\partanexos
+%
+%
+%
+%\end{anexosenv}
 
 % índice remissivo 
 %\phantompart
