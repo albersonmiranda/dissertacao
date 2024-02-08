@@ -6,7 +6,7 @@ format:
     include-after-body: config/elementos/pos_textuais.tex
     documentclass: abntex2
     classoption: [12pt, twoside, openright, a4paper, chapter=TITLE, section=TITLE, brazil]
-    keep-tex: true
+    keep-tex: false
     latex-max-runs: 4
     output-file: dissertacao.pdf
 ---
@@ -150,7 +150,7 @@ Previsões pontuais de séries temporais hierárquicas não é um assunto novo. 
 
 @wickramasuriya_optimal_2019 argumentam que o que de fato interessa é que as previsões reconciliadas tenham o menor erro. Então, corrigem a abordagem de reconciliação ótima para o objetivo de minimização dos erros das previsões reconciliadas $\mathbfit{\tilde{y}_{t+h}}$, ao invés dos erros das previsões individuais $\mathbfit{\hat{y}_{t+h}}$. Dado que isso implica na minimização da variância de $\mathbfit{\tilde{e}_{t+h}}$, ou seja, na minimização do somatório da diagonal, o traço, da matriz de variância-covariância de $\mathbfit{\tilde{e}_{t+h}}$, eles chamaram esse método de Traço Mínimo (MinT, na sigla em inglês). Paralelamente, usam desigualdade triangular para demonstrar que as previsões reconciliadas obtidas por esse método são ao menos tão boas quanto as previsões individuais.
 
-@panagiotelis_forecast_2021 reinterpreta a literatura de coerência e reconciliação de previsões pontuais a partir de uma abordagem geométrica, trazendo provas alternativas para conclusões anteriores ao mesmo tempo em que fornece novos teoremas. Além disso, os autores estendem essa interpretação geométrica para o contexto probabilístico, fornecendo métodos paramétricos e não paramétricos (via *bootstrapping*) para reconciliação de previsões probabilísticas.
+@panagiotelis_forecast_2021 reinterpretam a literatura de coerência e reconciliação de previsões pontuais a partir de uma abordagem geométrica, trazendo provas alternativas para conclusões anteriores ao mesmo tempo em que fornece novos teoremas. Além disso, os autores estendem essa interpretação geométrica para o contexto probabilístico, fornecendo métodos paramétricos e não paramétricos (via *bootstrapping*) para reconciliação de previsões probabilísticas.
 
 @spiliotis_hierarchical_2021 propõem a utilização de *machine learning* para a reconciliação ótima de séries temporais, especificamente os métodos de floresta aleatória e *gradient boosting*. Os autores descrevem como vantagens desse método em relação aos anteriores a descrição de relacionamentos não lineares, performance preditiva e a desnecessidade da utilização de todos os elementos da hierarquia na combinação ótima. Para o conjunto de dados utilizados, os autores afirmam que os métodos de *machine learning*, especialmente o XGBoost, alcançaram, em média, melhor performance que as abordagens de nível único e o *MinT*. Além disso, concluíram que quanto maior é a diferença entre as séries, em todos os níveis hierárquicos, maior são os benefícios da abordagem por *machine learning*.
 
@@ -184,7 +184,7 @@ $$
     y_{BB, t} \\
     y_{CA, t} \\
     y_{CB, t}
-\end{bmatrix}_{n=10 \times 1}
+\end{bmatrix}_{10 \times 1}
 =
 \begin{bmatrix}
     1 & 1 & 1 & 1 & 1 & 1 \\
@@ -197,7 +197,7 @@ $$
     0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}_{n=10 \times m=6}
+\end{bmatrix}_{10 \times 6}
 \begin{bmatrix}
     y_{AA, t} \\
     y_{AB, t} \\
@@ -205,7 +205,7 @@ $$
     y_{BB, t} \\
     y_{CA, t} \\
     y_{CB, t}
-\end{bmatrix}_{m=6 \times 1}
+\end{bmatrix}_{6 \times 1}
 $$ {#eq-matriz_hierarquia}
 
 Uma outra forma de desagregarmos o PIB é por atividade econômica --- agricultura, indústrias extrativas, indústria de transformação, eletricidade e gás, construção etc. Essa estrutura não pode ser desagregada naturalmente de uma única maneira, como é a hierarquia de estados e municípios. Não pode ser aninhada por um atributo como a própria geografia. A esse tipo de estrutura dá-se o nome de séries agrupadas.
@@ -238,7 +238,7 @@ $$
     y_{BY, t} \\
     y_{CX, t} \\
     y_{CY, t}
-\end{bmatrix}_{n=12 \times 1}
+\end{bmatrix}_{12 \times 1}
 =
 \begin{bmatrix}
     1 & 1 & 1 & 1 & 1 & 1 \\
@@ -253,7 +253,7 @@ $$
     0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 1 \\
-\end{bmatrix}_{n=12 \times m=6}
+\end{bmatrix}_{12 \times 6}
 \begin{bmatrix}
     y_{AX, t} \\
     y_{AY, t} \\
@@ -261,7 +261,7 @@ $$
     y_{BY, t} \\
     y_{CX, t} \\
     y_{CY, t}
-\end{bmatrix}_{m=6 \times 1}
+\end{bmatrix}_{6 \times 1}
 $$ {#eq-matriz_ha}
 
 ## Abordagens top-down, bottom-up e middle-out
@@ -290,7 +290,7 @@ $$
     p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
-\end{bmatrix}_{m=6 \times n=10}
+\end{bmatrix}_{6 \times 10}
 $$ {#eq-matriz_g}
 
 $\mathbfit{G}$ é uma matriz $m \times n$ que multiplica o vetor $\hat{\mathbfit{y}}_{T+h|T}$ que chamamos de *previsões base*, isto é, as previsões individuais para todos os níveis de agregação. A equação para a abordagem *top-down* será, então:
@@ -313,9 +313,9 @@ $$
     \tilde{y}_{BB, t} \\
     \tilde{y}_{CA, t} \\
     \tilde{y}_{CB, t}
-\end{bmatrix}_{n=10 \times 1}
+\end{bmatrix}_{10 \times 1}
 =
-\mathbfit{S}_{n \times m}
+\mathbfit{S}_{10 \times 6}
 \begin{bmatrix}
     p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
@@ -323,7 +323,7 @@ $$
     p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
-\end{bmatrix}_{m=6 \times n=10}
+\end{bmatrix}_{6 \times 10}
 \begin{bmatrix}
     \hat{y}_{T+h|T} \\
     \hat{y}_{A, T+h|T} \\
@@ -335,7 +335,7 @@ $$
     \hat{y}_{BB, T+h|T} \\
     \hat{y}_{CA, T+h|T} \\
     \hat{y}_{CB, T+h|T}
-\end{bmatrix}_{n \times 1}
+\end{bmatrix}_{10 \times 1}
 $$ {#eq-matriz_topdown1}
 
 Multiplicando as matrizes $\mathbfit{G}$ e $\mathbfit{\hat{y}}$ obtemos o vetor $\mathbfit{b}_t$^[Ver @eq-vetor_b.], que contém as previsões para os níveis mais desagregados, agora definidas como proporção do total.
@@ -351,9 +351,9 @@ $$
     \tilde{y}_{BB, t} \\
     \tilde{y}_{CA, t} \\
     \tilde{y}_{CB, t}
-\end{bmatrix}_{n=10 \times 1}
+\end{bmatrix}_{10 \times 1}
 =
-\mathbfit{S}_{n=10 \times m=6}
+\mathbfit{S}_{10 \times 6}
 \begin{bmatrix}
     p_1\hat{y}_{T+h|T} \\
     p_2\hat{y}_{T+h|T} \\
@@ -361,7 +361,7 @@ $$
     p_4\hat{y}_{T+h|T} \\
     p_5\hat{y}_{T+h|T} \\
     p_6\hat{y}_{T+h|T}
-\end{bmatrix}_{m \times 1}
+\end{bmatrix}_{6 \times 1}
 $$ {#eq-matriz_topdown2}
 
 Note que, por se tratar de um método *top-down*, é necessário apenas o primeiro elemento do vetor de previsões base, ou seja, a previsão do nível mais agregado (@eq-matriz_topdown2). Sendo essa exatamente uma das vantagens do método *top-down*, na prática, podemos anular os demais elementos de $\mathbfit{\hat{y}}$.
@@ -378,9 +378,9 @@ $$
     \tilde{y}_{BB, t} \\
     \tilde{y}_{CA, t} \\
     \tilde{y}_{CB, t}
-\end{bmatrix}_{n=10 \times 1}
+\end{bmatrix}_{10 \times 1}
 =
-\mathbfit{S}_{n \times m}
+\mathbfit{S}_{10 \times 6}
 \begin{bmatrix}
     p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
@@ -388,7 +388,7 @@ $$
     p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_6 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
-\end{bmatrix}_{m=6 \times n=10}
+\end{bmatrix}_{6 \times 10}
 \begin{bmatrix}
     \hat{y}_{T+h|T} \\
     0 \\
@@ -400,7 +400,7 @@ $$
     0 \\
     0 \\
     0
-\end{bmatrix}_{n=10 \times 1}
+\end{bmatrix}_{10 \times 1}
 $$ {#eq-matriz_topdown3}
 
 Substituindo a matriz $\mathbfit{S}$, temos as equações que definem as previsões reconciliadas.
@@ -417,7 +417,7 @@ $$
     \tilde{y}_{BB, t} \\
     \tilde{y}_{CA, t} \\
     \tilde{y}_{CB, t}
-\end{bmatrix}_{n=10 \times 1}
+\end{bmatrix}_{10 \times 1}
 =
 \begin{bmatrix}
     1 & 1 & 1 & 1 & 1 & 1 \\
@@ -430,7 +430,7 @@ $$
     0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}_{n=10 \times m=6}
+\end{bmatrix}_{10 \times 6}
 \begin{bmatrix}
     p_1\hat{y}_{T+h|T} \\
     p_2\hat{y}_{T+h|T} \\
@@ -438,7 +438,7 @@ $$
     p_4\hat{y}_{T+h|T} \\
     p_5\hat{y}_{T+h|T} \\
     p_6\hat{y}_{T+h|T}
-\end{bmatrix}_{m=6 \times 1}
+\end{bmatrix}_{6 \times 1}
 $$ {#eq-matriz_topdown3}
 
 Já a abordagem bottom-up parte do raciocínio inverso e define as previsões de cada elemento da estrutura a partir das previsões dos elementos mais desagregados. Para tanto, basta modificar a matriz $\mathbfit{G}$.
@@ -453,7 +453,7 @@ $$
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}_{m=6 \times n=10}
+\end{bmatrix}_{6 \times 10}
 $$ {#eq-matriz_gbu}
 
 Portanto, $\mathbfit{G}$ define a abordagem --- se *top-down* ou *bottom-up* ---, e $\mathbfit{S}$ define a maneira da qual as previsões são somadas para formar as equações de previsão para cada elemento da estrutura. Portanto, chamamos $\mathbfit{G}$ de matriz de reconciliação.
@@ -470,7 +470,7 @@ $$
     \tilde{y}_{BB, t} \\
     \tilde{y}_{CA, t} \\
     \tilde{y}_{CB, t}
-\end{bmatrix}_{n=10 \times 1}
+\end{bmatrix}_{10 \times 1}
 =
 \begin{bmatrix}
     1 & 1 & 1 & 1 & 1 & 1 \\
@@ -483,7 +483,7 @@ $$
     0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}_{n=10 \times m=6}
+\end{bmatrix}_{10 \times 6}
 \begin{bmatrix}
     \hat{y}_{AA, T+h|T} \\
     \hat{y}_{AB, T+h|T} \\
@@ -491,7 +491,7 @@ $$
     \hat{y}_{BB, T+h|T} \\
     \hat{y}_{CA, T+h|T} \\
     \hat{y}_{CB, T+h|T}
-\end{bmatrix}_{m=6 \times 1}
+\end{bmatrix}_{6 \times 1}
 $$ {#eq-matriz_bottomup}
 
 ## Coerência e reconciliação
@@ -504,6 +504,38 @@ Os métodos de gerar previsões coerentes ($\mathbfit{\tilde{y}_t}$) a partir de
 
 Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham o menor erro o possível. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
 
+Os métodos analíticos de reconciliação ótima são aqueles que estimam a matriz de reconciliação, $\mathbfit{G}$, através de regressão linear. Isso resulta na redefinição das previsões do nível mais desagregado como uma combinação linear^[Por essa razão, esses métodos são também chamados de métodos de combinação.] das previsões de todos os elementos de todos os níveis da hierarquia, utilizando, assim, toda a informação disponível.
+O estado-da-arte para esse tipo de método é o *MinT* [@wickramasuriya_optimal_2019]. Nele, o objetivo é minimizar o erro das previsões reconciliadas:
+$$
+\mathbfit{\tilde{e}}_{t+h|t} = \mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}
+$$ {#eq-mint1}
+Essa equação pode ser reescrita como $\mathbfit{\tilde{e}}_t = \mathbfit{SG\hat{e}}_t$, que tem variância dada por^[Ver demonstração \ref{proposicao3}.]
+$$
+\text{Var}[\mathbfit{\tilde{e}}] = \mathbfit{SG\hat{W}}_{t+h|t}\mathbfit{G'S'}
+$$ {#eq-mint2}
+\noindent em que $\mathbfit{\hat{W}}_{t+h|t}$ é a matriz de variância-covariância dos erros de previsão base.
+A abordagem consiste então em se obter um valor de $\mathbfit{G}$ que minimize o traço de $\text{Var}[\mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}]$. Isso resultaria no melhor (variância mínima) estimador linear não viesado^[A ausência de viés é garantida pela \nameref{proposicao1}.] [@wickramasuriya_optimal_2019].
+$$
+\mathbfit{G} = (\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{S})^{-1}\mathbfit{S'\hat{W}}^\dagger_{t+h|t}
+$$ {#eq-mint3}
+\noindent em que $\mathbfit{\hat{W}}^\dagger_{t+h|t}$ é a inversa generalizada de Moore-Penrose para $\mathbfit{\hat{W}}_{t+h|t}$^[A necessidade da inversa generalizada aqui é trivial, uma vez que a inversa regular, do tipo $\mathbfit{A}^{-1}$, requer matriz quadrada, o que não acontece no caso de séries temporais hierárquicas, uma vez que, necessariamente, tem-se $n>m$ ($n=m+\text{número de nós de agregação}$). Além disso, $\mathbfit{\hat{W}}$ é posto incompleto (ver demonstração \ref{proposicao4}).]. Essa formulação corresponde a um problema de regressão por mínimos quadradados generalizados, considerando $\mathbfit{S}$ como a matriz de preditores e $\mathbfit{G}$ os coeficientes a serem estimados. Consequentemente, as previsões ótimas reconciliadas são dadas por
+$$
+\mathbfit{\tilde{y}}_{t+h|t} = \mathbfit{S}(\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{S})^{-1}\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{\hat{y}}_{t+h|t}
+$$ {#eq-mint4}
+
+@spiliotis_hierarchical_2021 propõem estimar essa combinação através de métodos de ML ao invés de MQG. Sua abordagem consiste nas etapas transcritas a seguir, quase *ipsis litteris*:
+
+1. Seja $k$ a quantidade de níveis da hierarquia, $m$ a quantidade de séries e $n$ o tamanho de cada série. As séries são divididas em uma série de conjuntos de treinamento e conjuntos de teste, com cada conjunto de treinamento compreendendo as primeiras $p < n$ observações (para $p = q, q + 1, ..., n - 1$) e o conjunto de teste correspondente compreendendo apenas as observações no tempo $p + 1$.
+2. Um modelo de previsão é ajustado para cada série em cada conjunto de treinamento e previsões um passo à frente são produzidas para cada conjunto de teste.
+3. Um modelo de ML separado^[Os autores trabalharam com *random forest* e *XGBoost*.] é construído para prever cada uma das *m_k* séries inferiores da hierarquia. O conjunto de treinamento de cada modelo consiste em $n - p$ observações e $m + 1$ variáveis. As primeiras m variáveis (usadas como preditores ou entradas) são as previsões um passo à frente produzidas durante o processo de *rolling origin* para as $m$ séries da hierarquia, e a última variável (a variável explicada) é o valor real da série de nível inferior nos tempos correspondentes. A função de perda dos modelos é a soma dos erros quadráticos, e os hiperparâmetros dos modelos de ML são determinados arbitrariamente pelo usuário ou por meio de um procedimento de otimização.
+4. A amostra completa das séries (todas as $n$ observações) é usada para produzir previsões base de $h$ passos à frente para as $m$ séries da hierarquia, onde $h$ é o horizonte de previsão de interesse.
+5. Os modelos $m_k$ que foram construídos na 3ª etapa são usados para fornecer previsões para as séries do nível inferior da hierarquia, usando as previsões base produzidas na 4ª etapa como entrada. Esse processo é repetido h vezes, cada vez para um horizonte de previsão diferente.
+6. As previsões produzidas pelos modelos de ML na 5ª etapa são agregadas (somadas) para que as previsões reconciliadas sejam produzidas para o restante dos níveis hierárquicos.
+
+![Abordagem de reconciliação ótima por ML de @spiliotis_hierarchical_2021.](img/spiliotis.png){#fig-spiliotis}
+
+Este trabalho estende a abordagem de @spiliotis_hierarchical_2021 para a reconciliação de séries temporais hierárquicas *e agrupadas*; avalia a efetividade de mais 4 implementaçãoes de métodos de ML (*lasso*, *ridge*, *elastic net*, SVM e *lightGBM*), além dos 2 propostos por eles (*XGBoost* e *random forest*); e propõe variações metodológicas para as 3 primeiras etapas da metodologia, obtendo ganhos significativos de performance no contexto de séries temporais financeiras.
+
 # METODOLOGIA
 
 Neste capítulo estão contidas explicações sobre os dados e variáveis, sobre o *design* da modelagem e sobre a avaliação dos modelos.
@@ -514,13 +546,11 @@ O *software* usado foi o R [@R-base]. As previsões base e os métodos de reconc
 
 Os dados usados nesse trabalho são dados terciários obtidos do *datalake* público Base dos Dados [@dahis_data_2022]. A fonte primária são os bancos comerciais e múltiplos com carteira comercial que disponibilizam mensalmente os saldos dos principais verbetes do balancete via documento 4500^[Esses documentos são relatórios eletrônicos obrigatórios demandados pelo Bacen às instituições financeiras que permitem ao regulador o conhecimento minucioso dos bancos e de seus clientes.] ao Banco Central do Brasil, que os compila e publica, agrupados por agência bancária e por município, no relatório ESTBAN — Estatística Bancária Mensal e por Município^[https://www4.bcb.gov.br/fis/cosif/estban.asp?frame=1].
 
-O que compõe os verbetes de crédito, ou seja, os valores das séries temporais a serem trabalhadas, são os saldos de crédito ativo (empréstimos e financiamentos), que correspondem ao principal mais os juros calculados até 59 dias de atraso^[Não são consideradas crédito ativo as operações de crédito liquidadas ou que tenham sido transferidas para prejuízo. São transferidas para prejuízo as operações de crédito em atraso há mais 6 meses após sua classificação de risco em H, que é a mínima [@conselho_monetario_nacional_resolucao_1999].].
+O que compõe os verbetes de crédito, ou seja, os valores das séries temporais a serem trabalhadas, são os saldos de crédito ativo (empréstimos e financiamentos), que correspondem ao principal mais os juros calculados até 59 dias de atraso^[Não são consideradas crédito ativo as operações de crédito liquidadas ou que tenham sido transferidas para prejuízo. São transferidas para prejuízo as operações de crédito em atraso há mais 6 meses após sua classificação de risco em H, que é a mínima [@conselho_monetario_nacional_resolucao_1999].]. Além das estatísticas bancárias, foram obtidas informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
 
-Além das estatísticas bancárias, foram obtidas informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
+Em relação à cobertura temporal, utilizaremos dados entre 2003 e 2022. Por conta da limitação imposta pelo processo de *rolling origin* (1ª etapa da metodologia de @spiliotis_hierarchical_2021), que requer previsões para dentro do conjunto de treinamento, apesar do Banestes contar com 134 agências, foram mantidas apenas as agências com série completa, ou seja, que já estavam em atividade em 2003.
 
-Uma vez que o escopo deste trabalho se encerra ao Espírito Santo e ao Banestes, foram aplicados os filtros para UF e na raiz do CNPJ. Ademais, foram selecionados os principais verbetes, que são *empréstimos e títulos descontados* e *financiamentos*, e mantidas apenas as agências atualmente em atividade. Quanto ao período, há dados disponíveis desde 1988. Entretanto, utilizaremos os dados a partir de 2003 pois, se tratando de uma hierarquia larga, o custo computacional deve ser levado em conta. Por essa razão, apesar do Banestes contar com 134 agências, foram mantidas apenas as agências com série completa, ou seja, que já estavam em atividade em 2003.
-
-Por fim, as variáveis mantidas no *dataset* foram as descritas no Quadro \ref{tab:qdr-variaveis}. Dessa forma, temos séries mensais de saldos de créditos de `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia)))` agências bancárias, distribuídas por `r with(subset(estban, !is_aggregated(nome)), length(unique(nome)))` municípios, a partir de `r format(min(estban$ref), "%B de %Y")`, totalizando `r scales::number(nrow(subset(estban, !is_aggregated(cnpj_agencia) & !is_aggregated(verbete))), big.mark = ".", decimal.mark = ",")` observações.
+Por fim, o conjunto de dados conta com séries mensais de saldos de empréstimos e financiamentos de `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia)))` agências bancárias, distribuídas por `r with(subset(estban, !is_aggregated(nome)), length(unique(nome)))` municípios, entre `r format(min(estban$ref), "%B de %Y")` e `r format(max(estban$ref), "%B de %Y")`, totalizando `r scales::number(nrow(subset(estban, !is_aggregated(cnpj_agencia) & !is_aggregated(verbete))), big.mark = ".", decimal.mark = ",")` observações. Esses dados então são organizados de forma hierárquica por estado, mesorregião, microrregião, município e agência bancária; e, de forma agrupada, por verbete. Com a estrutura hierárquica e agrupada, o conjunto de dados alcança `r scales::number(nrow(estban))` observações.
 
 ```{r}
 #| tbl-cap: "Variáveis do banco de dados"
@@ -537,39 +567,15 @@ tibble::tribble(
   "cnpj agencia", "CNPJ da agência bancária",
   "saldo", "Saldo do verbete"
 ) |>
-  kbl(booktabs = TRUE, row.names = FALSE, format = "latex", caption = "Variáveis do dataset", label = "qdr-variaveis") |>
+  kbl(booktabs = TRUE, row.names = FALSE, format = "latex", caption = "Variáveis do banco de dados", label = "qdr-variaveis") |>
   kable_styling(latex_options = c("striped"), font_size = 12) |>
   column_spec(2, width = "10cm")
 ```
 
-```{=latex}
-\begin{quadro}
-
-  \caption{\label{tab:qdr-variaveis}Variáveis do dataset}
-  \centering
-  \fontsize{12}{14}\selectfont
-  \begin{tabular}[t]{l>{\raggedright\arraybackslash}p{10cm}}
-  \toprule
-  Variável & Descrição\\
-  \midrule
-  \cellcolor{gray!6}{ref} & \cellcolor{gray!6}{Data de referência do relatório  ESTBAN}\\
-  nome mesorregiao & Nome da mesorregião do ES\\
-  \cellcolor{gray!6}{nome microrregiao} & \cellcolor{gray!6}{Nome da microrregião   do ES}\\
-  verbete & Descrição da rubrica do balancete\\
-  \cellcolor{gray!6}{nome} & \cellcolor{gray!6}{Nome do município}\\
-  \addlinespace
-  cnpj agencia & CNPJ da agência bancária\\
-  \cellcolor{gray!6}{saldo} & \cellcolor{gray!6}{Saldo do verbete}\\
-  \bottomrule
-  \end{tabular}
-\end{quadro}
-```
-
-Esses dados então são organizados de forma hierárquica por estado, mesorregião, microrregião, município e agência bancária; e, de forma agrupada, por verbete. Isso significa que, para cada nó de agregação, são adicionadas mais três observações ao *dataset*: duas para cada verbete e a terceira para a soma de ambos. Com a estrutura hierárquica e agrupada, o conjunto alcança `r scales::number(nrow(estban))` observações. Por fim, o *dataset* adquiriu a estrutura apresentada na @tbl-dataset.
-
 ```{r}
 #| label: tbl-dataset
 #| tbl-cap: "Estrutura do dataset"
+#| include: false
 
 estban |>
   tail(13) |>
@@ -632,8 +638,12 @@ aggregate(
 ) |>
   #substituir "_" por espaço
   transform(
-    nome_mesorregiao = gsub("_", " ", `as.character(nome_mesorregiao)`),
-    nome_microrregiao = gsub("_", " ", `as.character(nome_microrregiao)`)
+    nome_mesorregiao = tools::toTitleCase(gsub("_", " ", `as.character(nome_mesorregiao)`)),
+    nome_microrregiao = tools::toTitleCase(gsub("_", " ", `as.character(nome_microrregiao)`))
+  ) |>
+  # substituir "Do", "Da" e "De" por "do", "da" e "de"
+  transform(
+    nome_microrregiao = gsub("Da", "da", gsub("De", "de", gsub("Do", "do", nome_microrregiao)))
   ) |>
   subset(select = c(nome_mesorregiao, nome_microrregiao)) |>
   kbl(
@@ -656,10 +666,15 @@ aggregate(
   data = subset(estban, !is_aggregated(nome) & !is_aggregated(nome_microrregiao)),
   FUN = function(x) paste(unique(x), collapse = ", ")
 ) |>
-  # substituir "_" por espaço
+  # substituir "_" por espaço e adicionar title case
   transform(
-    nome_microrregiao = gsub("_", " ", `as.character(nome_microrregiao)`),
-    nome = gsub("_", " ", `as.character(nome)`)
+    nome_microrregiao = tools::toTitleCase(gsub("_", " ", `as.character(nome_microrregiao)`)),
+    nome = tools::toTitleCase(gsub("_", " ", `as.character(nome)`))
+  ) |>
+  # substituir "Do" e "De" por "do" e "de"
+  transform(
+    nome = gsub("Da", "da", gsub("De", "de", gsub("Do", "do", nome))),
+    nome_microrregiao = gsub("Da", "da", gsub("De", "de", gsub("Do", "do", nome_microrregiao)))
   ) |>
   subset(select = c(nome_microrregiao, nome)) |>
   kbl(
@@ -674,13 +689,12 @@ aggregate(
   column_spec(2, width = "10cm")
 ```
 
-Na amostra selecionada para este trabalho, com exceção dos municípios de Colatina e Cachoeiro de Itapemirim, que contam com 2 agências cada, todos os demais municípios no interior contam com uma única agência. Já na microrregião da capital Vitória, se encontram municípios com múltiplas unidades. Isso pode afetar a decisão de incluir ou não o nível de município na hierarquia.
-
-O tamanho de uma estrutura hierárquica, em termos de observações, é determinada por seu nível mais desagregado. Assim, sendo `r length(unique(estban$ref))` meses e `r length(unique(subset(estban, !is_aggregated(cnpj_agencia))$cnpj_agencia))` agências, a estrutura hierárquica deve contar com `r length(unique(estban$ref))`\times`r length(unique(subset(estban, !is_aggregated(cnpj_agencia))$cnpj_agencia))` $=$ `r scales::number(length(unique(estban$ref)) * length(unique(subset(estban, !is_aggregated(cnpj_agencia))$cnpj_agencia)), big.mark = ".", decimal.mark = ",")` observações. Sendo também uma estrutura agrupada por `r length(unique(subset(estban, !is_aggregated(verbete))$verbete))` verbetes, a quantidade de observações é multiplicada pela quantidade de níveis transversais, totalizando as `r scales::number(length(unique(estban$ref)) * length(unique(subset(estban, !is_aggregated(cnpj_agencia))$cnpj_agencia)) * length(unique(subset(estban, !is_aggregated(verbete))$verbete)), big.mark = ".", decimal.mark = ",")` observações do *dataset* antes da adição dos nós de agregação. Portanto, podemos atestar a completude das séries temporais sem a necessidade de qualquer inspeção adicional.
+Na amostra selecionada para este trabalho, com exceção dos municípios de Colatina e Cachoeiro de Itapemirim, que contam com 2 agências cada, todos os demais municípios no interior contam com uma única agência. Já na microrregião da capital Vitória, se encontram municípios com múltiplas unidades. Considerando que essa microrregião é a mais representativa (@fig-micro), é importante a manutenção do nível hierárquico municipal.
 
 ```{r skim}
 #| label: tbl-estban
 #| tbl-cap: "Contagem de únicos no dataset ESTBAN"
+#| include: false
 
 temp = lapply(
   subset(estban, !is_aggregated(cnpj_agencia) & !is_aggregated(verbete))[sapply(estban, function(x) !is.numeric(x))],
@@ -696,7 +710,7 @@ temp |>
   kable_styling(latex_options = c("striped"))
 ```
 
-A série temporal do agregado de crédito no Banestes no Espírito Santo é apresentada na @fig-agregado. Como frequentemente ocorre em séries temporais de natureza social, a inspeção visual sugere a presença de quebras estruturais na média^[Aqui, destacam-se os períodos de 2008 a 2010, que corresponde à crise financeira global; de 2014 a 2016, que corresponde à crise econômica brasileira, e; a partir de 2020 com a pandemia do Covid-19. Também é sugestivo que a forma como o governo se comporta durante esses eventos pode ter impacto direto no comportamento do crédito.]. Essas quebras podem afetar a qualidade das previsões base a serem reconciliadas.
+A série temporal do agregado de crédito no Banestes no Espírito Santo é apresentada na @fig-agregado. Em relação à distribuição, a mesorregião Central Espírito-santense concentra mais crédito do que o somatório das demais regiões (@fig-meso), sendo a microrregião de Vitória a responsável por essa concentração (@fig-micro). Na ótica dos verbetes, o crédito para financiamentos é uma pequena fração do saldo de empréstimos, independentemente da mesorregião (@fig-verbetes e @fig-verbete-meso). 
 
 ```{r}
 #| label: fig-agregado
@@ -718,11 +732,9 @@ estban |>
   tema
 ```
 
-Em relação à distribuição, a mesorregião Central Espírito-santense concentra mais crédito do que o somatório das demais regiões (@fig-meso), sendo a microrregião de Vitória a responsável por essa concentração (@fig-micro). Na ótica dos verbetes, o crédito para financiamentos é uma pequena fração do saldo de empréstimos, independentemente da mesorregião (@fig-verbetes e @fig-verbete-meso). 
-
 ```{r}
 #| label: fig-meso
-#| fig-cap: "Série temporal do agregado de crédito do Banestes por mesorregião do ES"
+#| fig-cap: "Séries temporais do agregado de crédito do Banestes por mesorregião do ES"
 
 # plot agregado
 estban |>
@@ -735,17 +747,17 @@ estban |>
   ) |>
   # substituir "_" por espaço
   transform(
-    nome_mesorregiao = gsub("_", " ", nome_mesorregiao),
-    nome_microrregiao = gsub("_", " ", nome_microrregiao),
-    nome = gsub("_", " ", nome),
+    nome_mesorregiao = tools::toTitleCase(gsub("_", " ", nome_mesorregiao)),
+    nome_microrregiao = tools::toTitleCase(gsub("_", " ", nome_microrregiao)),
+    nome = tools::toTitleCase(gsub("_", " ", nome)),
     cnpj_agencia = gsub("_", " ", cnpj_agencia),
-    verbete = gsub("_", " ", verbete)
+    verbete = tools::toTitleCase(gsub("_", " ", verbete))
   ) |>
   ggplot(aes(x = ref, y = saldo)) +
   geom_line(color = cores$azul_banestes) +
   scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
   scale_x_yearmonth(date_labels = "%Y") +
-  facet_wrap(~ factor(nome_mesorregiao), scales = "free_y") +
+  facet_wrap(~ factor(nome_mesorregiao), scales = "free") +
   labs(x = "", y = "Saldo (em R$ bi)") +
   tema +
   theme(
@@ -757,7 +769,7 @@ estban |>
 
 ```{r}
 #| label: fig-micro
-#| fig-cap: "Série temporal do agregado de crédito do Banestes por microrregião do ES"
+#| fig-cap: "Séries temporais do agregado de crédito do Banestes por microrregião do ES"
 
 # plot agregado
 temp = estban |>
@@ -810,7 +822,7 @@ do.call(gridExtra::grid.arrange, c(plots, ncol = 2))
 
 ```{r}
 #| label: fig-verbetes
-#| fig-cap: "Verbetes no agregado do ES"
+#| fig-cap: "Séries temporais dos verbetes no agregado do ES"
 
 # plot por verbetes
 estban |>
@@ -833,13 +845,14 @@ estban |>
   geom_line() +
   scale_y_continuous(labels = scales::number_format(scale = 1 / 1e9)) +
   scale_color_manual(values = unlist(cores, use.names = FALSE)) +
-  labs(x = "", y = "Saldo (em R$ bi)", color = "Verbete") +
-  tema
+  labs(x = "", y = "Saldo (em R$ bi)", color = "") +
+  tema +
+  theme(legend.position = "bottom")
 ```
 
 ```{r}
 #| label: fig-verbete-meso
-#| fig-cap: "Verbete por mesorregião do ES"
+#| fig-cap: "Séries temporais dos verbetes por mesorregião do ES"
 
 # plot por mesorregião
 estban |>
@@ -864,26 +877,30 @@ estban |>
   scale_y_continuous(labels = scales::number_format(scale = 1 / 1000000)) +
   scale_x_yearmonth(date_labels = "%Y") +
   scale_color_manual(values = unlist(cores, use.names = FALSE)) +
-  labs(x = "", y = "Saldo (em R$ mi)", color = "Verbete") +
+  labs(x = "", y = "Saldo (em R$ mi)", color = "") +
   tema +
   theme(
     legend.text = element_text(size = 6),
     legend.title = element_text(size = 6),
-    strip.text = element_text(size = 6)
+    strip.text = element_text(size = 6),
+    legend.position = "bottom"
   )
 ```
 
 ## Previsões base {#sec-previsoes_base}
 
-Uma vez que o foco deste trabalho está no incremento de performance proporcionado pela reconciliação ótima sobre um conjunto de previsões base e não na qualidade destas, elas foram obtidas por meio de métodos básicos para previsão de séries temporais, especificamente o algoritmo de Hyndman-Koehler-Snyder-Grose para suavimento exponencial (ETS) [@hyndman_state_2002], sem tratamentos adicionais para *outliers*, quebras estruturais ou transformações. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
+Embora os métodos de ML também sejam utilizados no contexto de previsão de séries temporais, é importante ressaltar que este não é caso deste trabalho. As previsões de séries temporais são realizadas anteriormente, na obtenção das previsões base $\hat{y}_t$. Nada impede que essas previsões sejam obtidas por um modelo de ML, mas isso não é o foco deste trabalho. A aplicação dos métodos de ML aqui ocorrem na reconciliação, ou seja, na combinação contemporânea, *cross section*, das previsões base que, por sua vez, podem ter sido obtidas através de qualquer método.
 
-Os modelos foram treinados com dados de 2003 a 2021 e as previsões foram realizadas para o ano de 2022 (@fig-modelagem-1). Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Os resultados são apresentados na @tbl-lb-pvalue. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são ruído branco. Isso sugere que os modelos de previsão base são, em sua maior parte, adequados para o propósito deste trabalho.
+Uma vez que o foco deste trabalho está no incremento de performance proporcionado pela reconciliação ótima sobre um conjunto de previsões base e não na qualidade destas, elas foram obtidas por meio de métodos básicos para previsão de séries temporais, especificamente o algoritmo de Hyndman-Koehler-Snyder-Grose para suavimento exponencial (ETS) [@hyndman_state_2002]. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
 
-![Previsões base](img/modelagem_1.png){#fig-modelagem-1 width=70%}
+Os modelos foram treinados com dados de 2003 a 2021 e as previsões $h$ passos à frente foram realizadas para o ano de 2022, com $h={1, 2, 3, ..., 12}$ (@fig-modelagem-1). Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são ruído branco. Isso sugere que os modelos de previsão base são, em sua maior parte, adequados para o propósito deste trabalho.
+
+![Previsões base a serem reconciliadas. Em azul, o conjunto de treino e, em verde, as previsões $h$ passos à frente para fora da amostra.](img/modelagem_1.png){#fig-modelagem-1 width=70%}
 
 ```{r}
 #| label: tbl-lb-pvalue
 #| tbl-cap: "Resultados do teste de Ljung-box para as previsões base ($\\alpha = 0.05$)"
+#| include: false
 
 testes_lb = readRDS("data/estban/previsoes_base/testes_lb.rds") |>
   transform(h_0 = ifelse(lb_pvalue < 0.05, "rejeita", "não rejeita"))
@@ -895,28 +912,28 @@ prop.table(table(testes_lb$h_0)) |>
 
 ## *Design* do experimento
 
-O objetivo do experimento consiste em comparar o ganho de desempenho dos métodos de reconciliação em relação às previsões base, ou seja, dada a performance das previsões individuais, o quanto mais precisas elas se tornam ao aplicar um determinado método de reconciliação. Para isso, serão utilizadas a abordagem de nível único *bottom-up*^[Como o *dataset* Estban é agrupado, a desagregação não é única e as abordagem *top-down* e *middle-out* não podem ser aplicadas [@athanasopoulos_forecast_2023].], o método analítico de reconciliação ótima *MinT-Shrink* e os métodos de reconciliação ótima baseados em *machine learning*: *gradient boosting* (*Xgboost* e *LightGBM*), *Random Forest*, *Elastic Net* (Lasso, *Ridge* e *Elastic Net*) e *Support Vector Machines*.
+O objetivo do experimento consiste em comparar o ganho de desempenho dos métodos de reconciliação em relação às previsões base, ou seja, dada a performance das previsões individuais, o quanto mais precisas elas se tornam ao aplicar um determinado método de reconciliação. Para isso, serão utilizadas a abordagem de nível único *bottom-up*^[Como o banco de dados Estban é agrupado, a desagregação não é única e as abordagem *top-down* e *middle-out* não podem ser aplicadas [@athanasopoulos_forecast_2023].], o método analítico de reconciliação ótima *MinT-Shrink* e os métodos de reconciliação ótima baseados em *machine learning*: *gradient boosting* (*Xgboost* e *LightGBM*), *Random Forest*, *Elastic Net* (Lasso, *Ridge* e *Elastic Net*) e *Support Vector Machines*. Uma breve introdução sobre cada um desses métodos pode ser encontrado no Apêndice \ref{apendice_metodos_ml}.
 
-A metodologia para obtenção das previsões reconciliadas por métodos baseados em *machine-learning* será semelhante ao de @spiliotis_hierarchical_2021. Ela consiste em:
+Foram avaliadas três estratégias para obtenção das previsões reconciliadas. A primeira é a proposta por @spiliotis_hierarchical_2021, adaptada à base de dados Estban e com as janelas de treino e previsão mais próximas ao caso de uso de uma instituição financeira. Ela consiste em:
 
 1. Previsão contínua (*rolling forecast*):
 A amostra treino é separada em $p$ subamostras para todas as séries em todos os níveis de agregação, com a primeira separação abrangindo $y_1$ até $Y_Q$, a segunda $y_1$ até $Y_{Q+1}$ e assim sucessivamente até a última separação abrangendo $y_1$ até $Y_{Q+p-1}$. Para cada subamostra foi treinado um modelo (de mesmo algoritmo usado na [seção @sec-previsoes_base]) e obtida previsão um passo a frente. Para este trabalho, a amostra treino foi divida em 50%, com $Q=120$ e $p=108$.
 
-    ![Esquema de modelagem de previsões contínuas](img/modelagem_2.png){#fig-modelagem-2 width=70%}
+![Esquema de modelagem *rolling forecast*](img/modelagem_2.png){#fig-modelagem-2 width=70%}
 
 1. Treino dos modelos de *machine learning*:
-Para cada série do nível mais desagregado, $y_m$, é treinado um modelo de ML com $n+1$ variáveis, compostas pelas $n$ séries — que incluem todos os níveis de agregação —, mais a própria $y_m$ como *target* (@tbl-modelagem). Cada uma das $n$ séries contam com $p$ previsões obtidas no passo 1. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos.
+Para cada série do nível mais desagregado, $y_m$, é treinado um modelo de ML com $n+1$ variáveis, compostas pelas $n$ séries — que incluem todos os níveis de agregação —, mais a própria $y_m$ como variável explicada (@tbl-modelagem). Cada uma das $n$ séries contam com $p$ previsões obtidas no passo 1, representadas na @fig-modelagem-2 pela cor verde. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos.
     
 1. Reconciliação ótima:
-Com os modelos treinados, passa-se as previsões base obtidas na [seção @sec-previsoes_base] como regressores para se obter as previsões reconciliadas das séries do nível mais desagregado $\tilde{y}_m$.
+Com os modelos treinados no passo 2, passa-se as previsões base obtidas na [seção @sec-previsoes_base] como regressores para se obter as previsões reconciliadas 12 passos à frente das séries do nível mais desagregado $\tilde{y}_m$.
 
-1. Agregação: Assim como nos métodos analíticos de combinação ótima, a obtenção das previsões reconciliadas para os demais níveis de hierárquicos $\tilde{y}_n$ se dá através da agregação  semelhante ao *bottom-up*, mas ao invés de se somar as previsões base $\hat{y}_m$, somam-se as previsões reconciliadas $\tilde{y}_m$.
+1. Agregação: Assim como nos métodos analíticos de combinação ótima, a obtenção das previsões reconciliadas para os demais níveis de hierárquicos $\tilde{y}_n$ se dá através da agregação semelhante ao *bottom-up*, mas ao invés de se somar as previsões base $\hat{y}_m$, somam-se as previsões reconciliadas $\tilde{y}_m$.
 
 ```{r}
 #| label: tbl-modelagem
 #| tbl-cap: "Conjunto de dados para predição dos modelos de ML"
   tibble::tribble(
-    ~Target, ~`Variável 1`, ~`Variável 2`, ~..., ~`Variável n`,
+    ~`Var. Explicada`, ~`Variável 1`, ~`Variável 2`, ~..., ~`Variável n`,
     "$y_{1,Q+1}$", "$\\hat{y}_{1,Q+1}$", "$\\hat{y}_{2,Q+1}$", "...", "$\\hat{y}_{n,Q+1}$",
     "$y_{2,Q+2}$", "$\\hat{y}_{1,Q+2}$", "$\\hat{y}_{2,Q+2}$", "...", "$\\hat{y}_{n,Q+2}$",
     "...", "...", "...", "...", "...",
@@ -926,13 +943,13 @@ Com os modelos treinados, passa-se as previsões base obtidas na [seção @sec-p
   kable_styling(latex_options = c("striped"))
 ```
 
-Dessa forma, essa metodologia é semelhante à aplicada na reconciliação ótima analítica, se afastando principalmente em três pontos: (i) a utilização de algoritmos de ML ao invés de MQG, (ii) a não atribuição de peso de forma obrigatória para todos os nós da hierarquia e (iii) no ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série (@spiliotis_hierarchical_2021).
+Dessa forma, essa metodologia é semelhante à aplicada na reconciliação ótima analítica, se afastando principalmente em três pontos: (i) a utilização de algoritmos de ML ao invés de MQG, (ii) a não atribuição de peso de forma obrigatória para todos os nós da hierarquia e (iii) no ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021].
 
-Um ponto negativo na metodologia proposta por @spiliotis_hierarchical_2021 é o processo de *rolling origin* (passo 1). Esse processo requer a realização de previsões para dentro da amostra treino, o que pode ser um problema para séries temporais com poucas observações ou de série incompleta. No caso do *dataset* Estban, algumas das agências foram criadas após o período escolhido para o *split* em $Q$ (dezembro/2012), sendo necessário sua exclusão do dataset e invalidando o uso da metodologia para essas unidades. Nesse sentido, o MinT se mostra uma opção mais viável para aplicações no mundo real.
+Um ponto negativo na metodologia proposta por @spiliotis_hierarchical_2021 é o processo de *rolling origin* (passo 1). Esse processo requer a realização de previsões para dentro da amostra treino, o que pode ser um problema para séries temporais com poucas observações ou de série incompleta. No caso da base de dados Estban, algumas das agências foram criadas após o período escolhido para a sepração do conjunto de treino em $Q$ (dezembro/2012), sendo necessário sua exclusão do dataset e invalidando o uso da metodologia para essas unidades. Nesse sentido, o MinT se mostra uma opção mais viável para aplicações no mundo real.
 
-Nesses casos, uma alternativa para permitir o uso dos métodos de ML é substituir o processo de *rolling origin* e usar os valores ajustados dos modelos das previsões base $\hat{y}$ como input para os modelos de ML. Além de permitir a inclusão de séries incompletas — agências criadas durante o período, no caso do *dataset* Estban —, essa abordagem também aumenta o tamanho da amostra treino em $Q$ observações, o que pode melhorar a performance dos modelos de ML. Chamaremos essa estratégia de *fitted base forecasts*.
+Nesses casos, uma alternativa para permitir o uso dos métodos de ML é substituir o processo de *rolling origin* e usar os valores ajustados dos modelos das previsões base $\hat{y}$ ([seção @sec-previsoes_base]) como input para os modelos de ML. Isso signfica usar previsões 1 passo à frente obtidas ao longo de todo o período $q=1, 2, 3, ..., Q+p$. Além de permitir a inclusão de séries incompletas — agências criadas durante o período, no caso da base de dados Estban —, essa abordagem também aumenta o tamanho da amostra treino em $Q$ observações, o que pode melhorar a performance dos modelos de ML. Chamaremos essa 2ª estratégia de *fitted base*.
 
-Outra possibilidade de substituição do passo 1, caso as séries sejam de tamanho suficiente, é o processo de reajuste. Esse processo consiste no reajuste de um modelo para um novo conjunto de dados, conservando os hiperparâmetros originais porém reestimando os coeficientes (e.g., treina-se um modelo autoregressivo AR($p$) de coeficientes $\phi_p$ e então passa-se um novo conjunto de dados fora da amostra, mantendo o hiperparâmetro $p$ e reestimando $\phi_p$, obtendo novos valores ajustados). Utiliza-se então os valores reajustados para treinar os modelos de ML. Nessa estratégia, doravante denominada de *refit*, os modelos foram treinados até $Q$ e então reajustados para $Q+p$. Uma restrição dessa abordagem é que, fixados os hiperparâmetros anteriores, não necessariamente todos modelos alcançarão convergência no reajuste de seus coeficientes para o novo conjunto de dados.
+Outra possibilidade de substituição do passo 1, caso as séries sejam de tamanho suficiente, é o processo de reestimação. Esse processo consiste na reestimação do modelo para um novo conjunto de dados. Utiliza-se então os valores reajustados para treinar os modelos de ML. Nessa 3ª estratégia, doravante denominada de *refit*, os modelos foram treinados até $Q$ e então reajustados para o conjunto de dados disponível em $Q+p$. Uma restrição dessa abordagem é que, fixados os hiperparâmetros anteriores, não necessariamente todos modelos alcançarão convergência no reajuste de seus coeficientes para o novo conjunto de dados.
 
 ## Otimização de hiperparâmetros
 
@@ -1050,19 +1067,17 @@ tibble::tribble(
 
 # RESULTADOS
 
-As tabelas a seguir apresentam os resultados obtidos para o experimento. Para fins de comparação, além do *dataset* de interesse, o ESTBAN, o experimento foi executado também para o *dataset* TOURISM, disponível no pacote {tsibble} [@R-tsibble], e seus resultados reportados na [seção @sec-tourism].
+As tabelas a seguir apresentam os resultados obtidos para o experimento. As métricas utilizadas foram a Raiz do Erro Médio Escalado Quadrático (*Root Mean Squared Scaled Error* — RMSSE) e o erro médio escalado absoluto (*Mean Absolute Scaled Error* — MASE). Para fins de comparação, além da base de dados de interesse, o Estban, o experimento foi executado também para a base de dados "Tourism", disponível no pacote {tsibble} [@R-tsibble], e seus resultados reportados no apêndice \ref{apendice_tourism}.
 
-As @tbl-estban-results-analiticos e @tbl-tourism-results-analiticos contém as medidas de acurácia RMSSE e MASE para os métodos analíticos de reconciliação ótima BU (*bottom-up*) e MinT, e para as previsões base, ou seja, sem aplicar qualquer método de reconciliação. A primeira coluna especifica o método utilizado, enquanto as demais colunas apresentam a média da performance em cada nível de agregação.
+A @tbl-estban-results-analiticos contém as medidas de acurácia RMSSE e MASE para os métodos analíticos de reconciliação ótima BU (*bottom-up*) e MinT, e para as previsões base, ou seja, sem aplicar qualquer método de reconciliação. A primeira coluna especifica o método utilizado, enquanto as demais colunas apresentam a média da performance em cada nível de agregação.
 
-As @tbl-estban-results-ml-rolling, @tbl-estban-results-ml-fitted, @tbl-estban-results-ml-refit, @tbl-tourism-results-ml-rolling e @tbl-tourism-results-ml-fitted reportam as medidas de acurácia para os métodos de reconciliação ótima baseados em *machine learning*. Já as @tbl-estban-tempo-ml e @tbl-tourism-tempo-ml reportam o tempo de processamento para as etapas de calibragem, treino e predição desses métodos^[Os métodos analíticos não tiveram seu tempo de processamento medidos porque executam quase que instantaneamente, já sinalizando uma vantagem para esses métodos.].
+As @tbl-estban-results-ml-rolling, @tbl-estban-results-ml-fitted e @tbl-estban-results-ml-refit reportam as medidas de acurácia para os métodos de reconciliação ótima baseados em *machine learning*. Já a @tbl-estban-tempo-ml reporta o tempo de processamento para as etapas de calibragem, treino e predição desses métodos^[Os métodos analíticos não tiveram seu tempo de processamento medidos porque executam quase que instantaneamente, já sinalizando uma vantagem para esses métodos.].
 
 Em geral, os métodos baseados em árvore, além de requererem maior tempo de processamento devido a sua complexidade no espaço de hiperparâmetros, também tenderam a perder qualidade de performance conforme suas previsões são agregadas para formação dos níveis superiores da hierarquia. Contrariamente, os métodos de regressão regularizada e o SVM se mostraram mais robustos à agregação.
 
 Nas tabelas a seguir, **negrito** indica a melhor performance entre os métodos para aquele determinado nível de agregação, e \underline{sublinhado} indica que aquele método de ML superou o método analítico de melhor performance naquele nível de agregação.
 
-## ESTBAN
-
-Nos reportes para o *dataset* ESTBAN estão incluídas as médias de performance para cada nível hierárquico e agrupado. As colunas "agregado", "mesorregiao", "microrregiao", "municipio" e "agencia", fazem referência à estrutura hierárquica, ou seja, tratam o verbete de forma agregada. Já as colunas "verbete", "bottom" e "hierarquia", incluem também a estrutura agrupada, tratando o verbete de forma desagregada. Detalhadamente:
+Nos reportes para a base de dados Estban estão incluídas as médias de performance para cada nível hierárquico e agrupado. As colunas "agregado", "mesorregiao", "microrregiao", "municipio" e "agencia", fazem referência à estrutura hierárquica, ou seja, tratam o verbete de forma agregada. Já as colunas "verbete", "bottom" e "hierarquia", incluem também a estrutura agrupada, tratando o verbete de forma desagregada. Detalhadamente:
 
 - Agregado: performance do método para a série que representa o total, com os verbetes agregados, (@fig-agregado).
 - Mesorregião: a média das performances do método para as séries do agregado de cada mesorregião, com os verbetes agregados (@fig-meso).
@@ -1072,14 +1087,6 @@ Nos reportes para o *dataset* ESTBAN estão incluídas as médias de performance
 - Verbete: a média das performances do método para as séries de cada verbete, para o total da hierarquia (@fig-verbetes).
 - Bottom: a média das performances do método para as séries do nível mais desagregado, ou seja, verbete por agência.
 - Hierarquia: a média das performances do método para todas as séries, agregadas e desagregadas.
-
-Para o *dataset* ESTBAN, não houve uma combinação de método e estratégia que fosse consistentemente melhor ao longo de todos os níveis de agregação. Portanto, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador^[Se o objetivo é a elaboração de *guidance*, por exemplo, o pesquisador deve preferir o método e estratégia que geram as  previsões mais precisas para o nível agregado. Já para elaboração de metas individuais, os níveis individuais ou regionais podem ser preferíveis.].
-
-Para os níveis ao topo da hierarquia, os métodos de ML se mostraram a melhor opção para estimação. No nível agregado, o *elastic net* na estratégia *refit* (@tbl-estban-results-ml-refit) se mostrou a melhor opção para a estimação do agregado, com 89% de ganho de performance sobre o MinT (@tbl-estban-results-analiticos), em termos de RMSSE. Da mesma forma, para o nível de mesorregião, o *elastic net* na configuração *lasso* obteve a melhor performance, performando 7% melhor que BU. Por outro lado, tanto nos níveis hierárquicos abaixo, quanto nos níveis agrupados, os métodos de ML não foram capazes de superar os métodos analíticos.
-
-Os resultados se mostraram bastante sensíveis à estratégia utilizada. Na métrica RMSS, nenhum método utilizando as estratégias *rolling forecast* e *fitted base* foi capaz de superar o MinT em qualquer nível de agregação, enquanto na estratégia *refit* os métodos de ML mostraram ganhos de performance com os métodos SVM e nas três configurações do *elastic net*.
-
-Em geral, as medidas RMSSE e MASE se mostraram bastante correlacionadas, com os métodos que obtiveram melhor performance em uma métrica também obtendo melhor performance na outra. A exceção foi para o método *lasso* na estratégia *rolling forecast*, que obteve performance melhor que o MinT, em termos de MASE, para o nível agregado, sendo o único resultado positivo para a estratégia *rolling forecast*.
 
 ```{r}
 #| tbl-cap: "Resultados Estban: Acurácia dos métodos analíticos de reconciliação"
@@ -1227,15 +1234,18 @@ tempo |>
   kable_styling(latex_options = c("striped"))
 ```
 
-## TOURISM {#sec-tourism}
+Para a base de dados Estban, não houve uma combinação de método e estratégia que fosse consistentemente melhor ao longo de todos os níveis de agregação. Portanto, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador^[Se o objetivo é a elaboração de *guidance*, por exemplo, o pesquisador deve preferir o método e estratégia que geram as  previsões mais precisas para o nível agregado. Já para elaboração de metas individuais, os níveis individuais ou regionais podem ser preferíveis.].
 
-O *dataset* TOURISM consiste na quantidade trimestral de pernoites em visitas na Austrália entre 1998 e 2016. A estrutura é hierárquica e agrupada, composta por 3 níveis hierárquicos — *State* (Estados), *Region* (Regiões) e total —, e agrupado por *Purpose* (Propósito).
+Para os níveis ao topo da hierarquia, os métodos de ML se mostraram a melhor opção para estimação. No nível agregado, o *elastic net* na estratégia *refit* (@tbl-estban-results-ml-refit) se mostrou a melhor opção para a estimação do agregado, com 91% de ganho de performance sobre o MinT (@tbl-estban-results-analiticos), em termos de RMSSE, ou seja, o MinT obteve quase o dobro do erro do *elastic net*. Da mesma forma, para o nível de mesorregião, o *elastic net* na configuração *lasso* teve a melhor performance, sendo 7% melhor que BU. Por outro lado, tanto nos níveis hierárquicos abaixo, quanto nos níveis agrupados, os métodos de ML não foram capazes de superar os métodos analíticos.
 
-Assim como no *dataset* ESTBAN, aqui também não houve uma combinação de método e estratégia que fosse consistentemente melhor ao longo de todos os níveis de agregação. Entretanto, uma tendência pode foi observada em ambos *datasets*, com os métodos de ML se mostrando a melhor opção para estimação nos níveis ao topo da hierarquia, enquanto os métodos analíticos se mostram melhor opção para os níveis ao fundo da hierarquia.
+Os resultados se mostraram bastante sensíveis à estratégia utilizada. Na métrica RMSS, nenhum método utilizando as estratégias *rolling forecast* e *fitted base* foi capaz de superar o MinT em qualquer nível de agregação, enquanto na estratégia *refit* os métodos de ML mostraram ganhos de performance com os métodos SVM e nas três configurações do *elastic net*.
+
+Em geral, as medidas RMSSE e MASE se mostraram bastante correlacionadas, com os métodos que obtiveram melhor performance em uma métrica também obtendo melhor performance na outra. A exceção foi para o método *lasso* na estratégia *rolling forecast*, que obteve performance melhor que o MinT, em termos de MASE, para o nível agregado, sendo o único resultado positivo para a estratégia *rolling forecast*.
 
 ```{r}
 #| tbl-cap: "Resultados Tourism: Acurácia dos métodos analíticos de reconciliação"
 #| label: tbl-tourism-results-analiticos
+#| include: false
 
 rbind(
   readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
@@ -1264,6 +1274,7 @@ rbind(
 ```{r}
 #| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
 #| label: tbl-tourism-results-ml-rolling
+#| include: false
 
 rbind(
   readRDS("data/tourism/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
@@ -1300,6 +1311,7 @@ rbind(
 ```{r}
 #| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
 #| label: tbl-tourism-results-ml-fitted
+#| include: false
 
 rbind(
   readRDS("data/tourism/preds_ml/preds/fitted_base/resumo.RDS")[["rmsse"]],
@@ -1333,6 +1345,7 @@ rbind(
 ```{r}
 #| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia refit."
 #| label: tbl-tourism-results-ml-refit
+#| include: false
 
 rbind(
   readRDS("data/tourism/preds_ml/preds/one-step-ahead/resumo.RDS")[["rmsse"]],
@@ -1351,6 +1364,7 @@ rbind(
 ```{r}
 #| tbl-cap: "Resultados Tourism: Tempo de processamento dos métodos de ML (em horas)"
 #| label: tbl-tourism-tempo-ml
+#| include: false
 
 # obtendo tempo de processamento
 tempo = lapply(c("fitted_base", "rolling_forecast", "one-step-ahead"), function(tipo) {
@@ -1384,13 +1398,11 @@ Neste trabalho, foram apresentados experimentos de reconciliação ótima para s
 
 Este trabalho trouxe, além dos métodos de floresta aleatória e *gradient boosting* já trabalhados em @spiliotis_hierarchical_2021, o método de regressão regularizada *elastic net* e o *support vector machines*, além de avaliar outro método de *gradient boosting*, o *lightGBM*. Paralelamente, este trabalho propôs duas estratégias alternativas para a metodologia de reconciliação ótima baseada em *machine learning* proposta originalmente em @spiliotis_hierarchical_2021.
 
-Os resultados obtidos para o *dataset* ESTBAN mostraram, primeiramente, que não houve uma combinação de método e estratégia que obtivesse melhor performance de maneira consistente ao longo de todos os níveis hierárquicos. Dessa forma, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador. Para os níveis ao topo da hierarquia, a combinação correta de método e estratégia de estimação (*elastic net* + *refit*) gerou até 89% de ganho de performance no nível mais agregado, permitindo à instituição financeira maior precisão para tomada de decisão e planejamento estratégico, além de sinalizar maior confiança nas estimativas comunicadas ao mercado e aos investidores. Por outro lado, para os níveis inferiores na estrutura hierárquica, os métodos analíticos se mostraram a melhor escolha. Isso sugere que, com o objetivo de elaboração de metas individuais — seja para as agências ou superintendências regionais —, os métodos analíticos ainda são preferíveis.
+Os resultados obtidos para a base de dados Estban mostraram, primeiramente, que não houve uma combinação de método e estratégia que obtivesse melhor performance de maneira consistente ao longo de todos os níveis hierárquicos. Dessa forma, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador. Para os níveis ao topo da hierarquia, a combinação correta de método e estratégia de estimação (*elastic net* + *refit*) gerou até 91% de ganho de performance no nível mais agregado, permitindo à instituição financeira maior precisão para tomada de decisão e planejamento estratégico, além de sinalizar maior confiança nas estimativas comunicadas ao mercado e aos investidores. Por outro lado, para os níveis inferiores na estrutura hierárquica, os métodos analíticos se mostraram a melhor escolha. Isso sugere que, com o objetivo de elaboração de metas individuais — seja para as agências ou superintendências regionais —, os métodos analíticos ainda são preferíveis.
 
-Os restultados para o *dataset* ESTBAN também mostram que o resultado da reconciliação ótima é sensível à estratégia utilizada. Apenas na estratégia *refit* que os ganhos de performance foram observados, enquanto nas estratégias *rolling forecast* e *fitted base* os métodos de ML não foram capazes de superar os métodos analíticos.
+Os restultados também mostram que o resultado da reconciliação ótima é sensível à estratégia utilizada. Apenas na estratégia *refit* que os ganhos de performance foram observados, enquanto nas estratégias *rolling forecast* e *fitted base* os métodos de ML não foram capazes de superar os métodos analíticos^[O mesmo padrão em relação à performance ao logo dos níveis de agregação pôde ser observado na base de dados "Tourism" (Apêndice \ref{apendice_tourism}). Foi possível encontrar uma combinação de método de ML e estratégia capaz de superar os métodos analíticos para os níveis mais agregados, mas não para os níveis mais desagregados. Naquela base de dados, os métodos de ML superaram os analíticos em todos os níveis de agregação, exceto no mais desagregado, com os métodos *support vector machines* e *elastic net* liderando a performance tanto nas estratégias *rolling forecast* quanto *fitted base*.].
 
-O mesmo padrão em relação à performance ao logo dos níveis de agregação pôde ser observado no *dataset* TOURISM. Foi possível encontrar uma combinação de método de ML e estratégia capaz de superar os métodos analíticos para os níveis mais agregados, mas não para os níveis mais desagregados. Nesse *dataset*, os métodos de ML superaram os analíticos em todos os níveis de agregação, exceto no mais desagregado, com os métodos *support vector machines* e *elastic net* liderando a performance tanto nas estratégias *rolling forecast* quanto *fitted base*.
-
-Contrariamente aos resultados de @spiliotis_hierarchical_2021, em ambos *datasets*, os métodos de ML baseados em árvore de decisão (*XGBoost*, *ranger* e *lightGBM*) não foram capazes de superar os métodos analíticos em nenhum nível de agregação.
+Contrariamente aos resultados de @spiliotis_hierarchical_2021, os métodos de ML baseados em árvore de decisão (*XGBoost*, *ranger* e *lightGBM*) não foram capazes de superar os métodos analíticos em nenhum nível de agregação.
 
 Para pesquisas futuras, pode-se investigar se a performance dos diferentes métodos e estratégias estão relacionadas às características das séries temporais, por exemplo:
 
