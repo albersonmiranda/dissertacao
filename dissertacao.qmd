@@ -912,6 +912,8 @@ prop.table(table(testes_lb$h_0)) |>
 
 ## *Design* do experimento
 
+<!-- ! TODO: introduzir a necessidade e explicar o reduced fitted values (2 linhas, o porquê de estar testando essas estratégias) -->
+
 O objetivo do experimento consiste em comparar o ganho de desempenho dos métodos de reconciliação em relação às previsões base, ou seja, dada a performance das previsões individuais, o quanto mais precisas elas se tornam ao aplicar um determinado método de reconciliação. Para isso, serão utilizadas a abordagem de nível único *bottom-up*^[Como o banco de dados Estban é agrupado, a desagregação não é única e as abordagem *top-down* e *middle-out* não podem ser aplicadas [@athanasopoulos_forecast_2023].], o método analítico de reconciliação ótima *MinT-Shrink* e os métodos de reconciliação ótima baseados em *machine learning*: *gradient boosting* (*Xgboost* e *LightGBM*), *Random Forest*, *Elastic Net* (Lasso, *Ridge* e *Elastic Net*) e *Support Vector Machines*. Uma breve introdução sobre cada um desses métodos pode ser encontrado no Apêndice \ref{apendice_metodos_ml}.
 
 Foram avaliadas três estratégias para obtenção das previsões reconciliadas. A primeira é a proposta por @spiliotis_hierarchical_2021, adaptada à base de dados Estban e com as janelas de treino e previsão mais próximas ao caso de uso de uma instituição financeira. Ela consiste em:
@@ -949,7 +951,7 @@ Um ponto negativo na metodologia proposta por @spiliotis_hierarchical_2021 é o 
 
 Nesses casos, uma alternativa para permitir o uso dos métodos de ML é substituir o processo de *rolling origin* e usar os valores ajustados dos modelos das previsões base $\hat{y}$ ([seção @sec-previsoes_base]) como input para os modelos de ML. Isso signfica usar previsões 1 passo à frente obtidas ao longo de todo o período $q=1, 2, 3, ..., Q+p$. Além de permitir a inclusão de séries incompletas — agências criadas durante o período, no caso da base de dados Estban —, essa abordagem também aumenta o tamanho da amostra treino em $Q$ observações, o que pode melhorar a performance dos modelos de ML. Chamaremos essa 2ª estratégia de *fitted base*.
 
-Outra possibilidade de substituição do passo 1, caso as séries sejam de tamanho suficiente, é o processo de reestimação. Esse processo consiste na reestimação do modelo para um novo conjunto de dados. Utiliza-se então os valores reajustados para treinar os modelos de ML. Nessa 3ª estratégia, doravante denominada de *refit*, os modelos foram treinados até $Q$ e então reajustados para o conjunto de dados disponível em $Q+p$. Uma restrição dessa abordagem é que, fixados os hiperparâmetros anteriores, não necessariamente todos modelos alcançarão convergência no reajuste de seus coeficientes para o novo conjunto de dados.
+Outra possibilidade de substituição do passo 1, caso as séries sejam de tamanho suficiente, é o processo de reestimação. Esse processo consiste na reestimação do modelo para um novo conjunto de dados. Utiliza-se então os valores reajustados para treinar os modelos de ML. Nessa 3ª estratégia, doravante denominada de *reduced fitted values*, os modelos foram treinados até $Q$ e então reajustados para o conjunto de dados disponível em $Q+p$. Uma restrição dessa abordagem é que, fixados os hiperparâmetros anteriores, não necessariamente todos modelos alcançarão convergência no reajuste de seus coeficientes para o novo conjunto de dados.
 
 ## Otimização de hiperparâmetros
 
