@@ -112,7 +112,7 @@ No que concerne a elaboração dessas previsões, os bancos, assim como em diver
 
 Pode-se realizar previsões individualmente para todos os níveis da estrutura. No caso de uma insituição financeira, isso significa realizar previsões, por exemplo, para cada agência, para o agregado de cada região e para o agregado da instituição. Infelizmente, não há qualquer razão, exceto para métodos de previsão muito simples, para que essas previsões sejam *coerentes* (i.e. que a soma das previsões individuais seja igual à previsão do agregado). Além disso, realizar as previsões individualmente ignoraria os relacionamentos existentes entre as séries temporais na estrutura. Para fazer com que essas previsões se tornem coerentes entre si é que foram desenvolvidos os chamados métodos de *reconciliação*, sendo os mais simples o *top-down*, *bottom-up* e uma combinação das duas, o *middle-out*.
 
-A prática usual em *budgeting*^[O orçamento é um documento no qual é definido o planejamento financeiro de um empresa, geralmente para o ano seguinte, estabelecendo metas e objetivos. Nele, são projetadas as expectativas da empresa e é base de comparação para saber como os resultados estão se desviando da performance esperada.], principalmente para empresas com muitas filiais, é a *top-down*, ou seja, realizar previsões para o total e então distribuí-las para cada unidade seguindo alguma lógica proporcional. No caso dos bancos de varejo, com muitas agências espalhadas pelo território, especialmente em um país grande como o Brasil, esse método pode ser muito prático.
+A prática usual em *budgeting*^[O orçamento é um documento no qual é definido o planejamento financeiro de um empresa, geralmente para o ano seguinte, estabelecendo metas e objetivos. Nele, são projetadas as expectativas da empresa e é base de comparação para saber como os resultados estão se desviando da performance esperada.], principalmente para empresas com muitas filiais, é a *top-down*, ou seja, realizar previsões para o total e então distribuí-las para cada unidade seguindo alguma lógica proporcional. No caso dos bancos de varejo, com muitas agências espalhadas pelo território, esse método pode ser muito útil. Na prática, em um país continental como o Brasil, a quantidade de filiais para as quais se deve realizar previsões pode tornar a tarefa desafiadora mesmo para instituições regionais.
 
 Esse é o caso do Banestes. Com 134 agências distribuídas pelos 78 municípios capixabas, realizar o *budgeting* para R$ 5,5 bi de faturamento^[Conforme demonstrativos publicados referentes ao exercício de 2022 [@banco_do_estado_do_espirito_santo_demonstracoes_2022].] não é uma tarefa trivial. Além de uma estrutura hierárquica de alta dimensionalidade por conta da quantidade de agências, se tratando de um banco múltiplo^[Para ser classificado como banco múltiplo, a instituição financeira deve operar com, no mínimo, duas carteiras dentre: comercial; investimento ou desenvolvimento; crédito imobiliário; de crédito, financiamento e investimento, e; arrendamento mercantil [@conselho_monetario_nacional_resolucao_1994].] que opera com diversas carteiras, as $n$ modalidades de crédito^[Crédito consignado, rural, imobiliário, pessoal, capital de giro, desconto de títulos etc.] expandem a estrutura para um total de $n \times 134$ séries temporais a serem estimadas.
 
@@ -505,20 +505,29 @@ Os métodos de gerar previsões coerentes ($\mathbfit{\tilde{y}_t}$) a partir de
 Alternativamente, podemos pensar numa matriz $\mathbfit{G}$ qualquer que utilize toda a informação disponível e tenha algumas propriedades que garantam que as previsões coerentes tenham o menor erro o possível. Esse é o problema de pesquisa trabalhado na *reconciliação ótima*.
 
 Os métodos analíticos de reconciliação ótima são aqueles que estimam a matriz de reconciliação, $\mathbfit{G}$, através de regressão linear. Isso resulta na redefinição das previsões do nível mais desagregado como uma combinação linear^[Por essa razão, esses métodos são também chamados de métodos de combinação.] das previsões de todos os elementos de todos os níveis da hierarquia, utilizando, assim, toda a informação disponível.
+
 O estado-da-arte para esse tipo de método é o *MinT* [@wickramasuriya_optimal_2019]. Nele, o objetivo é minimizar o erro das previsões reconciliadas:
+
 $$
 \mathbfit{\tilde{e}}_{t+h|t} = \mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}
 $$ {#eq-mint1}
+
 Essa equação pode ser reescrita como $\mathbfit{\tilde{e}}_t = \mathbfit{SG\hat{e}}_t$, que tem variância dada por^[Ver demonstração \ref{proposicao3}.]
+
 $$
 \text{Var}[\mathbfit{\tilde{e}}] = \mathbfit{SG\hat{W}}_{t+h|t}\mathbfit{G'S'}
 $$ {#eq-mint2}
+
 \noindent em que $\mathbfit{\hat{W}}_{t+h|t}$ é a matriz de variância-covariância dos erros de previsão base.
-A abordagem consiste então em se obter um valor de $\mathbfit{G}$ que minimize o traço de $\text{Var}[\mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}]$. Isso resultaria no melhor (variância mínima) estimador linear não viesado^[A ausência de viés é garantida pela \nameref{proposicao1}.] [@wickramasuriya_optimal_2019].
+
+A abordagem consiste então em se obter um valor de $\mathbfit{G}$ que minimize o traço de $\text{Var}[\mathbfit{y}_{t+h} - \mathbfit{\tilde{y}}_{t+h|t}]$. Isso resultaria no melhor (variância mínima) estimador linear não viesado^[A ausência de viés é garantida pela \nameref{proposicao1}.] [@wickramasuriya_optimal_2019]. Sua solução é dada por
+
 $$
 \mathbfit{G} = (\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{S})^{-1}\mathbfit{S'\hat{W}}^\dagger_{t+h|t}
 $$ {#eq-mint3}
+
 \noindent em que $\mathbfit{\hat{W}}^\dagger_{t+h|t}$ é a inversa generalizada de Moore-Penrose para $\mathbfit{\hat{W}}_{t+h|t}$^[A necessidade da inversa generalizada aqui é trivial, uma vez que a inversa regular, do tipo $\mathbfit{A}^{-1}$, requer matriz quadrada, o que não acontece no caso de séries temporais hierárquicas, uma vez que, necessariamente, tem-se $n>m$ ($n=m+\text{número de nós de agregação}$). Além disso, $\mathbfit{\hat{W}}$ é posto incompleto (ver demonstração \ref{proposicao4}).]. Essa formulação corresponde a um problema de regressão por mínimos quadradados generalizados, considerando $\mathbfit{S}$ como a matriz de preditores e $\mathbfit{G}$ os coeficientes a serem estimados. Consequentemente, as previsões ótimas reconciliadas são dadas por
+
 $$
 \mathbfit{\tilde{y}}_{t+h|t} = \mathbfit{S}(\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{S})^{-1}\mathbfit{S'\hat{W}}^\dagger_{t+h|t}\mathbfit{\hat{y}}_{t+h|t}
 $$ {#eq-mint4}
@@ -527,14 +536,14 @@ $$ {#eq-mint4}
 
 1. Seja $k$ a quantidade de níveis da hierarquia, $m$ a quantidade de séries e $n$ o tamanho de cada série. As séries são divididas em uma série de conjuntos de treinamento e conjuntos de teste, com cada conjunto de treinamento compreendendo as primeiras $p < n$ observações (para $p = q, q + 1, ..., n - 1$) e o conjunto de teste correspondente compreendendo apenas as observações no tempo $p + 1$.
 2. Um modelo de previsão é ajustado para cada série em cada conjunto de treinamento e previsões um passo à frente são produzidas para cada conjunto de teste.
-3. Um modelo de ML separado^[Os autores trabalharam com *random forest* e *XGBoost*.] é construído para prever cada uma das *m_k* séries inferiores da hierarquia. O conjunto de treinamento de cada modelo consiste em $n - p$ observações e $m + 1$ variáveis. As primeiras m variáveis (usadas como preditores ou entradas) são as previsões um passo à frente produzidas durante o processo de *rolling origin* para as $m$ séries da hierarquia, e a última variável (a variável explicada) é o valor real da série de nível inferior nos tempos correspondentes. A função de perda dos modelos é a soma dos erros quadráticos, e os hiperparâmetros dos modelos de ML são determinados arbitrariamente pelo usuário ou por meio de um procedimento de otimização.
+3. Um modelo de ML separado^[Os autores trabalharam com *random forest* e *XGBoost*.] é construído para prever cada uma das $m_k$ séries inferiores da hierarquia. O conjunto de treinamento de cada modelo consiste em $n - p$ observações e $m + 1$ variáveis. As primeiras $m$ variáveis (usadas como preditores ou entradas) são as previsões um passo à frente produzidas durante o processo de *rolling origin* para as $m$ séries da hierarquia, e a última variável (a variável explicada) é o valor real da série de nível inferior nos tempos correspondentes. A função de perda dos modelos é a soma dos erros quadráticos, e os hiperparâmetros dos modelos de ML são determinados arbitrariamente pelo usuário ou por meio de um procedimento de otimização.
 4. A amostra completa das séries (todas as $n$ observações) é usada para produzir previsões base de $h$ passos à frente para as $m$ séries da hierarquia, onde $h$ é o horizonte de previsão de interesse.
 5. Os modelos $m_k$ que foram construídos na 3ª etapa são usados para fornecer previsões para as séries do nível inferior da hierarquia, usando as previsões base produzidas na 4ª etapa como entrada. Esse processo é repetido h vezes, cada vez para um horizonte de previsão diferente.
 6. As previsões produzidas pelos modelos de ML na 5ª etapa são agregadas (somadas) para que as previsões reconciliadas sejam produzidas para o restante dos níveis hierárquicos.
 
-![Abordagem de reconciliação ótima por ML de @spiliotis_hierarchical_2021.](img/spiliotis.png){#fig-spiliotis}
+![Abordagem de reconciliação ótima por ML. Fonte: @spiliotis_hierarchical_2021.](img/spiliotis.png){#fig-spiliotis}
 
-Este trabalho estende a abordagem de @spiliotis_hierarchical_2021 para a reconciliação de séries temporais hierárquicas *e agrupadas*; avalia a efetividade de mais 4 implementaçãoes de métodos de ML (*lasso*, *ridge*, *elastic net*, SVM e *lightGBM*), além dos 2 propostos por eles (*XGBoost* e *random forest*); e propõe variações metodológicas para as 3 primeiras etapas da metodologia, obtendo ganhos significativos de performance no contexto de séries temporais financeiras.
+Isto posto, a presente dissertação estende a abordagem de @spiliotis_hierarchical_2021 para a reconciliação de séries temporais hierárquicas *e agrupadas*; avalia a efetividade de mais 4 implementaçãoes de métodos de ML (*lasso*, *ridge*, *elastic net*, SVM e *lightGBM*), além dos 2 propostos por eles (*XGBoost* e *random forest*); e propõe variações metodológicas para as 3 primeiras etapas da metodologia, obtendo ganhos significativos de performance no contexto de séries temporais financeiras.
 
 # METODOLOGIA
 
@@ -893,7 +902,7 @@ Embora os métodos de ML também sejam utilizados no contexto de previsão de s�
 
 Uma vez que o foco deste trabalho está no incremento de performance proporcionado pela reconciliação ótima sobre um conjunto de previsões base e não na qualidade destas, elas foram obtidas por meio de métodos básicos para previsão de séries temporais, especificamente o algoritmo de Hyndman-Koehler-Snyder-Grose para suavimento exponencial (ETS) [@hyndman_state_2002]. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
 
-Os modelos foram treinados com dados de 2003 a 2021 e as previsões $h$ passos à frente foram realizadas para o ano de 2022, com $h={1, 2, 3, ..., 12}$ (@fig-modelagem-1). Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são ruído branco. Isso sugere que os modelos de previsão base são, em sua maior parte, adequados para o propósito deste trabalho.
+Os modelos foram treinados com dados de 2003 a 2021 e as previsões $h$ passos à frente foram realizadas para o ano de 2022, com $h={1, 2, 3, ..., 12}$ (@fig-modelagem-1). Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são descorrelatados. Isso sugere que os modelos de previsão base são, em sua maior parte, adequados para o propósito deste trabalho.
 
 ![Previsões base a serem reconciliadas. Em azul, o conjunto de treino e, em verde, as previsões $h$ passos à frente para fora da amostra.](img/modelagem_1.png){#fig-modelagem-1 width=70%}
 
@@ -914,17 +923,17 @@ prop.table(table(testes_lb$h_0)) |>
 
 <!-- ! TODO: introduzir a necessidade e explicar o reduced fitted values (2 linhas, o porquê de estar testando essas estratégias) -->
 
-O objetivo do experimento consiste em comparar o ganho de desempenho dos métodos de reconciliação em relação às previsões base, ou seja, dada a performance das previsões individuais, o quanto mais precisas elas se tornam ao aplicar um determinado método de reconciliação. Para isso, serão utilizadas a abordagem de nível único *bottom-up*^[Como o banco de dados Estban é agrupado, a desagregação não é única e as abordagem *top-down* e *middle-out* não podem ser aplicadas [@athanasopoulos_forecast_2023].], o método analítico de reconciliação ótima *MinT-Shrink* e os métodos de reconciliação ótima baseados em *machine learning*: *gradient boosting* (*Xgboost* e *LightGBM*), *Random Forest*, *Elastic Net* (Lasso, *Ridge* e *Elastic Net*) e *Support Vector Machines*. Uma breve introdução sobre cada um desses métodos pode ser encontrado no Apêndice \ref{apendice_metodos_ml}.
+O objetivo do experimento consiste em comparar o ganho de desempenho dos métodos de reconciliação em relação às previsões base, ou seja, dada a performance das previsões individuais, o quanto mais precisas elas se tornam ao aplicar um determinado método de reconciliação. Para isso, serão utilizadas as abordagens trabalhadas em @spiliotis_hierarchical_2021: a de nível único *bottom-up*^[Como o banco de dados Estban é agrupado, a desagregação não é única e as abordagem *top-down* e *middle-out* não podem ser aplicadas [@athanasopoulos_forecast_2023].], o método analítico de reconciliação ótima *MinT-Shrink* e os métodos de reconciliação ótima baseados em *machine learning*: *gradient boosting*, especificamente o *XGBoost*, e *Random Forest*. Adicionalmente, serão avaliados os métodos *Elastic Net* (*Lasso*, *Ridge* e *Elastic Net*) e *Support Vector Machines*, além de outra implementação de *gradient boosting*, o *LightGBM*. Uma breve introdução sobre cada um desses métodos pode ser encontrado no Apêndice \ref{apendice_metodos_ml}.
 
 Foram avaliadas três estratégias para obtenção das previsões reconciliadas. A primeira é a proposta por @spiliotis_hierarchical_2021, adaptada à base de dados Estban e com as janelas de treino e previsão mais próximas ao caso de uso de uma instituição financeira. Ela consiste em:
 
-1. Previsão contínua (*rolling forecast*):
+1. *rolling forecast*:
 A amostra treino é separada em $p$ subamostras para todas as séries em todos os níveis de agregação, com a primeira separação abrangindo $y_1$ até $Y_Q$, a segunda $y_1$ até $Y_{Q+1}$ e assim sucessivamente até a última separação abrangendo $y_1$ até $Y_{Q+p-1}$. Para cada subamostra foi treinado um modelo (de mesmo algoritmo usado na [seção @sec-previsoes_base]) e obtida previsão um passo a frente. Para este trabalho, a amostra treino foi divida em 50%, com $Q=120$ e $p=108$.
 
 ![Esquema de modelagem *rolling forecast*](img/modelagem_2.png){#fig-modelagem-2 width=70%}
 
 1. Treino dos modelos de *machine learning*:
-Para cada série do nível mais desagregado, $y_m$, é treinado um modelo de ML com $n+1$ variáveis, compostas pelas $n$ séries — que incluem todos os níveis de agregação —, mais a própria $y_m$ como variável explicada (@tbl-modelagem). Cada uma das $n$ séries contam com $p$ previsões obtidas no passo 1, representadas na @fig-modelagem-2 pela cor verde. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos.
+Para cada série do nível mais desagregado, $y_m$, é treinado um modelo de ML com $n+1$ variáveis, compostas pelas $n$ séries previstas — que incluem todos os níveis de agregação —, mais a própria $y_m$ como variável explicada (@tbl-modelagem). Cada uma das $n$ séries contam com $p$ previsões obtidas no passo 1, representadas na @fig-modelagem-2 pela cor verde. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos.
     
 1. Reconciliação ótima:
 Com os modelos treinados no passo 2, passa-se as previsões base obtidas na [seção @sec-previsoes_base] como regressores para se obter as previsões reconciliadas 12 passos à frente das séries do nível mais desagregado $\tilde{y}_m$.
@@ -947,11 +956,15 @@ Com os modelos treinados no passo 2, passa-se as previsões base obtidas na [se�
 
 Dessa forma, essa metodologia é semelhante à aplicada na reconciliação ótima analítica, se afastando principalmente em três pontos: (i) a utilização de algoritmos de ML ao invés de MQG, (ii) a não atribuição de peso de forma obrigatória para todos os nós da hierarquia e (iii) no ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021].
 
-Um ponto negativo na metodologia proposta por @spiliotis_hierarchical_2021 é o processo de *rolling origin* (passo 1). Esse processo requer a realização de previsões para dentro da amostra treino, o que pode ser um problema para séries temporais com poucas observações ou de série incompleta. No caso da base de dados Estban, algumas das agências foram criadas após o período escolhido para a sepração do conjunto de treino em $Q$ (dezembro/2012), sendo necessário sua exclusão do dataset e invalidando o uso da metodologia para essas unidades. Nesse sentido, o MinT se mostra uma opção mais viável para aplicações no mundo real.
+Um ponto negativo na metodologia proposta por @spiliotis_hierarchical_2021 é o processo de *rolling origin* (passo 1). Estimar um modelo para cada conjunto de treinamento sequencialmente em um cenário de largas hierarquias e diversos grupos pode ser muito custoso em tempo de processamento. No caso do banco de dados Estban, temos `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia)))` agências e `r with(subset(estban, !is_aggregated(verbete)), length(unique(verbete)))` verbetes, totalizando `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia))) * with(subset(estban, !is_aggregated(verbete)), length(unique(verbete)))` séries a serem estimadas. Para cada uma delas, devem ser ajustados $p$ modelos, somando ao todo `r scales::number(108 * 158, big.mark = ".", decimal.mark = ",")` modelos.
 
-Nesses casos, uma alternativa para permitir o uso dos métodos de ML é substituir o processo de *rolling origin* e usar os valores ajustados dos modelos das previsões base $\hat{y}$ ([seção @sec-previsoes_base]) como input para os modelos de ML. Isso signfica usar previsões 1 passo à frente obtidas ao longo de todo o período $q=1, 2, 3, ..., Q+p$. Além de permitir a inclusão de séries incompletas — agências criadas durante o período, no caso da base de dados Estban —, essa abordagem também aumenta o tamanho da amostra treino em $Q$ observações, o que pode melhorar a performance dos modelos de ML. Chamaremos essa 2ª estratégia de *fitted base*.
+Nesse sentido, uma alternativa é o processo de reestimação, que consiste na reestimação de um modelo para um novo conjunto de dados. Nessa estratégia, que chamremos de *reduced fitted values*, os $m$ modelos são treinados até $Q$ e então reajustados para o conjunto de dados disponível em $Q+p$, se esquivando do processo de *rolling origin*. Uma restrição dessa abordagem é que, fixados os hiperparâmetros anteriores, não necessariamente todos modelos alcançarão convergência no reajuste de seus coeficientes para o novo conjunto de dados.
 
-Outra possibilidade de substituição do passo 1, caso as séries sejam de tamanho suficiente, é o processo de reestimação. Esse processo consiste na reestimação do modelo para um novo conjunto de dados. Utiliza-se então os valores reajustados para treinar os modelos de ML. Nessa 3ª estratégia, doravante denominada de *reduced fitted values*, os modelos foram treinados até $Q$ e então reajustados para o conjunto de dados disponível em $Q+p$. Uma restrição dessa abordagem é que, fixados os hiperparâmetros anteriores, não necessariamente todos modelos alcançarão convergência no reajuste de seus coeficientes para o novo conjunto de dados.
+Porém, as duas estratégias possuem uma fragilidade em comum: a necessidade de realização de previsões para dentro da amostra treino. Isso pode ser um problema para séries temporais com poucas observações ou incompletas. No caso da base de dados Estban, algumas das agências foram criadas após o período escolhido para a separação do conjunto de treino em $Q$ (dezembro/2012), sendo necessário sua exclusão do dataset e invalidando o uso da metodologia para essas unidades.
+
+Nesses casos, uma 3º estratégia para permitir o uso dos métodos de ML é usar os valores ajustados dos modelos das previsões base $\hat{y}$ ([seção @sec-previsoes_base]) como input para os modelos de ML. Isso signfica usar previsões 1 passo à frente obtidas ao longo de todo o período $q=1, 2, 3, ..., Q+p$. Além de permitir a inclusão de séries incompletas — agências criadas durante o período, no caso da base de dados Estban —, essa abordagem também aumenta o tamanho da amostra treino em $Q$ observações, o que pode melhorar a performance dos modelos de ML. Chamaremos essa estratégia de *fitted base*.
+
+Em suma, vamos realizar o experimento através da metodologia de @spiliotis_hierarchical_2021, com a adição de 5 métodos de ML, e também testar duas outras possibilidades não investigadas em seu artigo original, doravante denominadas *fitted base* e *reduced fitted base*.
 
 ## Otimização de hiperparâmetros
 
@@ -1079,7 +1092,7 @@ Em geral, os métodos baseados em árvore, além de requererem maior tempo de pr
 
 Nas tabelas a seguir, **negrito** indica a melhor performance entre os métodos para aquele determinado nível de agregação, e \underline{sublinhado} indica que aquele método de ML superou o método analítico de melhor performance naquele nível de agregação.
 
-Nos reportes para a base de dados Estban estão incluídas as médias de performance para cada nível hierárquico e agrupado. As colunas "agregado", "mesorregiao", "microrregiao", "municipio" e "agencia", fazem referência à estrutura hierárquica, ou seja, tratam o verbete de forma agregada. Já as colunas "verbete", "bottom" e "hierarquia", incluem também a estrutura agrupada, tratando o verbete de forma desagregada. Detalhadamente:
+Nos resultados para a base de dados Estban estão incluídas as médias de performance para cada nível hierárquico e agrupado. As colunas "agregado", "mesorregiao", "microrregiao", "municipio" e "agencia", fazem referência à estrutura hierárquica, ou seja, tratam o verbete de forma agregada. Já as colunas "verbete", "bottom" e "hierarquia", incluem também a estrutura agrupada, tratando o verbete de forma desagregada. Detalhadamente:
 
 - Agregado: performance do método para a série que representa o total, com os verbetes agregados, (@fig-agregado).
 - Mesorregião: a média das performances do método para as séries do agregado de cada mesorregião, com os verbetes agregados (@fig-meso).
@@ -1098,10 +1111,6 @@ rbind(
   readRDS("data/estban/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
   readRDS("data/estban/preds_analitico/acuracia_analiticos.rds")[["mase"]]
  ) |>
-  # substituindo "glmnet" por "elastic net"
-  transform(
-    .model = ifelse(.model == "glmnet", "elastic net", .model)
-  ) |>
   kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 3) |>
   pack_rows("MASE", 4, 6) |>
@@ -1146,9 +1155,13 @@ rbind(
   readRDS("data/estban/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
   readRDS("data/estban/preds_ml/preds/rolling_forecast/resumo.RDS")[["mase"]]
  ) |>
- # substituindo "glmnet" por "elastic net"
+  # substituindo "glmnet" por "elastic net"
   transform(
     modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  # substituindo "ranger" por "random forest"
+  transform(
+    modelo = ifelse(modelo == "ranger", "random forest", modelo)
   ) |>
   kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 7) |>
@@ -1173,6 +1186,10 @@ rbind(
   transform(
     modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
   ) |>
+  # substituindo "ranger" por "random forest"
+  transform(
+    modelo = ifelse(modelo == "ranger", "random forest", modelo)
+  ) |>
   kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 7) |>
   pack_rows("MASE", 8, 14) |>
@@ -1180,7 +1197,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia refit."
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia reduced fitted base."
 #| label: tbl-estban-results-ml-refit
 
 rbind(
@@ -1190,6 +1207,10 @@ rbind(
   # substituindo "glmnet" por "elastic net"
   transform(
     modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  # substituindo "ranger" por "random forest"
+  transform(
+    modelo = ifelse(modelo == "ranger", "random forest", modelo)
   ) |>
   kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 7) |>
@@ -1227,8 +1248,8 @@ tempo = do.call(rbind, tempo)
 tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
 
 # nomeando df
-colnames(tempo) = c("xgb", "ranger", "elastic net", "lasso", "ridge", "svm", "lightgbm")
-rownames(tempo) = c("refit", "fitted base", "rolling forecast")
+colnames(tempo) = c("xgb", "random forest", "elastic net", "lasso", "ridge", "svm", "lightgbm")
+rownames(tempo) = c("reduced fitted base", "fitted base", "rolling forecast")
 
 # tabela
 tempo |>
@@ -1238,9 +1259,9 @@ tempo |>
 
 Para a base de dados Estban, não houve uma combinação de método e estratégia que fosse consistentemente melhor ao longo de todos os níveis de agregação. Portanto, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador^[Se o objetivo é a elaboração de *guidance*, por exemplo, o pesquisador deve preferir o método e estratégia que geram as  previsões mais precisas para o nível agregado. Já para elaboração de metas individuais, os níveis individuais ou regionais podem ser preferíveis.].
 
-Para os níveis ao topo da hierarquia, os métodos de ML se mostraram a melhor opção para estimação. No nível agregado, o *elastic net* na estratégia *refit* (@tbl-estban-results-ml-refit) se mostrou a melhor opção para a estimação do agregado, com 91% de ganho de performance sobre o MinT (@tbl-estban-results-analiticos), em termos de RMSSE, ou seja, o MinT obteve quase o dobro do erro do *elastic net*. Da mesma forma, para o nível de mesorregião, o *elastic net* na configuração *lasso* teve a melhor performance, sendo 7% melhor que BU. Por outro lado, tanto nos níveis hierárquicos abaixo, quanto nos níveis agrupados, os métodos de ML não foram capazes de superar os métodos analíticos.
+Para os níveis ao topo da hierarquia, os métodos de ML se mostraram a melhor opção para estimação. No nível agregado, o *elastic net* na estratégia *reduced fitted base* (@tbl-estban-results-ml-refit) se mostrou a melhor opção para a estimação do agregado, com 91% de ganho de performance sobre o MinT (@tbl-estban-results-analiticos), em termos de RMSSE, ou seja, o MinT obteve quase o dobro do erro do *elastic net*. Da mesma forma, para o nível de mesorregião, o *elastic net* na configuração *lasso* teve a melhor performance, sendo 7% melhor que BU. Por outro lado, tanto nos níveis hierárquicos abaixo, quanto nos níveis agrupados, os métodos de ML não foram capazes de superar os métodos analíticos.
 
-Os resultados se mostraram bastante sensíveis à estratégia utilizada. Na métrica RMSS, nenhum método utilizando as estratégias *rolling forecast* e *fitted base* foi capaz de superar o MinT em qualquer nível de agregação, enquanto na estratégia *refit* os métodos de ML mostraram ganhos de performance com os métodos SVM e nas três configurações do *elastic net*.
+Os resultados se mostraram bastante sensíveis à estratégia utilizada. Na métrica RMSS, nenhum método utilizando as estratégias *rolling forecast* e *fitted base* foi capaz de superar o MinT em qualquer nível de agregação, enquanto na estratégia *reduced fitted base* os métodos de ML mostraram ganhos de performance com os métodos SVM e nas três configurações do *elastic net*.
 
 Em geral, as medidas RMSSE e MASE se mostraram bastante correlacionadas, com os métodos que obtiveram melhor performance em uma métrica também obtendo melhor performance na outra. A exceção foi para o método *lasso* na estratégia *rolling forecast*, que obteve performance melhor que o MinT, em termos de MASE, para o nível agregado, sendo o único resultado positivo para a estratégia *rolling forecast*.
 
@@ -1253,10 +1274,6 @@ rbind(
   readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
   readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["mase"]]
  ) |>
- # substituindo "glmnet" por "elastic net"
-  transform(
-    .model = ifelse(.model == "glmnet", "elastic net", .model)
-  ) |>
   kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 3) |>
   pack_rows("MASE", 4, 6) |>
@@ -1282,9 +1299,13 @@ rbind(
   readRDS("data/tourism/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
   readRDS("data/tourism/preds_ml/preds/rolling_forecast/resumo.RDS")[["mase"]]
  ) |>
- # substituindo "glmnet" por "elastic net"
+  # substituindo "glmnet" por "elastic net"
   transform(
     modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  # substituindo "ranger" por "random forest"
+  transform(
+    modelo = ifelse(modelo == "ranger", "random forest", modelo)
   ) |>
   kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 7) |>
@@ -1323,6 +1344,10 @@ rbind(
   transform(
     modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
   ) |>
+  # substituindo "ranger" por "random forest"
+  transform(
+    modelo = ifelse(modelo == "ranger", "random forest", modelo)
+  ) |>
   kbl(booktabs = TRUE, format = "latex", digits = 2) |>
   pack_rows("RMSSE", 1, 7) |>
   pack_rows("MASE", 8, 14) |>
@@ -1345,7 +1370,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia refit."
+#| tbl-cap: "Resultados Tourism: Acurácia dos métodos de ML de reconciliação. Estratégia reduced fitted base."
 #| label: tbl-tourism-results-ml-refit
 #| include: false
 
@@ -1356,6 +1381,10 @@ rbind(
  # substituindo "glmnet" por "elastic net"
   transform(
     modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  # substituindo "ranger" por "random forest"
+  transform(
+    modelo = ifelse(modelo == "ranger", "random forest", modelo)
   ) |>
   kbl(booktabs = TRUE, format = "latex", digits = 2) |>
   pack_rows("RMSSE", 1, 3) |>
@@ -1383,8 +1412,8 @@ tempo = do.call(rbind, tempo)
 tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
 
 # nomeando df
-colnames(tempo) = c("xgb", "ranger", "elastic net", "lasso", "ridge", "svm", "lightgbm")
-rownames(tempo) = c("fitted base", "rolling forecast", "refit")
+colnames(tempo) = c("xgb", "random forest", "elastic net", "lasso", "ridge", "svm", "lightgbm")
+rownames(tempo) = c("fitted base", "rolling forecast", "reduced fitted base")
 
 # tabela
 tempo |>
@@ -1400,9 +1429,9 @@ Neste trabalho, foram apresentados experimentos de reconciliação ótima para s
 
 Este trabalho trouxe, além dos métodos de floresta aleatória e *gradient boosting* já trabalhados em @spiliotis_hierarchical_2021, o método de regressão regularizada *elastic net* e o *support vector machines*, além de avaliar outro método de *gradient boosting*, o *lightGBM*. Paralelamente, este trabalho propôs duas estratégias alternativas para a metodologia de reconciliação ótima baseada em *machine learning* proposta originalmente em @spiliotis_hierarchical_2021.
 
-Os resultados obtidos para a base de dados Estban mostraram, primeiramente, que não houve uma combinação de método e estratégia que obtivesse melhor performance de maneira consistente ao longo de todos os níveis hierárquicos. Dessa forma, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador. Para os níveis ao topo da hierarquia, a combinação correta de método e estratégia de estimação (*elastic net* + *refit*) gerou até 91% de ganho de performance no nível mais agregado, permitindo à instituição financeira maior precisão para tomada de decisão e planejamento estratégico, além de sinalizar maior confiança nas estimativas comunicadas ao mercado e aos investidores. Por outro lado, para os níveis inferiores na estrutura hierárquica, os métodos analíticos se mostraram a melhor escolha. Isso sugere que, com o objetivo de elaboração de metas individuais — seja para as agências ou superintendências regionais —, os métodos analíticos ainda são preferíveis.
+Os resultados obtidos para a base de dados Estban mostraram, primeiramente, que não houve uma combinação de método e estratégia que obtivesse melhor performance de maneira consistente ao longo de todos os níveis hierárquicos. Dessa forma, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador. Para os níveis ao topo da hierarquia, a combinação correta de método e estratégia de estimação (*elastic net* + *reduced fitted base*) gerou até 91% de ganho de performance no nível mais agregado, permitindo à instituição financeira maior precisão para tomada de decisão e planejamento estratégico, além de sinalizar maior confiança nas estimativas comunicadas ao mercado e aos investidores. Por outro lado, para os níveis inferiores na estrutura hierárquica, os métodos analíticos se mostraram a melhor escolha. Isso sugere que, com o objetivo de elaboração de metas individuais — seja para as agências ou superintendências regionais —, os métodos analíticos ainda são preferíveis.
 
-Os restultados também mostram que o resultado da reconciliação ótima é sensível à estratégia utilizada. Apenas na estratégia *refit* que os ganhos de performance foram observados, enquanto nas estratégias *rolling forecast* e *fitted base* os métodos de ML não foram capazes de superar os métodos analíticos^[O mesmo padrão em relação à performance ao logo dos níveis de agregação pôde ser observado na base de dados "Tourism" (Apêndice \ref{apendice_tourism}). Foi possível encontrar uma combinação de método de ML e estratégia capaz de superar os métodos analíticos para os níveis mais agregados, mas não para os níveis mais desagregados. Naquela base de dados, os métodos de ML superaram os analíticos em todos os níveis de agregação, exceto no mais desagregado, com os métodos *support vector machines* e *elastic net* liderando a performance tanto nas estratégias *rolling forecast* quanto *fitted base*.].
+Os restultados também mostram que o resultado da reconciliação ótima é sensível à estratégia utilizada. Apenas na estratégia *reduced fitted base* que os ganhos de performance foram observados, enquanto nas estratégias *rolling forecast* e *fitted base* os métodos de ML não foram capazes de superar os métodos analíticos^[O mesmo padrão em relação à performance ao logo dos níveis de agregação pôde ser observado na base de dados "Tourism" (Apêndice \ref{apendice_tourism}). Foi possível encontrar uma combinação de método de ML e estratégia capaz de superar os métodos analíticos para os níveis mais agregados, mas não para os níveis mais desagregados. Naquela base de dados, os métodos de ML superaram os analíticos em todos os níveis de agregação, exceto no mais desagregado, com os métodos *support vector machines* e *elastic net* liderando a performance tanto nas estratégias *rolling forecast* quanto *fitted base*.].
 
 Contrariamente aos resultados de @spiliotis_hierarchical_2021, os métodos de ML baseados em árvore de decisão (*XGBoost*, *ranger* e *lightGBM*) não foram capazes de superar os métodos analíticos em nenhum nível de agregação.
 
