@@ -1,6 +1,6 @@
 ---
-title: MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA 
-subtitle: SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
+title: MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA DE SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS DE INSTITUIÇÕES FINANCEIRAS
+subtitle: DISSERTAÇÃO DE MESTRADO
 author: Alberson Miranda, PPGEco/UFES
 date: '`r format(Sys.Date(), "%B de %Y")`'
 format:
@@ -58,11 +58,11 @@ source("scripts/hierarq.R")
 - Problemas populares na literatura: risco de crédito, detecção de anomalias (fraude), preços de ativos, alocação ótima de numerários [@sezer_financial_2019]
 - Pouco sobre projeção de saldos e rendas (*guidance*, *budgeting*)
 - Previsões equivocadas = percepção de incompetência, redução de reputação e receitas [@beccalli_earnings_2015]
-- *Budgeting* em empresas de muitas filiais: alta dimensionalidade e dúvidas
+- Orçamentação em empresas de muitas filiais: alta dimensionalidade e dúvidas
 
 ## ANÁLISE DE SÉRIES TEMPORAIS EM ECONOMIA BANCÁRIA
 
-- Banestes: 96 agências, 70 municípios do ES^[Postos de atendimento não contam como agência.], 13 microrregiões, 4 mesorregiões
+- Banestes: 134 agências, 78 municípios do ES, 13 microrregiões, 4 mesorregiões
 - Qual a melhor forma de realizar projeções?
     - Individualmente por agência?
     - Apenas o total e distribuir proporcionalmente?
@@ -112,18 +112,14 @@ Reescrever as previsões de forma que elas sejam coerentes, utilizando toda a in
 
 ## OBJETIVO GERAL
 
-Estudar o problema da reconciliação ótima de previsões pontuais a partir de métodos de *machine learning*
+Estudar o problema da reconciliação ótima de previsões pontuais a partir de métodos de *machine learning* em séries temporais hierárquicas e agrupadas do Banco do Estado do Espírito Santo
 
 ## OBJETIVOS ESPECÍFICOS
 
-1. Aplicar o método *elastic net* [@zou_regularization_2005] para reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas e atestar sua validade em dados de alta dimensionalidade;
-1. Comparar a performance, em termos de funções de custo e tempo de processamento, do mpetodo *elastic net* nas configurações $\alpha=0$ (*lasso*), $\alpha=1$ (*ridge*) e uma combinação de ambos obtida via reamostragem;
-1. Comparar a performance, em termos de funções de custo e tempo de processamento, do método *elastic net* com os métodos analíticos *bottom-up*, *top-down* e *MinT Shrink*;
-
-## OBJETIVOS ESPECÍFICOS
-
-4. Comparar a performance, em termos de funções de custo e tempo de processamento, das estratégias de reamostragem validação cruzada $k$*-fold* e *holdout* para o método *elastic net*;
-5. Verificar se a aplicação de regressão regularizada resulta em algum padrão reconhecível na estrutura (e.g., se a regularização tende a favorecer os coeficientes de séries temporais que compartilham o mesmo nó pai ou, em outras palavras, se tende a zerar os coeficientes de séries temporais que não compartilham o mesmo nó pai na hierarquia);
+1. Estender a abordagem de @spiliotis_hierarchical_2021 para a reconciliação ótima de séries temporais hierárquicas *e agrupadas*;
+1. Avaliar a efetividade de mais 4 implementaçãoes de métodos de ML (*lasso*, *ridge*, *elastic net*, SVM e *lightGBM*), além dos 2 propostos no trabalho original (*XGBoost* e *random forest*);
+1. Propor variações metodológicas para a metodologia;
+1. Obter ganhos de performance no contexto de séries temporais financeiras.
 
 # ABORDAGENS DE NÍVEL ÚNICO
 
@@ -134,13 +130,9 @@ Estudar o problema da reconciliação ótima de previsões pontuais a partir de 
 
 ## TOP-DOWN
 
-::: {.incremental}
 - apenas informações do nível mais agregado
 - há dezenas de métodos para distribuir proporcionalmente as previsões agregadas [@gross_disaggregation_1990]
-    - proporções históricas $$p_j = \frac{1}{T} \sum^{T}_{t=1} \frac{y_{j,t}}{y_t}$$ {#eq-top_down1}
-    - médias históricas $$p_j = \frac{\sum^{T}_{t=1} \frac{y_{j,t}}{T}}{\sum^{T}_{t=1} \frac{y_{t}}{T}}$$ {#eq-top_down2}
-    - proporções das previsões [@athanasopoulos_hierarchical_2009] $$p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}$$ {#eq-top_down3}
-:::
+- não podem ser utilizadas no contexto de séries temporais agrupadas^[Disambiguar uma estrutura agrupada resulta em uma estrutura hierárquica, mas há necessariamente perda de informação (e.g., fixar os verbetes abaixo das agências, causaria a perca da informação do agregado dos verbetes).].
 
 ## MIDDLE-OUT
 
@@ -176,7 +168,7 @@ $$
     \tilde{y}_{AC,t} \\
     \tilde{y}_{BA,t} \\
     \tilde{y}_{BB,t}
-  \end{bmatrix}_{n \times 1}
+  \end{bmatrix}_{8 \times 1}
   =
   \begin{bmatrix}
     1 & 1 & 1 & 1 & 1 \\
@@ -187,14 +179,14 @@ $$
     0  & 0  & 1  & 0  & 0  \\
     0  & 0  & 0  & 1  & 0  \\
     0  & 0  & 0  & 0  & 1
-  \end{bmatrix}_{n \times m}
+  \end{bmatrix}_{8 \times 5}
   \begin{bmatrix}
     \hat{y}_{AA,t} \\
     \hat{y}_{AB,t} \\
     \hat{y}_{AC,t} \\
     \hat{y}_{BA,t} \\
     \hat{y}_{BB,t}
-  \end{bmatrix}_{m \times 1}
+  \end{bmatrix}_{5 \times 1}
 $$ {#eq-reconciliacao2}
 
 \begin{center}
@@ -216,7 +208,7 @@ $$
     \tilde{y}_{AC, t} \\
     \tilde{y}_{BA, t} \\
     \tilde{y}_{BB, t}
-\end{bmatrix}_{n \times 1}
+\end{bmatrix}_{8 \times 1}
 =
 \mathbfit{S}_{n \times m}
 \begin{bmatrix}
@@ -225,7 +217,7 @@ $$
     p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0
-\end{bmatrix}_{m \times n}
+\end{bmatrix}_{5 \times 8}
 \begin{bmatrix}
     \hat{y}_{T+h|T} \\
     \hat{y}_{A, T+h|T} \\
@@ -235,7 +227,7 @@ $$
     \hat{y}_{AC, T+h|T} \\
     \hat{y}_{BA, T+h|T} \\
     \hat{y}_{BB, T+h|T}
-\end{bmatrix}_{n \times 1}
+\end{bmatrix}_{8 \times 1}
 $$ {#eq-reconciliacao3}
 
 \begin{center}
@@ -255,16 +247,16 @@ $$
     \tilde{y}_{AC, t} \\
     \tilde{y}_{BA, t} \\
     \tilde{y}_{BB, t}
-\end{bmatrix}_{n \times 1}
+\end{bmatrix}_{8 \times 1}
 =
-\mathbfit{S}_{n \times m}
+\mathbfit{S}_{8 \times 5}
 \begin{bmatrix}
     0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
     0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
     0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}_{m \times n}
+\end{bmatrix}_{5 \times 8}
 \begin{bmatrix}
     \hat{y}_{T+h|T} \\
     \hat{y}_{A, T+h|T} \\
@@ -274,7 +266,7 @@ $$
     \hat{y}_{AC, T+h|T} \\
     \hat{y}_{BA, T+h|T} \\
     \hat{y}_{BB, T+h|T}
-\end{bmatrix}_{n \times 1}
+\end{bmatrix}_{8 \times 1}
 $$ {#eq-reconciliacao4}
 
 \begin{center}
@@ -283,6 +275,8 @@ $$ {#eq-reconciliacao4}
 \end{center}
 
 ## MATRIZ DE RECONCILIAÇÃO
+
+<!-- # MARK: PAREI AQUI -->
 
 E se quisermos utilizar toda a informação e não apenas parte do espaço das previsões base?
 
