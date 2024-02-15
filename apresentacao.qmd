@@ -123,7 +123,7 @@ Estudar o problema da reconciliação ótima de previsões pontuais a partir de 
 1. Propor variações metodológicas para a metodologia;
 1. Obter ganhos de performance no contexto de séries temporais financeiras.
 
-# ABORDAGENS DE NÍVEL ÚNICO
+# RECONCILIAÇÃO DE SÉRIES TEMPORAIS HIERÁRQUICAS
 
 ## BOTTOM-UP
 
@@ -140,8 +140,6 @@ Estudar o problema da reconciliação ótima de previsões pontuais a partir de 
 
 - informações apenas de um nível intermediário
 - soma-se para obter os níveis agregados e distribui-se proporcionalmente para os níveis mais desagregados
-
-# MÉTODOS ANALÍTICOS PARA RECONCILIAÇÃO ÓTIMA
 
 ## NOTAÇÃO MATRICIAL
 
@@ -284,58 +282,25 @@ E se quisermos utilizar toda a informação e não apenas parte do espaço das p
 
 Estimar uma matriz de reconciliação $\mathbfit{G}$ que utilize toda a informação disponível e com o menor erro de previsão
 
-## RECONCILIAÇÃO ÓTIMA
+## MATRIZ DE RECONCILIAÇÃO
 
 ### PROBLEMA DE REGRESSÃO
 
 - Minimização do traço da matriz de covariância dos erros das previsões reconciliadas (MinT^[[@wickramasuriya_optimal_2019].])
-$$\min_{\tilde{e}} y_{T+h} - \tilde{y}_{T+h}$$ {#eq-mint1}
+$$
+\min_{\tilde{e}} y_{T+h} - \tilde{y}_{T+h}
+$$ {#eq-mint1}
 
 - Mínimos Quadrados Generalizados (MQG)
-$$\mathbfit{G}=(\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{S})^{-1}\mathbfit{S}'\mathbfit{W}_h^{\dagger}$$ {#eq-mint2}
+$$
+\mathbfit{G}=(\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{S})^{-1}\mathbfit{S}'\mathbfit{W}_h^{\dagger}
+$$ {#eq-mint2}
 
-## RECONCILIAÇÃO ÓTIMA
-
-- 1ª abordagem: $\mathbfit{W}_h = k_hI$
-    - Mínimos Quadrados Ordinários (MQO)
-    - Não há qualquer razão ou justificativa para supor homoscedasticidade
-    - Erros descorrelacionados e equivariantes não fazem sentido em séries hierárquicas
-
-## RECONCILIAÇÃO ÓTIMA
-
-- 2ª abordagem: $\mathbfit{W}_h = k_h\text{diag}(\mathbfit{\hat{W_1}}) \mid \mathbfit{\hat{W_1}} = \frac{1}{T}\sum^{T}_{t=1}\mathbfit{\hat{e}}_{T+1}\mathbfit{\hat{e}'}_{T+1}$
-    - Mínimos Quadrados Ponderados (MQP)
-    - $\mathbfit{\hat{e}}_{T+1} = \mathbfit{y_{T+1}} - \mathbfit{\hat{y}}_{T+1}$
-    - Erros descorrelacionados e ponderados pela variância do erro das previsões base
-
-## RECONCILIAÇÃO ÓTIMA
-
-- 3ª abordagem: $\mathbfit{W}_h = k_h\mathbfit{\hat{W}}_1$
-    - MQG irrestrito
-    - Quando $m \geq T$, pode-se usar estimador de encolhimento
-    - Leva em consideração correlação e variância ao longo de toda estrutura
-
-# MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA
-
-## ELASTIC NET
-
-- O *elastic net* [@zou_regularization_2005] é um método de regressão regularizada que combina as penalidades *lasso* e do *ridge*
-- A função objetivo a ser minimizada é dada por
+Substituindo $\mathbfit{G}$ na [@eq-reconciliacao1], temos:
 
 $$
-L(\lambda_1, \lambda_2, \mathbfit{\beta}) = |\mathbf{y} - \mathbf{X}\mathbfit{\beta}|^2 + \lambda_2|\mathbfit{\beta}|^2 + \lambda_1|\mathbfit{\beta}|_1
-$$ {#eq-elastic_net1}
-
-## ELASTIC NET
-
-- Solução dada por
-$$
-\mathbfit{\hat{\beta}} = \arg \min_{\mathbfit{\beta}} |\mathbf{y}-\mathbf{X}\mathbfit{\beta}|^2 \text{, sujeito a } (1-\alpha)|\mathbfit{\beta}|_1 + \alpha|\mathbfit{\beta}|^2 \leq t
-$$ {#eq-elastic_net2}
-
-- $\alpha = \frac{\lambda_2}{\lambda_1 + \lambda_2}$ e $t \in \mathbb{R}^+$ ($t = L_1$)
-- $\alpha = 0 \implies \lambda_2 = 0$, *lasso*
-- $\alpha = 1 \implies \lambda_1 = 0$, *ridge*
+\mathbfit{\tilde{y}}=\mathbfit{S}(\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{S})^{-1}\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{\hat{y}_{h}}
+$$ {#eq-mint3}
 
 # METODOLOGIA
 
