@@ -1,14 +1,16 @@
 ---
 title: MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA DE SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS DE INSTITUIÇÕES FINANCEIRAS
-subtitle: DISSERTAÇÃO DE MESTRADO
+subtitle: DEFESA DE DISSERTAÇÃO DE MESTRADO
 author: Alberson Miranda, PPGEco/UFES
 date: '`r format(Sys.Date(), "%B de %Y")`'
 format:
     beamer:
         include-in-header: config/beamer/preamble.tex
         include-after-body: config/beamer/backmatter.tex
-        output-file: render/apresentacao.pdf
         keep-tex: false
+        latex-max-runs: 4
+        number-sections: false
+        output-file: apresentacao.pdf
 bibliography: config/elementos/dissertacao.bib
 cite-method: biblatex
 link-citations: true
@@ -48,7 +50,7 @@ knitr::write_bib(
 )
 
 # scripts
-source("scripts/hierarq.R")
+source("scripts/estban/hierarq.R")
 ```
 
 # CONTEXTUALIZAÇÃO DA PESQUISA
@@ -275,8 +277,6 @@ $$ {#eq-reconciliacao4}
 \end{center}
 
 ## MATRIZ DE RECONCILIAÇÃO
-
-<!-- # MARK: PAREI AQUI -->
 
 E se quisermos utilizar toda a informação e não apenas parte do espaço das previsões base?
 
