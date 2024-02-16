@@ -120,7 +120,7 @@ Estudar o problema da reconciliação ótima de previsões pontuais a partir de 
 
 1. Estender a abordagem de @spiliotis_hierarchical_2021 para a reconciliação ótima de séries temporais hierárquicas *e agrupadas*;
 1. Avaliar a efetividade de mais 4 implementaçãoes de métodos de ML (*lasso*, *ridge*, *elastic net*, SVM e *lightGBM*), além dos 2 propostos no trabalho original (*XGBoost* e *random forest*);
-1. Propor variações metodológicas para a metodologia;
+1. Propor duas variações metodológicas para o treino dos modelos de ML;
 1. Obter ganhos de performance no contexto de séries temporais financeiras.
 
 # RECONCILIAÇÃO DE SÉRIES TEMPORAIS HIERÁRQUICAS
@@ -134,7 +134,7 @@ Estudar o problema da reconciliação ótima de previsões pontuais a partir de 
 
 - apenas informações do nível mais agregado
 - há dezenas de métodos para distribuir proporcionalmente as previsões agregadas [@gross_disaggregation_1990]
-- não podem ser utilizadas no contexto de séries temporais agrupadas^[Disambiguar uma estrutura agrupada resulta em uma estrutura hierárquica, mas há necessariamente perda de informação (e.g., fixar os verbetes abaixo das agências, causaria a perca da informação do agregado dos verbetes).].
+- não podem ser utilizadas no contexto de séries temporais agrupadas^[Desambiguar uma estrutura agrupada resulta em uma estrutura hierárquica, mas há necessariamente perda de informação (e.g., fixar os verbetes abaixo das agências, causaria a perca da informação do agregado dos verbetes).].
 
 ## MIDDLE-OUT
 
@@ -301,6 +301,10 @@ Substituindo $\mathbfit{G}$ na [@eq-reconciliacao1], temos:
 $$
 \mathbfit{\tilde{y}}=\mathbfit{S}(\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{S})^{-1}\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{\hat{y}_{h}}
 $$ {#eq-mint3}
+
+## RECONCILIAÇÃO POR MACHINE LEARNING
+
+
 
 # METODOLOGIA
 
