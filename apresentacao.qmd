@@ -304,7 +304,7 @@ $$ {#eq-mint3}
 
 ## RECONCILIAÇÃO POR MACHINE LEARNING
 
-
+![Abordagem de reconciliação ótima por ML. Fonte: @spiliotis_hierarchical_2021](img/spiliotis.png)
 
 # METODOLOGIA
 
@@ -312,10 +312,10 @@ $$ {#eq-mint3}
 
 - Estatística Bancária Mensal e por Município (Bacen)
 - Municípios (IBGE)
-- Saldos de crédito
-- CNPJ Banestes (expansível para todo SFN)
-- 01/2010 - 02/2023
-- 43.923 observações
+- Saldos de crédito dos verbetes empréstimos e financiamentos
+- CNPJ Banestes mas expansível para todo SFN
+- 01/2003 - 12/2022
+- 37.920 observações (114.480 com nós de agregação)
 
 ## DADOS E VARIÁVEIS
 
@@ -323,22 +323,23 @@ $$ {#eq-mint3}
     - total
     - 4 mesorregiões
     - 13 microrregiões
-    - 96 agências
+    - 79 agências
 - Estrutura agrupada
     - 3 modalidades de crédito
 
+## PREVISÕES BASE
+
+- Previsões para fora da amostra a serem reconciliadas
+- ETS (podem ser obtidas por qualquer método, incluindo ML)
+- Treino: 01/2003 - 12/2021
+- Horizonte de previsão ($h$): 01/2022 - 12/2022, fora da amostra
+
 ## DESIGN DO EXPERIMENTO
 
-- $\mathbfit{\hat{y}}$ via Arima ou ETS
-- *benchmark* (RMSE, tempo de processamento):
-    - *Top-down*
-    - *bottom-up*
-    - MinT OLS
-    - MinT WLS
-    - MinT *Shrink* ($t = 156, m = 96 \times 3$)
-    - *Elastic Net* Lasso
-    - *Elastic Net* Ridge
-    - *Elastic Net* CV-5
+- Dada a performance das previsões base, *o quanto mais precisas elas se tornam ao aplicar um determinado método de reconciliação*?
+- *bottom-up*, MinT *Shrink*, *Elastic Net* Lasso
+- *Elastic Net* Ridge
+- *Elastic Net* CV-5
 
 ## DESIGN DO EXPERIMENTO
 
