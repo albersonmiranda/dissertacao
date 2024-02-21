@@ -921,26 +921,22 @@ prop.table(table(testes_lb$h_0)) |>
 
 ## *Design* do experimento
 
-<!-- ! TODO: introduzir a necessidade e explicar o reduced fitted values (2 linhas, o porquê de estar testando essas estratégias) -->
-
 O objetivo do experimento consiste em comparar o ganho de desempenho dos métodos de reconciliação em relação às previsões base, ou seja, dada a performance das previsões individuais, o quanto mais precisas elas se tornam ao aplicar um determinado método de reconciliação. Para isso, serão utilizadas as abordagens trabalhadas em @spiliotis_hierarchical_2021: a de nível único *bottom-up*^[Como o banco de dados Estban é agrupado, a desagregação não é única e as abordagem *top-down* e *middle-out* não podem ser aplicadas [@athanasopoulos_forecast_2023].], o método analítico de reconciliação ótima *MinT-Shrink* e os métodos de reconciliação ótima baseados em *machine learning*: *gradient boosting*, especificamente o *XGBoost*, e *Random Forest*. Adicionalmente, serão avaliados os métodos *Elastic Net* (*Lasso*, *Ridge* e *Elastic Net*) e *Support Vector Machines*, além de outra implementação de *gradient boosting*, o *LightGBM*. Uma breve introdução sobre cada um desses métodos pode ser encontrado no Apêndice \ref{apendice_metodos_ml}.
 
 Foram avaliadas três estratégias para obtenção das previsões reconciliadas. A primeira é a proposta por @spiliotis_hierarchical_2021, adaptada à base de dados Estban e com as janelas de treino e previsão mais próximas ao caso de uso de uma instituição financeira. Ela consiste em:
 
-1. *rolling forecast*:
+@. *rolling forecast*:
 A amostra treino é separada em $p$ subamostras para todas as séries em todos os níveis de agregação, com a primeira separação abrangindo $y_1$ até $Y_Q$, a segunda $y_1$ até $Y_{Q+1}$ e assim sucessivamente até a última separação abrangendo $y_1$ até $Y_{Q+p-1}$. Para cada subamostra foi treinado um modelo (de mesmo algoritmo usado na [seção @sec-previsoes_base]) e obtida previsão um passo a frente. Para este trabalho, a amostra treino foi divida em 50%, com $Q=120$ e $p=108$.
 
 ![Esquema de modelagem *rolling forecast*](img/modelagem_2.png){#fig-modelagem-2 width=70%}
 
-1. Treino dos modelos de *machine learning*:
+@. Treino dos modelos de *machine learning*:
 Para cada série do nível mais desagregado, $y_m$, é treinado um modelo de ML com $n+1$ variáveis, compostas pelas $n$ séries previstas — que incluem todos os níveis de agregação —, mais a própria $y_m$ como variável explicada (@tbl-modelagem). Cada uma das $n$ séries contam com $p$ previsões obtidas no passo 1, representadas na @fig-modelagem-2 pela cor verde. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos.
     
-1. Reconciliação ótima:
-Com os modelos treinados no passo 2, passa-se as previsões base obtidas na [seção @sec-previsoes_base] como regressores para se obter as previsões reconciliadas 12 passos à frente das séries do nível mais desagregado $\tilde{y}_m$.
+@. Reconciliação ótima:
+Com os modelos treinados no passo 2, passa-se as previsões base obtidas na [seção @sec-previsoes_base] como regressores para se obter as previsões reconciliadas $h$ passos à frente das séries do nível mais desagregado $\tilde{y}_m$.
 
-1. Agregação: Assim como nos métodos analíticos de combinação ótima, a obtenção das previsões reconciliadas para os demais níveis de hierárquicos $\tilde{y}_n$ se dá através da agregação semelhante ao *bottom-up*, mas ao invés de se somar as previsões base $\hat{y}_m$, somam-se as previsões reconciliadas $\tilde{y}_m$.
-
-<!-- ! FIX: Corrigir índices da tabela -->
+@. Agregação: Assim como nos métodos analíticos de combinação ótima, a obtenção das previsões reconciliadas para os demais níveis de hierárquicos $\tilde{y}_n$ se dá através da agregação semelhante ao *bottom-up*, mas ao invés de se somar as previsões base $\hat{y}_m$, somam-se as previsões reconciliadas $\tilde{y}_m$.
 
 ```{r}
 #| label: tbl-modelagem
@@ -948,7 +944,7 @@ Com os modelos treinados no passo 2, passa-se as previsões base obtidas na [se�
   tibble::tribble(
     ~`Var. Explicada`, ~`Variável 1`, ~`Variável 2`, ~..., ~`Variável n`,
     "$y_{1,Q+1}$", "$\\hat{y}_{1,Q+1}$", "$\\hat{y}_{2,Q+1}$", "...", "$\\hat{y}_{n,Q+1}$",
-    "$y_{2,Q+2}$", "$\\hat{y}_{1,Q+2}$", "$\\hat{y}_{2,Q+2}$", "...", "$\\hat{y}_{n,Q+2}$",
+    "$y_{1,Q+2}$", "$\\hat{y}_{1,Q+2}$", "$\\hat{y}_{2,Q+2}$", "...", "$\\hat{y}_{n,Q+2}$",
     "...", "...", "...", "...", "...",
     "$y_{m,Q+p}$", "$\\hat{y}_{1,Q+p}$", "$\\hat{y}_{2,Q+p}$", "...", "$\\hat{y}_{n,Q+p}$"
   ) |>
@@ -960,7 +956,7 @@ Dessa forma, essa metodologia é semelhante à aplicada na reconciliação ótim
 
 Um ponto negativo na metodologia proposta por @spiliotis_hierarchical_2021 é o processo de *rolling origin* (passo 1). Estimar um modelo para cada conjunto de treinamento sequencialmente em um cenário de largas hierarquias e diversos grupos pode ser muito custoso em tempo de processamento. No caso do banco de dados Estban, temos `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia)))` agências e `r with(subset(estban, !is_aggregated(verbete)), length(unique(verbete)))` verbetes, totalizando `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia))) * with(subset(estban, !is_aggregated(verbete)), length(unique(verbete)))` séries a serem estimadas. Para cada uma delas, devem ser ajustados $p$ modelos, somando ao todo `r scales::number(108 * 158, big.mark = ".", decimal.mark = ",")` modelos.
 
-Nesse sentido, uma alternativa é o processo de reestimação, que consiste na reestimação de um modelo para um novo conjunto de dados. Nessa estratégia, que chamremos de *reduced fitted values*, os $m$ modelos são treinados até $Q$ e então reajustados para o conjunto de dados disponível em $Q+p$, se esquivando do processo de *rolling origin*. Uma restrição dessa abordagem é que, fixados os hiperparâmetros anteriores, não necessariamente todos modelos alcançarão convergência no reajuste de seus coeficientes para o novo conjunto de dados.
+Nesse sentido, uma alternativa é o processo de reestimação, que consiste na reestimação de um modelo para um novo conjunto de dados. Nessa estratégia, que chamaremos de *reduced fitted values*, os $m$ modelos são treinados até $Q$ e então reajustados para o conjunto de dados disponível em $Q+p$, se esquivando do processo de *rolling origin*. Uma restrição dessa abordagem é que, fixados os hiperparâmetros anteriores, não necessariamente todos modelos alcançarão convergência no reajuste de seus coeficientes para o novo conjunto de dados.
 
 Porém, as duas estratégias possuem uma fragilidade em comum: a necessidade de realização de previsões para dentro da amostra treino. Isso pode ser um problema para séries temporais com poucas observações ou incompletas. No caso da base de dados Estban, algumas das agências foram criadas após o período escolhido para a separação do conjunto de treino em $Q$ (dezembro/2012), sendo necessário sua exclusão do dataset e invalidando o uso da metodologia para essas unidades.
 
