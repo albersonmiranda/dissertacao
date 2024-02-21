@@ -940,6 +940,8 @@ Com os modelos treinados no passo 2, passa-se as previsões base obtidas na [se�
 
 1. Agregação: Assim como nos métodos analíticos de combinação ótima, a obtenção das previsões reconciliadas para os demais níveis de hierárquicos $\tilde{y}_n$ se dá através da agregação semelhante ao *bottom-up*, mas ao invés de se somar as previsões base $\hat{y}_m$, somam-se as previsões reconciliadas $\tilde{y}_m$.
 
+<!-- ! FIX: Corrigir índices da tabela -->
+
 ```{r}
 #| label: tbl-modelagem
 #| tbl-cap: "Conjunto de dados para predição dos modelos de ML"
