@@ -120,7 +120,7 @@ Estudar o problema da reconciliação ótima de previsões pontuais a partir de 
 
 1. Estender a abordagem de @spiliotis_hierarchical_2021 para a reconciliação ótima de séries temporais hierárquicas *e agrupadas*;
 1. Avaliar a efetividade de mais 4 implementaçãoes de métodos de ML (*lasso*, *ridge*, *elastic net*, SVM e *lightGBM*), além dos 2 propostos no trabalho original (*XGBoost* e *random forest*);
-1. Propor duas variações metodológicas para o treino dos modelos de ML;
+1. Propor duas variações metodológicas para obtenção da amostra de treino dos modelos de ML;
 1. Obter ganhos de performance no contexto de séries temporais financeiras.
 
 # RECONCILIAÇÃO DE SÉRIES TEMPORAIS HIERÁRQUICAS
@@ -325,7 +325,7 @@ $$ {#eq-mint3}
     - 13 microrregiões
     - 79 agências
 - Estrutura agrupada
-    - 3 modalidades de crédito
+    - 2 modalidades de crédito
 
 ## PREVISÕES BASE
 
@@ -336,10 +336,19 @@ $$ {#eq-mint3}
 
 ## DESIGN DO EXPERIMENTO
 
-- Dada a performance das previsões base, *o quanto mais precisas elas se tornam ao aplicar um determinado método de reconciliação*?
-- *bottom-up*, MinT *Shrink*, *Elastic Net* Lasso
-- *Elastic Net* Ridge
-- *Elastic Net* CV-5
+Dado um conjunto de previsões base, *o quanto mais precisas elas se tornam ao se aplicar um determinado método de reconciliação*?
+
+## DESIGN DO EXPERIMENTO
+
+- Métodos de reconciliação:
+    - Analíticos: *Bottom-up* e MinT *Shrink*
+    - Regressão regularizada: *Elastic Net* (lasso, ridge e CV)
+    - Árvores: *Random forest*, XGBoost e LightGBM
+    - *Support Vector Machines* (SVM)
+- Estratégias para obtenção da amostra de treino:
+    - *Rolling forecast*
+    - *Fitted base forecasts*
+    - *Reduced fitted base forecasts*
 
 ## DESIGN DO EXPERIMENTO
 
