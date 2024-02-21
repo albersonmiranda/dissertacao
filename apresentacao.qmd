@@ -340,6 +340,19 @@ Dado um conjunto de previsões base, *o quanto mais precisas elas se tornam ao s
 
 ## DESIGN DO EXPERIMENTO
 
+Metodologia de @spiliotis_hierarchical_2021:
+
+1. Previsões para dentro da amostra (ETS)
+1. Treino dos modelos de ML para cada $y_m$
+1. Reconciliação ótima das previsões base (fora da amostra)
+1. Agregação das previsões reconciliadas para obtenção dos demais níveis hierárquicos
+
+### METODOLOGIA ML VERSUS MINT
+
+(i) a utilização de algoritmos de ML ao invés de MQG, (ii) a não atribuição de peso de forma obrigatória para todos os nós da hierarquia e (iii) no ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021].
+
+## DESIGN DO EXPERIMENTO
+
 - Métodos de reconciliação:
     - Analíticos: *Bottom-up* e MinT *Shrink*
     - Regressão regularizada: *Elastic Net* (lasso, ridge e CV)
@@ -347,17 +360,12 @@ Dado um conjunto de previsões base, *o quanto mais precisas elas se tornam ao s
     - *Support Vector Machines* (SVM)
 - Estratégias para obtenção da amostra de treino:
     - *Rolling forecast*
-    - *Fitted base forecasts*
     - *Reduced fitted base forecasts*
+    - *Fitted base forecasts*
 
-## DESIGN DO EXPERIMENTO
+## ROLLING FORECAST
 
-- Procedimentos para o método *elastic net* [@spiliotis_hierarchical_2021]
-    1. Obter $\mathbfit{\hat{y}}_{t+1}$
-    2. Treinar modelo *elastic net* usando (1) como preditores e    $\mathbfit{y}_{t+1}$ como alvo
-    3. Obter $\mathbfit{\hat{y}}_{T+h}$
-    4. Obter $\mathbfit{\tilde{y}}_{T+h}$ passando os preditores (3)    ao modelo treinado em (2)
-    5. Agregar as previsões reconciliadas para obter as previsões nos demais níveis hierárquicos
+![Estratégia *Rolling Forecast*](img/modelagem_2.png){width=90%}
 
 # REFERÊNCIAS
 
