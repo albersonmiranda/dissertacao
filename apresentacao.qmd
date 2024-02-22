@@ -349,7 +349,7 @@ Metodologia de @spiliotis_hierarchical_2021:
 
 ### METODOLOGIA ML VERSUS MINT
 
-(i) a utilização de algoritmos de ML ao invés de MQG, (ii) a não atribuição de peso de forma obrigatória para todos os nós da hierarquia e (iii) no ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021].
+As principais diferenças entre os ambas metodologias são: (i) a utilização de algoritmos de ML ao invés de MQG (permitindo combinações não lineares), (ii) a não atribuição de peso de forma obrigatória para todos os nós da hierarquia e (iii) no ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021].
 
 ## DESIGN DO EXPERIMENTO
 
@@ -358,14 +358,23 @@ Metodologia de @spiliotis_hierarchical_2021:
     - Regressão regularizada: *Elastic Net* (lasso, ridge e CV)
     - Árvores: *Random forest*, XGBoost e LightGBM
     - *Support Vector Machines* (SVM)
-- Estratégias para obtenção da amostra de treino:
+- Estratégias para obtenção das previsões *in-sample*:
     - *Rolling forecast*
     - *Reduced fitted base forecasts*
     - *Fitted base forecasts*
 
-## ROLLING FORECAST
+## ESTRATÉGIA ROLLING FORECAST
 
 ![Estratégia *Rolling Forecast*](img/modelagem_2.png){width=90%}
+
+## ESTRATÉGIA REDUCED FITTED BASE
+
+- Desvantagem do *Rolling Forecast*: a cada $h$, um novo modelo é ajustado, totalizando $m \times p = 17064$ modelos.
+- *Reduced fitted base forecasts*: ajusta-se apenas $m$ modelos, com dados até $Q$ e então reestima-se esses modelos passando-se o restante do conjunto de treinamento ($Q+p$), conservando os hiperparâmetros originais. Os valores ajustados dos modelos reestimados são utilizados para treinar os modelos de ML.
+
+## ESTRATÉGIA FITTED BASE
+
+
 
 # REFERÊNCIAS
 
