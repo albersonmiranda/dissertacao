@@ -1,14 +1,16 @@
 ---
-title: MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA 
-subtitle: SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
+title: MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA DE SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS DE INSTITUIÇÕES FINANCEIRAS
+subtitle: DEFESA DE DISSERTAÇÃO DE MESTRADO
 author: Alberson Miranda, PPGEco/UFES
 date: '`r format(Sys.Date(), "%B de %Y")`'
 format:
     beamer:
         include-in-header: config/beamer/preamble.tex
         include-after-body: config/beamer/backmatter.tex
-        output-file: render/apresentacao.pdf
         keep-tex: false
+        latex-max-runs: 4
+        number-sections: false
+        output-file: apresentacao.pdf
 bibliography: config/elementos/dissertacao.bib
 cite-method: biblatex
 link-citations: true
@@ -48,7 +50,7 @@ knitr::write_bib(
 )
 
 # scripts
-source("scripts/hierarq.R")
+source("scripts/estban/hierarq.R")
 ```
 
 # CONTEXTUALIZAÇÃO DA PESQUISA
@@ -58,11 +60,11 @@ source("scripts/hierarq.R")
 - Problemas populares na literatura: risco de crédito, detecção de anomalias (fraude), preços de ativos, alocação ótima de numerários [@sezer_financial_2019]
 - Pouco sobre projeção de saldos e rendas (*guidance*, *budgeting*)
 - Previsões equivocadas = percepção de incompetência, redução de reputação e receitas [@beccalli_earnings_2015]
-- *Budgeting* em empresas de muitas filiais: alta dimensionalidade e dúvidas
+- Orçamentação em empresas de muitas filiais: alta dimensionalidade e dúvidas
 
 ## ANÁLISE DE SÉRIES TEMPORAIS EM ECONOMIA BANCÁRIA
 
-- Banestes: 96 agências, 70 municípios do ES^[Postos de atendimento não contam como agência.], 13 microrregiões, 4 mesorregiões
+- Banestes: 134 agências, 78 municípios do ES, 13 microrregiões, 4 mesorregiões
 - Qual a melhor forma de realizar projeções?
     - Individualmente por agência?
     - Apenas o total e distribuir proporcionalmente?
@@ -112,20 +114,16 @@ Reescrever as previsões de forma que elas sejam coerentes, utilizando toda a in
 
 ## OBJETIVO GERAL
 
-Estudar o problema da reconciliação ótima de previsões pontuais a partir de métodos de *machine learning*
+Estudar o problema da reconciliação ótima de previsões pontuais a partir de métodos de *machine learning* em séries temporais hierárquicas e agrupadas do Banco do Estado do Espírito Santo
 
 ## OBJETIVOS ESPECÍFICOS
 
-1. Aplicar o método *elastic net* [@zou_regularization_2005] para reconciliação ótima de previsões pontuais de séries temporais hierárquicas e agrupadas e atestar sua validade em dados de alta dimensionalidade;
-1. Comparar a performance, em termos de funções de custo e tempo de processamento, do mpetodo *elastic net* nas configurações $\alpha=0$ (*lasso*), $\alpha=1$ (*ridge*) e uma combinação de ambos obtida via reamostragem;
-1. Comparar a performance, em termos de funções de custo e tempo de processamento, do método *elastic net* com os métodos analíticos *bottom-up*, *top-down* e *MinT Shrink*;
+1. Estender a abordagem de @spiliotis_hierarchical_2021 para a reconciliação ótima de séries temporais hierárquicas *e agrupadas*;
+1. Avaliar a efetividade de mais 4 implementaçãoes de métodos de ML (*lasso*, *ridge*, *elastic net*, SVM e *lightGBM*), além dos 2 propostos no trabalho original (*XGBoost* e *random forest*);
+1. Propor duas variações metodológicas para obtenção da amostra de treino dos modelos de ML;
+1. Obter ganhos de performance no contexto de séries temporais financeiras.
 
-## OBJETIVOS ESPECÍFICOS
-
-4. Comparar a performance, em termos de funções de custo e tempo de processamento, das estratégias de reamostragem validação cruzada $k$*-fold* e *holdout* para o método *elastic net*;
-5. Verificar se a aplicação de regressão regularizada resulta em algum padrão reconhecível na estrutura (e.g., se a regularização tende a favorecer os coeficientes de séries temporais que compartilham o mesmo nó pai ou, em outras palavras, se tende a zerar os coeficientes de séries temporais que não compartilham o mesmo nó pai na hierarquia);
-
-# ABORDAGENS DE NÍVEL ÚNICO
+# RECONCILIAÇÃO DE SÉRIES TEMPORAIS HIERÁRQUICAS
 
 ## BOTTOM-UP
 
@@ -134,20 +132,14 @@ Estudar o problema da reconciliação ótima de previsões pontuais a partir de 
 
 ## TOP-DOWN
 
-::: {.incremental}
 - apenas informações do nível mais agregado
 - há dezenas de métodos para distribuir proporcionalmente as previsões agregadas [@gross_disaggregation_1990]
-    - proporções históricas $$p_j = \frac{1}{T} \sum^{T}_{t=1} \frac{y_{j,t}}{y_t}$$ {#eq-top_down1}
-    - médias históricas $$p_j = \frac{\sum^{T}_{t=1} \frac{y_{j,t}}{T}}{\sum^{T}_{t=1} \frac{y_{t}}{T}}$$ {#eq-top_down2}
-    - proporções das previsões [@athanasopoulos_hierarchical_2009] $$p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}$$ {#eq-top_down3}
-:::
+- não podem ser utilizadas no contexto de séries temporais agrupadas^[Desambiguar uma estrutura agrupada resulta em uma estrutura hierárquica, mas há necessariamente perda de informação (e.g., fixar os verbetes abaixo das agências, causaria a perca da informação do agregado dos verbetes).].
 
 ## MIDDLE-OUT
 
 - informações apenas de um nível intermediário
 - soma-se para obter os níveis agregados e distribui-se proporcionalmente para os níveis mais desagregados
-
-# MÉTODOS ANALÍTICOS PARA RECONCILIAÇÃO ÓTIMA
 
 ## NOTAÇÃO MATRICIAL
 
@@ -176,7 +168,7 @@ $$
     \tilde{y}_{AC,t} \\
     \tilde{y}_{BA,t} \\
     \tilde{y}_{BB,t}
-  \end{bmatrix}_{n \times 1}
+  \end{bmatrix}_{8 \times 1}
   =
   \begin{bmatrix}
     1 & 1 & 1 & 1 & 1 \\
@@ -187,14 +179,14 @@ $$
     0  & 0  & 1  & 0  & 0  \\
     0  & 0  & 0  & 1  & 0  \\
     0  & 0  & 0  & 0  & 1
-  \end{bmatrix}_{n \times m}
+  \end{bmatrix}_{8 \times 5}
   \begin{bmatrix}
     \hat{y}_{AA,t} \\
     \hat{y}_{AB,t} \\
     \hat{y}_{AC,t} \\
     \hat{y}_{BA,t} \\
     \hat{y}_{BB,t}
-  \end{bmatrix}_{m \times 1}
+  \end{bmatrix}_{5 \times 1}
 $$ {#eq-reconciliacao2}
 
 \begin{center}
@@ -216,7 +208,7 @@ $$
     \tilde{y}_{AC, t} \\
     \tilde{y}_{BA, t} \\
     \tilde{y}_{BB, t}
-\end{bmatrix}_{n \times 1}
+\end{bmatrix}_{8 \times 1}
 =
 \mathbfit{S}_{n \times m}
 \begin{bmatrix}
@@ -225,7 +217,7 @@ $$
     p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
     p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0
-\end{bmatrix}_{m \times n}
+\end{bmatrix}_{5 \times 8}
 \begin{bmatrix}
     \hat{y}_{T+h|T} \\
     \hat{y}_{A, T+h|T} \\
@@ -235,7 +227,7 @@ $$
     \hat{y}_{AC, T+h|T} \\
     \hat{y}_{BA, T+h|T} \\
     \hat{y}_{BB, T+h|T}
-\end{bmatrix}_{n \times 1}
+\end{bmatrix}_{8 \times 1}
 $$ {#eq-reconciliacao3}
 
 \begin{center}
@@ -255,16 +247,16 @@ $$
     \tilde{y}_{AC, t} \\
     \tilde{y}_{BA, t} \\
     \tilde{y}_{BB, t}
-\end{bmatrix}_{n \times 1}
+\end{bmatrix}_{8 \times 1}
 =
-\mathbfit{S}_{n \times m}
+\mathbfit{S}_{8 \times 5}
 \begin{bmatrix}
     0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
     0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
     0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}_{m \times n}
+\end{bmatrix}_{5 \times 8}
 \begin{bmatrix}
     \hat{y}_{T+h|T} \\
     \hat{y}_{A, T+h|T} \\
@@ -274,7 +266,7 @@ $$
     \hat{y}_{AC, T+h|T} \\
     \hat{y}_{BA, T+h|T} \\
     \hat{y}_{BB, T+h|T}
-\end{bmatrix}_{n \times 1}
+\end{bmatrix}_{8 \times 1}
 $$ {#eq-reconciliacao4}
 
 \begin{center}
@@ -290,58 +282,29 @@ E se quisermos utilizar toda a informação e não apenas parte do espaço das p
 
 Estimar uma matriz de reconciliação $\mathbfit{G}$ que utilize toda a informação disponível e com o menor erro de previsão
 
-## RECONCILIAÇÃO ÓTIMA
+## MATRIZ DE RECONCILIAÇÃO
 
 ### PROBLEMA DE REGRESSÃO
 
 - Minimização do traço da matriz de covariância dos erros das previsões reconciliadas (MinT^[[@wickramasuriya_optimal_2019].])
-$$\min_{\tilde{e}} y_{T+h} - \tilde{y}_{T+h}$$ {#eq-mint1}
+$$
+\min_{\tilde{e}} y_{T+h} - \tilde{y}_{T+h}
+$$ {#eq-mint1}
 
 - Mínimos Quadrados Generalizados (MQG)
-$$\mathbfit{G}=(\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{S})^{-1}\mathbfit{S}'\mathbfit{W}_h^{\dagger}$$ {#eq-mint2}
+$$
+\mathbfit{G}=(\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{S})^{-1}\mathbfit{S}'\mathbfit{W}_h^{\dagger}
+$$ {#eq-mint2}
 
-## RECONCILIAÇÃO ÓTIMA
-
-- 1ª abordagem: $\mathbfit{W}_h = k_hI$
-    - Mínimos Quadrados Ordinários (MQO)
-    - Não há qualquer razão ou justificativa para supor homoscedasticidade
-    - Erros descorrelacionados e equivariantes não fazem sentido em séries hierárquicas
-
-## RECONCILIAÇÃO ÓTIMA
-
-- 2ª abordagem: $\mathbfit{W}_h = k_h\text{diag}(\mathbfit{\hat{W_1}}) \mid \mathbfit{\hat{W_1}} = \frac{1}{T}\sum^{T}_{t=1}\mathbfit{\hat{e}}_{T+1}\mathbfit{\hat{e}'}_{T+1}$
-    - Mínimos Quadrados Ponderados (MQP)
-    - $\mathbfit{\hat{e}}_{T+1} = \mathbfit{y_{T+1}} - \mathbfit{\hat{y}}_{T+1}$
-    - Erros descorrelacionados e ponderados pela variância do erro das previsões base
-
-## RECONCILIAÇÃO ÓTIMA
-
-- 3ª abordagem: $\mathbfit{W}_h = k_h\mathbfit{\hat{W}}_1$
-    - MQG irrestrito
-    - Quando $m \geq T$, pode-se usar estimador de encolhimento
-    - Leva em consideração correlação e variância ao longo de toda estrutura
-
-# MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA
-
-## ELASTIC NET
-
-- O *elastic net* [@zou_regularization_2005] é um método de regressão regularizada que combina as penalidades *lasso* e do *ridge*
-- A função objetivo a ser minimizada é dada por
+Substituindo $\mathbfit{G}$ na [@eq-reconciliacao1], temos:
 
 $$
-L(\lambda_1, \lambda_2, \mathbfit{\beta}) = |\mathbf{y} - \mathbf{X}\mathbfit{\beta}|^2 + \lambda_2|\mathbfit{\beta}|^2 + \lambda_1|\mathbfit{\beta}|_1
-$$ {#eq-elastic_net1}
+\mathbfit{\tilde{y}}=\mathbfit{S}(\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{S})^{-1}\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{\hat{y}_{h}}
+$$ {#eq-mint3}
 
-## ELASTIC NET
+## RECONCILIAÇÃO POR MACHINE LEARNING
 
-- Solução dada por
-$$
-\mathbfit{\hat{\beta}} = \arg \min_{\mathbfit{\beta}} |\mathbf{y}-\mathbf{X}\mathbfit{\beta}|^2 \text{, sujeito a } (1-\alpha)|\mathbfit{\beta}|_1 + \alpha|\mathbfit{\beta}|^2 \leq t
-$$ {#eq-elastic_net2}
-
-- $\alpha = \frac{\lambda_2}{\lambda_1 + \lambda_2}$ e $t \in \mathbb{R}^+$ ($t = L_1$)
-- $\alpha = 0 \implies \lambda_2 = 0$, *lasso*
-- $\alpha = 1 \implies \lambda_1 = 0$, *ridge*
+![Abordagem de reconciliação ótima por ML. Fonte: @spiliotis_hierarchical_2021](img/spiliotis.png)
 
 # METODOLOGIA
 
@@ -349,10 +312,10 @@ $$ {#eq-elastic_net2}
 
 - Estatística Bancária Mensal e por Município (Bacen)
 - Municípios (IBGE)
-- Saldos de crédito
-- CNPJ Banestes (expansível para todo SFN)
-- 01/2010 - 02/2023
-- 43.923 observações
+- Saldos de crédito dos verbetes empréstimos e financiamentos
+- CNPJ Banestes mas expansível para todo SFN
+- 01/2003 - 12/2022
+- 37.920 observações (114.480 com nós de agregação)
 
 ## DADOS E VARIÁVEIS
 
@@ -360,31 +323,49 @@ $$ {#eq-elastic_net2}
     - total
     - 4 mesorregiões
     - 13 microrregiões
-    - 96 agências
+    - 79 agências
 - Estrutura agrupada
-    - 3 modalidades de crédito
+    - 2 modalidades de crédito
+
+## PREVISÕES BASE
+
+- Previsões para fora da amostra a serem reconciliadas
+- ETS (podem ser obtidas por qualquer método, incluindo ML)
+- Treino: 01/2003 - 12/2021
+- Horizonte de previsão ($h$): 01/2022 - 12/2022, fora da amostra
 
 ## DESIGN DO EXPERIMENTO
 
-- $\mathbfit{\hat{y}}$ via Arima ou ETS
-- *benchmark* (RMSE, tempo de processamento):
-    - *Top-down*
-    - *bottom-up*
-    - MinT OLS
-    - MinT WLS
-    - MinT *Shrink* ($t = 156, m = 96 \times 3$)
-    - *Elastic Net* Lasso
-    - *Elastic Net* Ridge
-    - *Elastic Net* CV-5
+Dado um conjunto de previsões base, *o quanto mais precisas elas se tornam ao se aplicar um determinado método de reconciliação*?
 
 ## DESIGN DO EXPERIMENTO
 
-- Procedimentos para o método *elastic net* [@spiliotis_hierarchical_2021]
-    1. Obter $\mathbfit{\hat{y}}_{t+1}$
-    2. Treinar modelo *elastic net* usando (1) como preditores e    $\mathbfit{y}_{t+1}$ como alvo
-    3. Obter $\mathbfit{\hat{y}}_{T+h}$
-    4. Obter $\mathbfit{\tilde{y}}_{T+h}$ passando os preditores (3)    ao modelo treinado em (2)
-    5. Agregar as previsões reconciliadas para obter as previsões nos demais níveis hierárquicos
+Metodologia de @spiliotis_hierarchical_2021:
+
+1. Previsões para dentro da amostra (ETS)
+1. Treino dos modelos de ML para cada $y_m$
+1. Reconciliação ótima das previsões base (fora da amostra)
+1. Agregação das previsões reconciliadas para obtenção dos demais níveis hierárquicos
+
+### METODOLOGIA ML VERSUS MINT
+
+(i) a utilização de algoritmos de ML ao invés de MQG, (ii) a não atribuição de peso de forma obrigatória para todos os nós da hierarquia e (iii) no ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021].
+
+## DESIGN DO EXPERIMENTO
+
+- Métodos de reconciliação:
+    - Analíticos: *Bottom-up* e MinT *Shrink*
+    - Regressão regularizada: *Elastic Net* (lasso, ridge e CV)
+    - Árvores: *Random forest*, XGBoost e LightGBM
+    - *Support Vector Machines* (SVM)
+- Estratégias para obtenção da amostra de treino:
+    - *Rolling forecast*
+    - *Reduced fitted base forecasts*
+    - *Fitted base forecasts*
+
+## ROLLING FORECAST
+
+![Estratégia *Rolling Forecast*](img/modelagem_2.png){width=90%}
 
 # REFERÊNCIAS
 
