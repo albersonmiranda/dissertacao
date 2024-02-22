@@ -370,9 +370,21 @@ As principais diferenças entre os ambas metodologias são: (i) a utilização d
 ## ESTRATÉGIA REDUCED FITTED BASE
 
 - Desvantagem do *Rolling Forecast*: a cada $h$, um novo modelo é ajustado, totalizando $m \times p = 17064$ modelos.
-- *Reduced fitted base forecasts*: ajusta-se apenas $m$ modelos, com dados até $Q$ e então reestima-se esses modelos passando-se o restante do conjunto de treinamento ($Q+p$), conservando os hiperparâmetros originais. Os valores ajustados dos modelos reestimados são utilizados para treinar os modelos de ML.
+- *Reduced fitted base*: ajusta-se apenas $m$ modelos, com dados até $Q$ e então reestima-se esses modelos passando-se o restante do conjunto de treinamento ($Q+p$), conservando os hiperparâmetros originais. Os valores ajustados dos modelos reestimados são utilizados para treinar os modelos de ML.
 
 ## ESTRATÉGIA FITTED BASE
+
+- Pode ser um problema obter previsões para dentro da amostra para séries de poucas observações ou incompletas
+- *Fitted base*: utiliza-se os valores ajustados dos modelos de previsão base obtidos ao longo de todo o período $q=1,2,3,...,Q+p$ (todo conjunto de treinamento)
+
+## OTIMIZAÇÃO DE HIPERPARÂMETROS
+
+- @bischl_hyperparameter_2021
+- $m$ modelos tunados individualmente
+- *grid* para *elastic net* e bayesiana os demais métodos
+- *Resampling*: CV-10, RMSE
+
+# RESULTADOS
 
 
 
