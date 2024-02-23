@@ -352,7 +352,12 @@ Metodologia de @spiliotis_hierarchical_2021:
 
 ### METODOLOGIA ML VERSUS MINT
 
-As principais diferenças entre os ambas metodologias são: (i) a utilização de algoritmos de ML ao invés de MQG (permitindo combinações não lineares), (ii) a não atribuição de peso de forma obrigatória para todos os nós da hierarquia e (iii) no ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021].
+As principais diferenças entre os ambas metodologias são:
+
+- A utilização de algoritmos de ML ao invés de MQG (permitindo combinações não lineares)
+- A não atribuição de peso de forma obrigatória para todos os nós da hierarquia 
+
+- O ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021].
 
 ## DESIGN DO EXPERIMENTO
 
@@ -518,8 +523,6 @@ rbind(
 ## ESTBAN - ML - TEMPO DE PROCESSAMENTO
 
 ```{r}
-#| tbl-cap: "Resultados Estban: Tempo de processamento dos métodos de ML (em horas)"
-#| label: tbl-estban-tempo-ml
 
 # obtendo tempo de processamento
 tempo = lapply(c("one-step-ahead", "fitted_base", "rolling_forecast"), function(tipo) {
@@ -696,6 +699,29 @@ tempo |>
   kable_styling(font_size = 8)
 ```
 
-# REFERÊNCIAS
+## RESULTADOS
 
-## BIBLIOGRAFIA
+- Os métodos baseados em árvore, além de requererem maior tempo de processamento devido a sua complexidade no espaço de hiperparâmetros, também tenderam a perder qualidade de performance nos níveis superiores da hierarquia
+- Os métodos de regressão regularizada e o SVM se mostraram mais robustos à agregação
+- Nenhum combinação de método/estratégia é consistentemente melhor ao longo de todos os níveis de agregação
+
+## RESULTADOS
+
+- Para o nível agregado, o *elastic net* na estratégia *reduced fitted base* foi 91% melhor que o MinT
+- Para as mesorregiões, o Lasso superou o BU em 7%
+- Nos demais níveis hierárquicos, os métodos analíticos superaram os de ML (*idem* TOURISM)
+
+# CONCLUSÃO
+
+## OUTLINE
+
+- Os métodos de ML podem trazer ganhos de performance em relação aos analíticos
+- A escolha do método dependerá do objetivo do pesquisador:
+  - Para elaboração de metas individuais, os métodos analíticos são preferíveis
+  - Para previsão dos níveis mais agregados, os métodos lineares de ML obtiveram melhor performance
+  - Os métodos baseados em árvore de decisão não foram capazes de superar os analíticos em nenhum nível de agregação
+
+## OUTLINE
+
+- Não houve uma combinação de método e estratégia que obtivesse melhor performance de maneira consistente ao longo de todos os níveis hierárquicos
+- A performance da reconciliação ótima é sensível à estratégia de geração de previsões para dentro da amostra
