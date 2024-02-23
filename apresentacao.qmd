@@ -2,7 +2,8 @@
 title: MÉTODOS DE MACHINE LEARNING PARA RECONCILIAÇÃO ÓTIMA DE SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS DE INSTITUIÇÕES FINANCEIRAS
 subtitle: DEFESA DE DISSERTAÇÃO DE MESTRADO
 author: Alberson Miranda, PPGEco/UFES
-date: '`r format(Sys.Date(), "%B de %Y")`'
+date: last-modified
+date-format: "[Fevereiro de 2024]"
 format:
     beamer:
         include-in-header: config/beamer/preamble.tex
@@ -347,6 +348,8 @@ Metodologia de @spiliotis_hierarchical_2021:
 1. Reconciliação ótima das previsões base (fora da amostra)
 1. Agregação das previsões reconciliadas para obtenção dos demais níveis hierárquicos
 
+## DESIGN DO EXPERIMENTO
+
 ### METODOLOGIA ML VERSUS MINT
 
 As principais diferenças entre os ambas metodologias são: (i) a utilização de algoritmos de ML ao invés de MQG (permitindo combinações não lineares), (ii) a não atribuição de peso de forma obrigatória para todos os nós da hierarquia e (iii) no ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021].
@@ -380,13 +383,318 @@ As principais diferenças entre os ambas metodologias são: (i) a utilização d
 ## OTIMIZAÇÃO DE HIPERPARÂMETROS
 
 - @bischl_hyperparameter_2021
-- $m$ modelos tunados individualmente
+- $m$ modelos calibrados individualmente
 - *grid* para *elastic net* e bayesiana os demais métodos
 - *Resampling*: CV-10, RMSE
 
 # RESULTADOS
 
+## ESTBAN - ANALÍTICOS
 
+```{r}
+
+rbind(
+  readRDS("data/estban/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
+  readRDS("data/estban/preds_analitico/acuracia_analiticos.rds")[["mase"]]
+ ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
+  pack_rows("RMSSE", 1, 3) |>
+  pack_rows("MASE", 4, 6) |>
+  kable_styling(latex_options = c("scale_down")) |>
+  # microrregião
+  column_spec(
+    4,
+    bold = c(F, T, F, F, T, F)
+  ) |>
+  # município
+  column_spec(
+    5,
+    bold = c(T, F, F, T, F, F)
+  ) |>
+  # agência
+  column_spec(
+    6,
+    bold = c(F, F, T, T, F, F)
+  ) |>
+  # verbete
+  column_spec(
+    7,
+    bold = c(F, F, T, F, F, T)
+  ) |>
+  # bottom
+  column_spec(
+    8,
+    bold = c(F, F, T, F, T, F)
+  ) |>
+  # hierarquia
+  column_spec(
+    9,
+    bold = c(F, F, T, F, F, T)
+  )
+```
+
+## ESTBAN - ML - ROLLING FORECAST
+
+```{r}
+
+rbind(
+  readRDS("data/estban/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
+  readRDS("data/estban/preds_ml/preds/rolling_forecast/resumo.RDS")[["mase"]]
+ ) |>
+  # substituindo "glmnet" por "elastic net"
+  transform(
+    modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  # substituindo "ranger" por "random forest"
+  transform(
+    modelo = ifelse(modelo == "ranger", "random forest", modelo)
+  ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("scale_down")) |>
+  # agregado
+  column_spec(
+    2,
+    underline = c(F, F, F, F, F, F, F, F, T, F, F, F, F, F)
+  )
+```
+
+## ESTBAN - ML - FITTED BASE
+
+```{r}
+
+rbind(
+  readRDS("data/estban/preds_ml/preds/fitted_base/resumo.RDS")[["rmsse"]],
+  readRDS("data/estban/preds_ml/preds/fitted_base/resumo.RDS")[["mase"]]
+ ) |>
+ # substituindo "glmnet" por "elastic net"
+  transform(
+    modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  # substituindo "ranger" por "random forest"
+  transform(
+    modelo = ifelse(modelo == "ranger", "random forest", modelo)
+  ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("scale_down"))
+```
+
+## ESTBAN - ML - REDUCED FITTED BASE
+
+```{r}
+
+rbind(
+  readRDS("data/estban/preds_ml/preds/one-step-ahead/resumo.RDS")[["rmsse"]],
+  readRDS("data/estban/preds_ml/preds/one-step-ahead/resumo.RDS")[["mase"]]
+ ) |>
+  # substituindo "glmnet" por "elastic net"
+  transform(
+    modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  # substituindo "ranger" por "random forest"
+  transform(
+    modelo = ifelse(modelo == "ranger", "random forest", modelo)
+  ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(latex_options = c("scale_down")) |>
+  # agregado
+  column_spec(
+    2,
+    bold = c(T, F, F, F, F, F, F, T, F, F, F, F, F, F),
+    underline = c(F, T, F, F, T, F, F, F, T, F, F, T, F, F)
+  ) |>
+  # mesorregião
+  column_spec(
+    3,
+    bold = c(F, T, F, F, F, F, F, F, T, F, F, F, F, F)
+  )
+```
+
+## ESTBAN - ML - TEMPO DE PROCESSAMENTO
+
+```{r}
+#| tbl-cap: "Resultados Estban: Tempo de processamento dos métodos de ML (em horas)"
+#| label: tbl-estban-tempo-ml
+
+# obtendo tempo de processamento
+tempo = lapply(c("one-step-ahead", "fitted_base", "rolling_forecast"), function(tipo) {
+  lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm"), function(learner) {
+    preds = readRDS(paste0("data/estban/preds_ml/preds/", tipo, "/preds_", learner, ".RDS"))[[2]]
+    return(preds)
+  })
+})
+
+# juntando predições em um único dataframe
+tempo = do.call(rbind, tempo)
+
+# convertendo colunas para numérico
+tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
+
+# nomeando df
+colnames(tempo) = c("xgb", "random forest", "elastic net", "lasso", "ridge", "svm", "lightgbm")
+rownames(tempo) = c("reduced fitted base", "fitted base", "rolling forecast")
+
+# tabela
+tempo |>
+  kbl(booktabs = TRUE, digits = 3) |>
+  kable_styling(latex_options = c("scale_down"))
+```
+
+## TOURISM - ANALÍTICOS
+
+```{r}
+
+rbind(
+  readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
+  readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["mase"]]
+ ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
+  pack_rows("RMSSE", 1, 3) |>
+  pack_rows("MASE", 4, 6) |>
+  kable_styling(font_size = 8) |>
+  # bottom
+  column_spec(
+    6,
+    bold = c(F, F, T, F, F, T)
+  ) |>
+  # hierarquia
+  column_spec(
+    7,
+    bold = c(F, F, T, F, F, T)
+  )
+```
+
+## TOURISM - ML - ROLLING FORECAST
+
+```{r}
+
+rbind(
+  readRDS("data/tourism/preds_ml/preds/rolling_forecast/resumo.RDS")[["rmsse"]],
+  readRDS("data/tourism/preds_ml/preds/rolling_forecast/resumo.RDS")[["mase"]]
+ ) |>
+  # substituindo "glmnet" por "elastic net"
+  transform(
+    modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  # substituindo "ranger" por "random forest"
+  transform(
+    modelo = ifelse(modelo == "ranger", "random forest", modelo)
+  ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(font_size = 8) |>
+  # agregado
+  column_spec(
+    2,
+    bold = c(F, F, F, F, F, T, F, F, F, F, F, F, T, F),
+    underline = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
+  ) |>
+  # state
+  column_spec(
+    3,
+    bold = c(F, F, F, F, F, T, F, F, F, F, F, F, T, F),
+    underline = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
+  ) |>
+  # purpose
+  column_spec(
+    5,
+    bold = c(F, F, F, F, F, T, F, F, F, F, F, F, T, F),
+    underline = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
+  )
+```
+
+## TOURISM - ML - FITTED BASE
+
+```{r}
+
+rbind(
+  readRDS("data/tourism/preds_ml/preds/fitted_base/resumo.RDS")[["rmsse"]],
+  readRDS("data/tourism/preds_ml/preds/fitted_base/resumo.RDS")[["mase"]]
+ ) |>
+ # substituindo "glmnet" por "elastic net"
+  transform(
+    modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  # substituindo "ranger" por "random forest"
+  transform(
+    modelo = ifelse(modelo == "ranger", "random forest", modelo)
+  ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  pack_rows("RMSSE", 1, 7) |>
+  pack_rows("MASE", 8, 14) |>
+  kable_styling(font_size = 8) |>
+  # state
+  column_spec(
+    3,
+    underline = c(F, F, F, F, T, T, F, F, F, F, F, T, T, F)
+  ) |>
+  # region
+  column_spec(
+    4,
+    bold = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
+  ) |>
+  # purpose
+  column_spec(
+    5,
+    underline = c(F, F, F, F, F, F, F, F, F, F, F, T, F, F)
+  )
+```
+
+## TOURISM - ML - REDUCED FITTED BASE
+
+```{r}
+
+rbind(
+  readRDS("data/tourism/preds_ml/preds/one-step-ahead/resumo.RDS")[["rmsse"]],
+  readRDS("data/tourism/preds_ml/preds/one-step-ahead/resumo.RDS")[["mase"]]
+ ) |>
+ # substituindo "glmnet" por "elastic net"
+  transform(
+    modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
+  ) |>
+  # substituindo "ranger" por "random forest"
+  transform(
+    modelo = ifelse(modelo == "ranger", "random forest", modelo)
+  ) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  pack_rows("RMSSE", 1, 3) |>
+  pack_rows("MASE", 4, 6) |>
+  kable_styling(font_size = 8)
+```
+
+## TOURISM - ML - TEMPO DE PROCESSAMENTO
+
+```{r}
+
+# obtendo tempo de processamento
+tempo = lapply(c("fitted_base", "rolling_forecast", "one-step-ahead"), function(tipo) {
+  lapply(c("xgb", "ranger", "glmnet", "lasso", "ridge", "svm", "lightgbm"), function(learner) {
+    preds = readRDS(paste0("data/tourism/preds_ml/preds/", tipo, "/preds_", learner, ".RDS"))[[2]]
+    return(preds)
+  })
+})
+
+# juntando predições em um único dataframe
+tempo = do.call(rbind, tempo)
+
+# convertendo colunas para numérico
+tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
+
+# nomeando df
+colnames(tempo) = c("xgb", "random forest", "elastic net", "lasso", "ridge", "svm", "lightgbm")
+rownames(tempo) = c("fitted base", "rolling forecast", "reduced fitted base")
+
+# tabela
+tempo |>
+  kbl(booktabs = TRUE, digits = 3) |>
+  kable_styling(font_size = 8)
+```
 
 # REFERÊNCIAS
 
