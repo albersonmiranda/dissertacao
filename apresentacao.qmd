@@ -715,9 +715,13 @@ tempo |>
 
 ## OUTLINE
 
-- Os métodos de ML podem trazer ganhos de performance em relação aos analíticos
+- Os métodos de ML podem trazer ganhos de performance substanciais em relação aos analíticos
+- A metodologia de reconciliação ótima desenvolvida neste trabalho pode ser estendida para todo o SFN e para outros problemas de previsão de séries temporais
+
+## OUTLINE
+
 - A escolha do método dependerá do objetivo do pesquisador:
-  - Para elaboração de metas individuais, os métodos analíticos são preferíveis
+  - Para elaboração de metas individuais, os métodos analíticos se mostraram preferíveis
   - Para previsão dos níveis mais agregados, os métodos lineares de ML obtiveram melhor performance
   - Os métodos baseados em árvore de decisão não foram capazes de superar os analíticos em nenhum nível de agregação
 
