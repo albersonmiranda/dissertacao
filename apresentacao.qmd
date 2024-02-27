@@ -80,16 +80,19 @@ Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagreg
 
 ![](img/hierarq.png)
 
+<!--
 ## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
 
 - Cada nível traz informação diferente
 - É razoável supor que exista covariância entre as previsões dos diferentes níveis
 - Toda informação da estrutura pode ser útil
+-->
 
 ## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
 
 Séries temporais agrupadas são aquelas que não impõem uma única estrutura hierárquica
 
+<!--
 ## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
 
 ![](img/agrupadas.png)
@@ -97,6 +100,8 @@ Séries temporais agrupadas são aquelas que não impõem uma única estrutura h
 ## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
 
 ![](img/hier_agrup.png)
+
+-->
 
 ## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
 
@@ -111,21 +116,6 @@ Séries temporais agrupadas são aquelas que não impõem uma única estrutura h
 
 Reescrever as previsões de forma que elas sejam coerentes, utilizando toda a informação disponível na estrutura hierárquica, ao mesmo tempo em que minimiza a variância do erro de previsão
 
-# OBJETIVOS
-
-## OBJETIVO GERAL
-
-Estudar o problema da reconciliação ótima de previsões pontuais a partir de métodos de *machine learning* em séries temporais hierárquicas e agrupadas do Banco do Estado do Espírito Santo
-
-## OBJETIVOS ESPECÍFICOS
-
-1. Estender a abordagem de @spiliotis_hierarchical_2021 para a reconciliação ótima de séries temporais hierárquicas *e agrupadas*;
-1. Avaliar a efetividade de mais 4 implementaçãoes de métodos de ML (*lasso*, *ridge*, *elastic net*, SVM e *lightGBM*), além dos 2 propostos no trabalho original (*XGBoost* e *random forest*);
-1. Propor duas variações metodológicas para obtenção da amostra de treino dos modelos de ML;
-1. Obter ganhos de performance no contexto de séries temporais financeiras.
-
-# RECONCILIAÇÃO DE SÉRIES TEMPORAIS HIERÁRQUICAS
-
 ## BOTTOM-UP
 
 - informações apenas dos níveis mais desagregados
@@ -137,10 +127,14 @@ Estudar o problema da reconciliação ótima de previsões pontuais a partir de 
 - há dezenas de métodos para distribuir proporcionalmente as previsões agregadas [@gross_disaggregation_1990]
 - não podem ser utilizadas no contexto de séries temporais agrupadas^[Desambiguar uma estrutura agrupada resulta em uma estrutura hierárquica, mas há necessariamente perda de informação (e.g., fixar os verbetes abaixo das agências, causaria a perca da informação do agregado dos verbetes).].
 
+<!-- 
 ## MIDDLE-OUT
 
 - informações apenas de um nível intermediário
 - soma-se para obter os níveis agregados e distribui-se proporcionalmente para os níveis mais desagregados
+-->
+
+# RECONCILIAÇÃO DE SÉRIES TEMPORAIS HIERÁRQUICAS
 
 ## NOTAÇÃO MATRICIAL
 
@@ -154,6 +148,49 @@ Em que
 - $\mathbfit{S}$ é a matriz de soma
 - $\mathbfit{G}$ é a matriz de reconciliação
 - $\mathbfit{\hat{y}_t}$ é o vetor de previsões base
+
+<!--
+
+## MATRIZ DE RECONCILIAÇÃO
+
+$\mathbfit{G}$ mapeia o nível mais desagregado a partir das previsões de todos os níveis da hierarquia, garantindo a coerência
+
+$$
+\begin{bmatrix}
+    \tilde{y}_{t} \\
+    \tilde{y}_{A, t} \\
+    \tilde{y}_{B, t} \\
+    \tilde{y}_{AA, t} \\
+    \tilde{y}_{AB, t} \\
+    \tilde{y}_{AC, t} \\
+    \tilde{y}_{BA, t} \\
+    \tilde{y}_{BB, t}
+\end{bmatrix}_{8 \times 1}
+=
+\mathbfit{S}_{8 \times 5}
+\begin{bmatrix}
+    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}_{5 \times 8}
+\begin{bmatrix}
+    \hat{y}_{T+h|T} \\
+    \hat{y}_{A, T+h|T} \\
+    \hat{y}_{B, T+h|T} \\
+    \hat{y}_{AA, T+h|T} \\
+    \hat{y}_{AB, T+h|T} \\
+    \hat{y}_{AC, T+h|T} \\
+    \hat{y}_{BA, T+h|T} \\
+    \hat{y}_{BB, T+h|T}
+\end{bmatrix}_{8 \times 1}
+$$ {#eq-reconciliacao3}
+
+\begin{center}
+\scriptsize
+\bf{\it{exemplo 1: matriz de reconciliação} top-down}
+\end{center}
 
 ## MATRIZ DE SOMA
 
@@ -181,59 +218,12 @@ $$
     0  & 0  & 0  & 1  & 0  \\
     0  & 0  & 0  & 0  & 1
   \end{bmatrix}_{8 \times 5}
-  \begin{bmatrix}
-    \hat{y}_{AA,t} \\
-    \hat{y}_{AB,t} \\
-    \hat{y}_{AC,t} \\
-    \hat{y}_{BA,t} \\
-    \hat{y}_{BB,t}
-  \end{bmatrix}_{5 \times 1}
+  \mathbfit{b}_{5 \times 1}
 $$ {#eq-reconciliacao2}
 
 \begin{center}
 \scriptsize
-\bf{\it{exemplo 1: matriz de soma}}
-\end{center}
-
-## MATRIZ DE RECONCILIAÇÃO
-
-$\mathbfit{G}$ mapeia o nível mais desagregado a partir das previsões de todos os níveis da hierarquia, garantindo a coerência
-
-$$
-\begin{bmatrix}
-    \tilde{y}_{t} \\
-    \tilde{y}_{A, t} \\
-    \tilde{y}_{B, t} \\
-    \tilde{y}_{AA, t} \\
-    \tilde{y}_{AB, t} \\
-    \tilde{y}_{AC, t} \\
-    \tilde{y}_{BA, t} \\
-    \tilde{y}_{BB, t}
-\end{bmatrix}_{8 \times 1}
-=
-\mathbfit{S}_{n \times m}
-\begin{bmatrix}
-    p_1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-    p_5 & 0 & 0 & 0 & 0 & 0 & 0 & 0
-\end{bmatrix}_{5 \times 8}
-\begin{bmatrix}
-    \hat{y}_{T+h|T} \\
-    \hat{y}_{A, T+h|T} \\
-    \hat{y}_{B, T+h|T} \\
-    \hat{y}_{AA, T+h|T} \\
-    \hat{y}_{AB, T+h|T} \\
-    \hat{y}_{AC, T+h|T} \\
-    \hat{y}_{BA, T+h|T} \\
-    \hat{y}_{BB, T+h|T}
-\end{bmatrix}_{8 \times 1}
-$$ {#eq-reconciliacao3}
-
-\begin{center}
-\scriptsize
-\bf{\it{exemplo 2: matriz de reconciliação} top-down}
+\bf{\it{exemplo 2: matriz de soma}}
 \end{center}
 
 ## MATRIZ DE RECONCILIAÇÃO
@@ -279,9 +269,11 @@ $$ {#eq-reconciliacao4}
 
 E se quisermos utilizar toda a informação e não apenas parte do espaço das previsões base?
 
-### O PROBLEMA DE PESQUISA DA RECONCILIAÇÃO ÓTIMA
+### PROBLEMA DE PESQUISA DA RECONCILIAÇÃO ÓTIMA
 
 Estimar uma matriz de reconciliação $\mathbfit{G}$ que utilize toda a informação disponível e com o menor erro de previsão
+
+-->
 
 ## MATRIZ DE RECONCILIAÇÃO
 
@@ -306,6 +298,19 @@ $$ {#eq-mint3}
 ## RECONCILIAÇÃO POR MACHINE LEARNING
 
 ![Abordagem de reconciliação ótima por ML. Fonte: @spiliotis_hierarchical_2021](img/spiliotis.png)
+
+# OBJETIVOS
+
+## OBJETIVO GERAL
+
+Estudar o problema da reconciliação ótima de previsões pontuais a partir de métodos de *machine learning* em séries temporais hierárquicas e agrupadas do Banco do Estado do Espírito Santo
+
+## OBJETIVOS ESPECÍFICOS
+
+1. Estender a abordagem de @spiliotis_hierarchical_2021 para a reconciliação ótima de séries temporais hierárquicas *e agrupadas*;
+1. Avaliar a efetividade de mais 4 implementaçãoes de métodos de ML (*lasso*, *ridge*, *elastic net*, SVM e *lightGBM*), além dos 2 propostos no trabalho original (*XGBoost* e *random forest*);
+1. Propor duas variações metodológicas para obtenção da amostra de treino dos modelos de ML;
+1. Obter ganhos de performance no contexto de séries temporais financeiras.
 
 # METODOLOGIA
 
