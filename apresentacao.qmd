@@ -116,6 +116,8 @@ Séries temporais agrupadas são aquelas que não impõem uma única estrutura h
 
 Reescrever as previsões de forma que elas sejam coerentes, utilizando toda a informação disponível na estrutura hierárquica, ao mesmo tempo em que minimiza a variância do erro de previsão
 
+<!-- 
+
 ## BOTTOM-UP
 
 - informações apenas dos níveis mais desagregados
@@ -127,7 +129,6 @@ Reescrever as previsões de forma que elas sejam coerentes, utilizando toda a in
 - há dezenas de métodos para distribuir proporcionalmente as previsões agregadas [@gross_disaggregation_1990]
 - não podem ser utilizadas no contexto de séries temporais agrupadas^[Desambiguar uma estrutura agrupada resulta em uma estrutura hierárquica, mas há necessariamente perda de informação (e.g., fixar os verbetes abaixo das agências, causaria a perca da informação do agregado dos verbetes).].
 
-<!-- 
 ## MIDDLE-OUT
 
 - informações apenas de um nível intermediário
@@ -295,6 +296,27 @@ $$
 \mathbfit{\tilde{y}}=\mathbfit{S}(\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{S})^{-1}\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{\hat{y}_{h}}
 $$ {#eq-mint3}
 
+## PROBLEMA DE REGERSSÃO
+
+- 1ª abordagem [@hyndman_optimal_2011]: $\mathbfit{W}_h = k_hI$
+    - Mínimos Quadrados Ordinários (MQO)
+    - Não há qualquer razão ou justificativa para supor homoscedasticidade
+    - Erros descorrelacionados e equivariantes não fazem sentido em séries hierárquicas
+
+## PROBLEMA DE REGERSSÃO
+
+- 2ª abordagem [@hyndman_fast_2016]: $\mathbfit{W}_h = k_h\text{diag}(\mathbfit{\hat{W_1}}) \mid \mathbfit{\hat{W_1}} = \frac{1}{T}\sum^{T}_{t=1}\mathbfit{\hat{e}}_{T+1}\mathbfit{\hat{e}'}_{T+1}$
+    - Mínimos Quadrados Ponderados (MQP)
+    - $\mathbfit{\hat{e}}_{T+1} = \mathbfit{y_{T+1}} - \mathbfit{\hat{y}}_{T+1}$
+    - Erros descorrelacionados e ponderados pela variância do erro das previsões base
+
+## PROBLEMA DE REGERSSÃO
+
+- 3ª abordagem [@wickramasuriya_optimal_2019]: $\mathbfit{W}_h = k_h\mathbfit{\hat{W}}_1$
+    - MQG irrestrito
+    - Quando $m \geq T$, pode-se usar estimador de encolhimento
+    - Leva em consideração correlação e variância ao longo de toda estrutura
+
 ## RECONCILIAÇÃO POR MACHINE LEARNING
 
 ![Abordagem de reconciliação ótima por ML. Fonte: @spiliotis_hierarchical_2021](img/spiliotis.png)
@@ -308,11 +330,22 @@ Estudar o problema da reconciliação ótima de previsões pontuais a partir de 
 ## OBJETIVOS ESPECÍFICOS
 
 1. Estender a abordagem de @spiliotis_hierarchical_2021 para a reconciliação ótima de séries temporais hierárquicas *e agrupadas*;
-1. Avaliar a efetividade de mais 4 implementaçãoes de métodos de ML (*lasso*, *ridge*, *elastic net*, SVM e *lightGBM*), além dos 2 propostos no trabalho original (*XGBoost* e *random forest*);
+1. Avaliar a efetividade de mais 4 implementaçãoes de métodos de ML (*lasso*, *ridge*, *elastic net*, *Support Vector Machines* (SVM) e *lightGBM*), além dos 2 propostos no trabalho original (*XGBoost* e *random forest*);
 1. Propor duas variações metodológicas para obtenção da amostra de treino dos modelos de ML;
 1. Obter ganhos de performance no contexto de séries temporais financeiras.
 
 # METODOLOGIA
+
+## BENCHMARK
+
+1. Métodos analíticos: *bottom-up* e MinT *Shrink* [@wickramasuriya_optimal_2019]
+1. Métodos de ML [@spiliotis_hierarchical_2021]: *XGBoost* e *random forest*
+1. Treino: *rolling forecast*
+
+## METODOLOGIA PROPOSTA
+
+1. Métodos de ML: *lasso*, *ridge*, *elastic net*, SVM e *lightGBM*
+1. Treino: *reduced fitted base* e *fitted base*
 
 ## DADOS E VARIÁVEIS
 
@@ -326,12 +359,12 @@ Estudar o problema da reconciliação ótima de previsões pontuais a partir de 
 ## DADOS E VARIÁVEIS
 
 - Estrutura hierárquica
-    - total
-    - 4 mesorregiões
-    - 13 microrregiões
-    - 79 agências
+  - total
+  - 4 mesorregiões
+  - 13 microrregiões
+  - 79 agências
 - Estrutura agrupada
-    - 2 modalidades de crédito
+  - 2 modalidades de crédito
 
 ## PREVISÕES BASE
 
@@ -339,6 +372,8 @@ Estudar o problema da reconciliação ótima de previsões pontuais a partir de 
 - ETS (podem ser obtidas por qualquer método, incluindo ML)
 - Treino: 01/2003 - 12/2021
 - Horizonte de previsão ($h$): 01/2022 - 12/2022, fora da amostra
+
+![Previsões base](img/modelagem_1.png){width=70%}
 
 ## DESIGN DO EXPERIMENTO
 
@@ -361,20 +396,19 @@ As principais diferenças entre os ambas metodologias são:
 
 - A utilização de algoritmos de ML ao invés de MQG (permitindo combinações não lineares)
 - A não atribuição de peso de forma obrigatória para todos os nós da hierarquia 
-
 - O ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021].
 
 ## DESIGN DO EXPERIMENTO
 
 - Métodos de reconciliação:
-    - Analíticos: *Bottom-up* e MinT *Shrink*
-    - Regressão regularizada: *Elastic Net* (lasso, ridge e CV)
-    - Árvores: *Random forest*, XGBoost e LightGBM
-    - *Support Vector Machines* (SVM)
+  - Analíticos: *Bottom-up* e MinT *Shrink*
+  - Regressão regularizada: *Elastic Net* (lasso, ridge e CV)
+  - Árvores: *Random forest*, XGBoost e LightGBM
+  - *Support Vector Machines* (SVM)
 - Estratégias para obtenção das previsões *in-sample*:
-    - *Rolling forecast*
-    - *Reduced fitted base forecasts*
-    - *Fitted base forecasts*
+  - *Rolling forecast*
+  - *Reduced fitted base forecasts*
+  - *Fitted base forecasts*
 
 ## ESTRATÉGIA ROLLING FORECAST
 
@@ -383,12 +417,12 @@ As principais diferenças entre os ambas metodologias são:
 ## ESTRATÉGIA REDUCED FITTED BASE
 
 - Desvantagem do *Rolling Forecast*: a cada $h$, um novo modelo é ajustado, totalizando $m \times p = 17064$ modelos.
-- *Reduced fitted base*: ajusta-se apenas $m$ modelos, com dados até $Q$ e então reestima-se esses modelos passando-se o restante do conjunto de treinamento ($Q+p$), conservando os hiperparâmetros originais. Os valores ajustados dos modelos reestimados são utilizados para treinar os modelos de ML.
+- Proposição: *Reduced fitted base*. Ajusta-se apenas $m$ modelos, com dados até $Q$ e então reestima-se esses modelos passando-se o restante do conjunto de treinamento ($Q+p$), conservando os hiperparâmetros originais. Os valores ajustados dos modelos reestimados são utilizados para treinar os modelos de ML.
 
 ## ESTRATÉGIA FITTED BASE
 
 - Pode ser um problema obter previsões para dentro da amostra para séries de poucas observações ou incompletas
-- *Fitted base*: utiliza-se os valores ajustados dos modelos de previsão base obtidos ao longo de todo o período $q=1,2,3,...,Q+p$ (todo conjunto de treinamento)
+- Proposição: *Fitted base*. Utiliza-se os valores ajustados dos modelos de previsão base obtidos ao longo de todo o período $q=1,2,3,...,Q+p$ (todo conjunto de treinamento)
 
 ## OTIMIZAÇÃO DE HIPERPARÂMETROS
 
@@ -553,6 +587,46 @@ tempo |>
   kable_styling(latex_options = c("scale_down"))
 ```
 
+## RESULTADOS
+
+- Os métodos baseados em árvore, além de requererem maior tempo de processamento devido a sua complexidade no espaço de hiperparâmetros, também tenderam a perder qualidade de performance nos níveis superiores da hierarquia
+- Os métodos de regressão regularizada e o SVM se mostraram mais robustos à agregação
+- Nenhum combinação de método/estratégia é consistentemente melhor ao longo de todos os níveis de agregação
+
+## RESULTADOS
+
+- Para o nível agregado, o *elastic net* na estratégia *reduced fitted base* foi 91% melhor que o MinT
+- Para as mesorregiões, o Lasso superou o BU em 7%
+- Nos demais níveis hierárquicos, os métodos analíticos superaram os de ML (*idem* TOURISM)
+
+# CONCLUSÃO
+
+## OUTLINE
+
+- Os métodos de ML podem trazer ganhos de performance substanciais em relação aos analíticos
+- A metodologia de reconciliação ótima desenvolvida neste trabalho pode ser estendida para todo o SFN e para outros problemas de previsão de séries temporais
+
+## OUTLINE
+
+- A escolha do método dependerá do objetivo do pesquisador:
+  - Para elaboração de metas individuais, os métodos analíticos se mostraram preferíveis
+  - Para previsão dos níveis mais agregados, os métodos lineares de ML obtiveram melhor performance
+  - Os métodos baseados em árvore de decisão não foram capazes de superar os analíticos em nenhum nível de agregação
+
+## OUTLINE
+
+- Não houve uma combinação de método e estratégia que obtivesse melhor performance de maneira consistente ao longo de todos os níveis hierárquicos
+- A performance da reconciliação ótima é sensível à estratégia de geração de previsões para dentro da amostra
+
+# APÊNDICE
+
+## BENCHMARK
+
+- @hyndman_forecasting_2021 (cap. 11.4):
+  - Métodos analíticos: *bottom-up* e MinT *Shrink*
+- @spiliotis_hierarchical_2021:
+  - Métodos de ML: *XGBoost* e *random forest* 
+
 ## TOURISM - ANALÍTICOS
 
 ```{r}
@@ -703,34 +777,3 @@ tempo |>
   kbl(booktabs = TRUE, digits = 3) |>
   kable_styling(font_size = 8)
 ```
-
-## RESULTADOS
-
-- Os métodos baseados em árvore, além de requererem maior tempo de processamento devido a sua complexidade no espaço de hiperparâmetros, também tenderam a perder qualidade de performance nos níveis superiores da hierarquia
-- Os métodos de regressão regularizada e o SVM se mostraram mais robustos à agregação
-- Nenhum combinação de método/estratégia é consistentemente melhor ao longo de todos os níveis de agregação
-
-## RESULTADOS
-
-- Para o nível agregado, o *elastic net* na estratégia *reduced fitted base* foi 91% melhor que o MinT
-- Para as mesorregiões, o Lasso superou o BU em 7%
-- Nos demais níveis hierárquicos, os métodos analíticos superaram os de ML (*idem* TOURISM)
-
-# CONCLUSÃO
-
-## OUTLINE
-
-- Os métodos de ML podem trazer ganhos de performance substanciais em relação aos analíticos
-- A metodologia de reconciliação ótima desenvolvida neste trabalho pode ser estendida para todo o SFN e para outros problemas de previsão de séries temporais
-
-## OUTLINE
-
-- A escolha do método dependerá do objetivo do pesquisador:
-  - Para elaboração de metas individuais, os métodos analíticos se mostraram preferíveis
-  - Para previsão dos níveis mais agregados, os métodos lineares de ML obtiveram melhor performance
-  - Os métodos baseados em árvore de decisão não foram capazes de superar os analíticos em nenhum nível de agregação
-
-## OUTLINE
-
-- Não houve uma combinação de método e estratégia que obtivesse melhor performance de maneira consistente ao longo de todos os níveis hierárquicos
-- A performance da reconciliação ótima é sensível à estratégia de geração de previsões para dentro da amostra
