@@ -92,7 +92,6 @@ Séries temporais hierárquicas são aquelas que podem ser agregadas ou desagreg
 
 Séries temporais agrupadas são aquelas que não impõem uma única estrutura hierárquica.
 
-<!--
 ## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
 
 ![](img/agrupadas.png)
@@ -100,8 +99,6 @@ Séries temporais agrupadas são aquelas que não impõem uma única estrutura h
 ## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
 
 ![](img/hier_agrup.png)
-
--->
 
 ## SÉRIES TEMPORAIS HIERÁRQUICAS E AGRUPADAS
 
@@ -117,7 +114,6 @@ Séries temporais agrupadas são aquelas que não impõem uma única estrutura h
 Reescrever as previsões de forma que elas sejam coerentes, utilizando toda a informação disponível na estrutura hierárquica, ao mesmo tempo em que minimiza a variância do erro de previsão.
 
 <!-- 
-
 ## BOTTOM-UP
 
 - informações apenas dos níveis mais desagregados
@@ -294,12 +290,12 @@ Estimar uma matriz de reconciliação $\mathbfit{G}$ que utilize toda a informa�
 
 ### PROBLEMA DE REGRESSÃO
 
-- Minimização do traço da matriz de covariância dos erros das previsões reconciliadas (MinT^[[@wickramasuriya_optimal_2019].]):
+Minimização do traço da matriz de covariância dos erros das previsões reconciliadas (MinT^[[@wickramasuriya_optimal_2019].]):
 $$
 \min_{\tilde{e}} y_{T+h} - \tilde{y}_{T+h}
 $$ {#eq-mint1}
 
-- Mínimos Quadrados Generalizados (MQG):
+Mínimos Quadrados Generalizados (MQG):
 $$
 \mathbfit{G}=(\mathbfit{S}'\mathbfit{W}_h^{\dagger}\mathbfit{S})^{-1}\mathbfit{S}'\mathbfit{W}_h^{\dagger}
 $$ {#eq-mint2}
@@ -333,13 +329,14 @@ $$ {#eq-mint3}
 
 ## RECONCILIAÇÃO POR MACHINE LEARNING
 
+@spiliotis_hierarchical_2021 propõem uma abordagem de reconciliação ótima por *machine learning* (ML) ao invés de MQG.
+
 ### METODOLOGIA ML VERSUS MINT
 
-As principais diferenças entre os ambas metodologias são:
-
-- A utilização de algoritmos de ML ao invés de MQG (permitindo combinações não lineares)
-- A não atribuição de peso de forma obrigatória para todos os nós da hierarquia 
-- O ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021]
+- Permite combinações não lineares;
+- Performance preditiva;
+- A não atribuição de peso de forma obrigatória para todos os nós da hierarquia;
+- O ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021].
 
 ## RECONCILIAÇÃO POR MACHINE LEARNING
 
