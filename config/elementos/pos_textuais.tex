@@ -233,38 +233,18 @@ na maior variação negativa na função de perda
 
 \begin{figure}
 
-\begin{minipage}[t]{\linewidth}
+  \begin{minipage}[t]{\linewidth}
+    {\centering\raisebox{-\height}{\includegraphics{img/xgboost.png}}}
+    \subcaption{\label{fig-xgboost}\emph{level-wise}}
+  \end{minipage}%
+  \newline
+  \begin{minipage}[t]{\linewidth}
+    {\centering\raisebox{-\height}{\includegraphics{img/lightgbm.png}}}
+    \subcaption{\label{fig-lightgbm}\emph{leaf-wise}}
+  \end{minipage}%
 
-{\centering 
-
-\raisebox{-\height}{
-
-\includegraphics{img/xgboost.png}
-
-}
-
-}
-
-\subcaption{\label{fig-xgboost}\emph{level-wise}}
-\end{minipage}%
-\newline
-\begin{minipage}[t]{\linewidth}
-
-{\centering 
-
-\raisebox{-\height}{
-
-\includegraphics{img/lightgbm.png}
-
-}
-
-}
-
-\subcaption{\label{fig-lightgbm}\emph{leaf-wise}}
-\end{minipage}%
-
-\caption{\label{fig-tree-growth}Crescimento de árvores em algoritmos de
-\emph{boosting}.}
+  \caption{\label{fig-tree-growth}Crescimento de árvores em algoritmos de
+  \emph{boosting}.}
 
 \end{figure}
 
@@ -353,42 +333,24 @@ solução única para um hiperplano entre duas classes perfeitamente
 separadas pela maior margem possível (Figura~\ref{fig-svm1}).
 
 \begin{figure}
-
-\begin{minipage}[t]{\linewidth}
-
-{\centering 
-
-\raisebox{-\height}{
-
-\includegraphics{img/svm1.png}
-
-}
-
-}
-
-\subcaption{\label{fig-svm1}Hiperplano entre duas classes perfeitamente
-separáveis.}
-\end{minipage}%
-\newline
-\begin{minipage}[t]{\linewidth}
-
-{\centering 
-
-\raisebox{-\height}{
-
-\includegraphics{img/svm2.png}
-
-}
-
-}
-
-\subcaption{\label{fig-svm2}Hiperplano entre duas classes não
-separáveis.}
-\end{minipage}%
-
-\caption{\label{fig-svm}\emph{Support vector classifiers}. Fonte:
-\textcite{hastie_elements_2009}.}
-
+  \begin{minipage}[t]{\linewidth}
+    {
+      \centering
+      \raisebox{-\height}
+      {\includegraphics{img/svm1.png}}
+    }
+    \subcaption{\label{fig-svm1}Hiperplano entre duas classes perfeitamente separáveis.}
+  \end{minipage}%
+  \newline
+  \begin{minipage}[t]{\linewidth}
+    {
+      \centering
+      \raisebox{-\height}
+      {\includegraphics{img/svm2.png}}
+    }
+    \subcaption{\label{fig-svm2}Hiperplano entre duas classes não separáveis.}
+  \end{minipage}%
+  \caption[\emph{Support vector classifiers}]{\label{fig-svm}\emph{Support vector classifiers}. Fonte: \textcite{hastie_elements_2009}.}
 \end{figure}
 
 Entretanto, no mundo real, dificilmente um problema de classificação
@@ -430,7 +392,7 @@ classificação. A função objetivo se torna
 }\label{eq-svm4}\end{equation}
 
 % apêndice C
-\chapter{CONJUNTO DE HIPERPARÂMETROS} \label{apendice_hiperparametros}
+\chapter{CONJUNTOS DE HIPERPARÂMETROS} \label{apendice_hiperparametros}
 
 \begin{table}
 
@@ -525,155 +487,6 @@ classificação. A função objetivo se torna
   \end{tabular}
 \end{table}
 
-% apendice D
-\chapter{RESULTADOS PARA A BASE DE DADOS TOURISM}\label{apendice_tourism}
-
-A base de dados "Tourism" consiste na quantidade trimestral de pernoites
-em visitas na Austrália entre 1998 e 2016. A estrutura é hierárquica e
-agrupada, composta por 3 níveis hierárquicos --- \emph{State} (Estados),
-\emph{Region} (Regiões) e total ---, e agrupado por \emph{Purpose}
-(Propósito).
-
-Assim como na base de dados Estban, aqui também não houve uma combinação
-de método e estratégia que fosse consistentemente melhor ao longo de
-todos os níveis de agregação. Entretanto, uma tendência pode ser
-observada em ambas bases de dados, com os métodos de ML se mostrando a
-melhor opção para estimação nos níveis ao topo da hierarquia, enquanto
-os métodos analíticos se mostram melhor opção para os níveis ao fundo da
-hierarquia.
-
-Nessa base de dados, o método SVM na estratégia \emph{rolling forecast}
-se mostrou a melhor combinação para os níveis mais agregados, alcançando
-93\% de incremento de performance em relação ao MinT, em termos de
-RMSSE, ou seja, o MinT teve quase o dobro do erro que o SVM. Já a estratégia \emph{reduced fitted base} teve performance muito baixa, com probelmas de estimação e necessidade de imputação de dados. Além da perda de performance nas medidas de acurácia, a estratégia \emph{reduced fitted base} também teve tempo de processamento muito longos em relação às outras estratégias. Nessa estratégia também foi observada presença de valores negativos para os métodos \emph{elastic net} e SVM, de forma que foram excluídos do \emph{benchmark}.
-
-\hypertarget{tbl-tourism-results-analiticos}{}
-\begin{table}
-\caption{\label{tbl-tourism-results-analiticos}Resultados Tourism: Acurácia dos métodos analíticos de reconciliação }\tabularnewline
-
-\centering
-\begin{tabular}[t]{lrrrr>{}r>{}r}
-\toprule
-.model & agregado & state & region & purpose & bottom & hierarquia\\
-\midrule
-\addlinespace[0.3em]
-\multicolumn{7}{l}{\textbf{RMSSE}}\\
-\cellcolor{gray!10}{\hspace{1em}base} & \cellcolor{gray!10}{1.446} & \cellcolor{gray!10}{1.260} & \cellcolor{gray!10}{1.068} & \cellcolor{gray!10}{1.265} & \cellcolor{gray!10}{0.925} & \cellcolor{gray!10}{0.976}\\
-\hspace{1em}bu & 2.580 & 1.634 & 1.113 & 2.004 & 0.925 & 1.011\\
-\cellcolor{gray!10}{\hspace{1em}mint} & \cellcolor{gray!10}{1.813} & \cellcolor{gray!10}{1.296} & \cellcolor{gray!10}{0.978} & \cellcolor{gray!10}{1.420} & \textbf{\cellcolor{gray!10}{0.876}} & \textbf{\cellcolor{gray!10}{0.923}}\\
-\addlinespace[0.3em]
-\multicolumn{7}{l}{\textbf{MASE}}\\
-\hspace{1em}base & 1.533 & 1.399 & 1.132 & 1.330 & 0.979 & 1.036\\
-\cellcolor{gray!10}{\hspace{1em}bu} & \cellcolor{gray!10}{3.164} & \cellcolor{gray!10}{1.877} & \cellcolor{gray!10}{1.176} & \cellcolor{gray!10}{2.323} & \cellcolor{gray!10}{0.979} & \cellcolor{gray!10}{1.078}\\
-\hspace{1em}mint & 2.086 & 1.449 & 1.021 & 1.512 & \textbf{0.937} & \textbf{0.984}\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\hypertarget{tbl-tourism-results-ml-rolling}{}
-\begin{table}
-\caption{\label{tbl-tourism-results-ml-rolling}Resultados Tourism: Acurácia dos métodos de ML de reconciliação.
-Estratégia rolling forecast. }\tabularnewline
-
-\centering
-\begin{tabular}[t]{l>{}r>{}rr>{}rrr}
-\toprule
-modelo & agregado & State & Region & Purpose & bottom & hierarquia\\
-\midrule
-\addlinespace[0.3em]
-\multicolumn{7}{l}{\textbf{RMSSE}}\\
-\cellcolor{gray!10}{\hspace{1em}elastic net} & \cellcolor{gray!10}{1.990} & \cellcolor{gray!10}{1.386} & \cellcolor{gray!10}{1.086} & \cellcolor{gray!10}{1.541} & \cellcolor{gray!10}{0.988} & \cellcolor{gray!10}{1.041}\\
-\hspace{1em}lasso & 1.929 & 1.373 & 1.100 & 1.523 & 1.026 & 1.069\\
-\cellcolor{gray!10}{\hspace{1em}lightgbm} & \cellcolor{gray!10}{4.330} & \cellcolor{gray!10}{2.762} & \cellcolor{gray!10}{1.651} & \cellcolor{gray!10}{3.456} & \cellcolor{gray!10}{1.141} & \cellcolor{gray!10}{1.354}\\
-\hspace{1em}ranger & 2.135 & 1.365 & 1.033 & 1.709 & 0.908 & 0.966\\
-\cellcolor{gray!10}{\hspace{1em}ridge} & \underline{\cellcolor{gray!10}{1.256}} & \underline{\cellcolor{gray!10}{1.185}} & \cellcolor{gray!10}{1.013} & \underline{\cellcolor{gray!10}{1.202}} & \cellcolor{gray!10}{0.919} & \cellcolor{gray!10}{0.959}\\
-\hspace{1em}svm & \textbf{0.940} & \textbf{1.010} & 1.076 & \textbf{1.011} & 1.100 & 1.097\\
-\cellcolor{gray!10}{\hspace{1em}xgb} & \cellcolor{gray!10}{2.340} & \cellcolor{gray!10}{1.451} & \cellcolor{gray!10}{1.114} & \cellcolor{gray!10}{1.892} & \cellcolor{gray!10}{0.964} & \cellcolor{gray!10}{1.031}\\
-\addlinespace[0.3em]
-\multicolumn{7}{l}{\textbf{MASE}}\\
-\hspace{1em}elastic net & 2.360 & 1.572 & 1.145 & 1.653 & 1.058 & 1.115\\
-\cellcolor{gray!10}{\hspace{1em}lasso} & \cellcolor{gray!10}{2.264} & \cellcolor{gray!10}{1.557} & \cellcolor{gray!10}{1.168} & \cellcolor{gray!10}{1.593} & \cellcolor{gray!10}{1.110} & \cellcolor{gray!10}{1.155}\\
-\hspace{1em}lightgbm & 5.505 & 3.214 & 1.763 & 4.060 & 1.200 & 1.448\\
-\cellcolor{gray!10}{\hspace{1em}ranger} & \cellcolor{gray!10}{2.579} & \cellcolor{gray!10}{1.528} & \cellcolor{gray!10}{1.073} & \cellcolor{gray!10}{1.816} & \cellcolor{gray!10}{0.961} & \cellcolor{gray!10}{1.020}\\
-\hspace{1em}ridge & \underline{1.343} & \underline{1.309} & 1.058 & \underline{1.192} & 0.981 & 1.020\\
-\cellcolor{gray!10}{\hspace{1em}svm} & \textbf{\cellcolor{gray!10}{1.070}} & \textbf{\cellcolor{gray!10}{1.096}} & \cellcolor{gray!10}{1.140} & \textbf{\cellcolor{gray!10}{1.033}} & \cellcolor{gray!10}{1.178} & \cellcolor{gray!10}{1.174}\\
-\hspace{1em}xgb & 2.888 & 1.650 & 1.162 & 2.118 & 1.013 & 1.087\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\hypertarget{tbl-tourism-results-ml-fitted}{}
-\begin{table}
-\caption{\label{tbl-tourism-results-ml-fitted}Resultados Tourism: Acurácia dos métodos de ML de reconciliação.
-Estratégia fitted base. }\tabularnewline
-
-\centering
-\begin{tabular}[t]{lr>{}r>{}r>{}rrr}
-\toprule
-modelo & agregado & State & Region & Purpose & bottom & hierarquia\\
-\midrule
-\addlinespace[0.3em]
-\multicolumn{7}{l}{\textbf{RMSSE}}\\
-\cellcolor{gray!10}{\hspace{1em}elastic net} & \cellcolor{gray!10}{2.17} & \cellcolor{gray!10}{1.40} & \cellcolor{gray!10}{1.10} & \cellcolor{gray!10}{1.77} & \cellcolor{gray!10}{0.97} & \cellcolor{gray!10}{1.03}\\
-\hspace{1em}lasso & 1.90 & 1.45 & 1.09 & 1.61 & 0.97 & 1.03\\
-\cellcolor{gray!10}{\hspace{1em}lightgbm} & \cellcolor{gray!10}{4.33} & \cellcolor{gray!10}{2.76} & \cellcolor{gray!10}{1.65} & \cellcolor{gray!10}{3.46} & \cellcolor{gray!10}{1.14} & \cellcolor{gray!10}{1.35}\\
-\hspace{1em}ranger & 2.12 & 1.36 & 1.03 & 1.72 & 0.91 & 0.96\\
-\cellcolor{gray!10}{\hspace{1em}ridge} & \cellcolor{gray!10}{1.57} & \underline{\cellcolor{gray!10}{1.16}} & \textbf{\cellcolor{gray!10}{0.97}} & \cellcolor{gray!10}{1.29} & \cellcolor{gray!10}{0.90} & \cellcolor{gray!10}{0.93}\\
-\hspace{1em}svm & 1.50 & \underline{1.19} & 1.05 & 1.38 & 1.04 & 1.05\\
-\cellcolor{gray!10}{\hspace{1em}xgb} & \cellcolor{gray!10}{2.27} & \cellcolor{gray!10}{1.42} & \cellcolor{gray!10}{1.10} & \cellcolor{gray!10}{1.83} & \cellcolor{gray!10}{0.96} & \cellcolor{gray!10}{1.02}\\
-\addlinespace[0.3em]
-\multicolumn{7}{l}{\textbf{MASE}}\\
-\hspace{1em}elastic net & 2.59 & 1.57 & 1.16 & 1.95 & 1.04 & 1.10\\
-\cellcolor{gray!10}{\hspace{1em}lasso} & \cellcolor{gray!10}{2.21} & \cellcolor{gray!10}{1.67} & \cellcolor{gray!10}{1.16} & \cellcolor{gray!10}{1.73} & \cellcolor{gray!10}{1.04} & \cellcolor{gray!10}{1.11}\\
-\hspace{1em}lightgbm & 5.50 & 3.21 & 1.76 & 4.06 & 1.20 & 1.45\\
-\cellcolor{gray!10}{\hspace{1em}ranger} & \cellcolor{gray!10}{2.54} & \cellcolor{gray!10}{1.54} & \cellcolor{gray!10}{1.07} & \cellcolor{gray!10}{1.84} & \cellcolor{gray!10}{0.97} & \cellcolor{gray!10}{1.02}\\
-\hspace{1em}ridge & 1.77 & \underline{1.29} & \textbf{1.01} & \underline{1.31} & 0.96 & 0.99\\
-\cellcolor{gray!10}{\hspace{1em}svm} & \cellcolor{gray!10}{1.75} & \underline{\cellcolor{gray!10}{1.30}} & \cellcolor{gray!10}{1.09} & \cellcolor{gray!10}{1.36} & \cellcolor{gray!10}{1.10} & \cellcolor{gray!10}{1.11}\\
-\hspace{1em}xgb & 2.79 & 1.62 & 1.15 & 2.04 & 1.01 & 1.08\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\hypertarget{tbl-tourism-results-ml-refit}{}
-\begin{table}
-\caption{\label{tbl-tourism-results-ml-refit}Resultados Tourism: Acurácia dos métodos de ML de reconciliação.
-Estratégia reduced fitted base. }\tabularnewline
-
-\centering
-\begin{tabular}[t]{lrrrrrr}
-\toprule
-modelo & agregado & State & Region & Purpose & bottom & hierarquia\\
-\midrule
-\addlinespace[0.3em]
-\multicolumn{7}{l}{\textbf{RMSSE}}\\
-\cellcolor{gray!10}{\hspace{1em}lightgbm} & \cellcolor{gray!10}{4.33} & \cellcolor{gray!10}{2.76} & \cellcolor{gray!10}{1.65} & \cellcolor{gray!10}{3.46} & \cellcolor{gray!10}{1.14} & \cellcolor{gray!10}{1.35}\\
-\hspace{1em}ranger & 2.58 & 1.55 & 1.11 & 2.01 & 0.92 & 1.01\\
-\cellcolor{gray!10}{\hspace{1em}xgb} & \cellcolor{gray!10}{3.14} & \cellcolor{gray!10}{1.93} & \cellcolor{gray!10}{1.28} & \cellcolor{gray!10}{2.44} & \cellcolor{gray!10}{1.02} & \cellcolor{gray!10}{1.14}\\
-\addlinespace[0.3em]
-\multicolumn{7}{l}{\textbf{MASE}}\\
-\hspace{1em}lightgbm & 5.50 & 3.21 & 1.76 & 4.06 & 1.20 & 1.45\\
-\cellcolor{gray!10}{\hspace{1em}ranger} & \cellcolor{gray!10}{3.18} & \cellcolor{gray!10}{1.76} & \cellcolor{gray!10}{1.17} & \cellcolor{gray!10}{2.24} & \cellcolor{gray!10}{0.98} & \cellcolor{gray!10}{1.07}\\
-\hspace{1em}xgb & 3.93 & 2.27 & 1.38 & 2.86 & 1.07 & 1.21\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\hypertarget{tbl-tourism-tempo-ml}{}
-\begin{table}
-\caption{\label{tbl-tourism-tempo-ml}Resultados Tourism: Tempo de processamento dos métodos de ML (em horas) }\tabularnewline
-
-\centering
-\begin{tabular}[t]{lrrrrrrr}
-\toprule
-  & xgb & ranger & elastic net & lasso & ridge & svm & lightgbm\\
-\midrule
-\cellcolor{gray!10}{fitted base} & \cellcolor{gray!10}{15.767} & \cellcolor{gray!10}{3.687} & \cellcolor{gray!10}{1.540} & \cellcolor{gray!10}{1.282} & \cellcolor{gray!10}{1.371} & \cellcolor{gray!10}{1.977} & \cellcolor{gray!10}{3.535}\\
-rolling forecast & 12.087 & 2.987 & 0.957 & 0.796 & 1.073 & 2.035 & 3.596\\
-\cellcolor{gray!10}{reduced fitted base} & \cellcolor{gray!10}{24.627} & \cellcolor{gray!10}{15.386} & \cellcolor{gray!10}{6.006} & \cellcolor{gray!10}{4.968} & \cellcolor{gray!10}{5.323} & \cellcolor{gray!10}{10.474} & \cellcolor{gray!10}{19.362}\\
-\bottomrule
-\end{tabular}
-\end{table}
-
 \end{apendicesenv}
 
 % anexos 
@@ -683,7 +496,3 @@ rolling forecast & 12.087 & 2.987 & 0.957 & 0.796 & 1.073 & 2.035 & 3.596\\
 %
 %
 %\end{anexosenv}
-
-% índice remissivo 
-%\phantompart
-%\printindex
