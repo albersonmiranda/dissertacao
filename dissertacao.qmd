@@ -1031,9 +1031,16 @@ estban |>
 
 Uma vez que o foco deste trabalho está no incremento de performance proporcionado pela reconciliação ótima sobre um conjunto de previsões base e não na qualidade destas, elas foram obtidas por meio de métodos básicos para previsão de séries temporais, especificamente o algoritmo de Hyndman-Koehler-Snyder-Grose para suavimento exponencial (ETS) [@hyndman_state_2002]. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
 
-Os modelos foram treinados com dados de 2003 a 2021 e as previsões $h$ passos à frente foram realizadas para o ano de 2022, com $h={1, 2, 3, ..., 12}$ (@fig-modelagem-1). Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são descorrelatados. Isso sugere que os modelos de previsão base são, em sua maior parte, adequados para o propósito deste trabalho.
+Os modelos foram treinados com dados de 2003 a 2021 e as previsões $h$ passos à frente foram realizadas para o ano de 2022, com $h={1, 2, 3, ..., 12}$ (Figura \ref{fig:modelagem-1}). Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são descorrelatados. Isso sugere que os modelos de previsão base são, em sua maior parte, adequados para o propósito deste trabalho.
 
-![Previsões base a serem reconciliadas. Em azul, o conjunto de treino e, em verde, as previsões $h$ passos à frente para fora da amostra.](img/modelagem_1.png){#fig-modelagem-1 width=70%}
+```{=latex}
+\begin{figure}[hbtp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{img/modelagem_1.png}
+  \caption[Previsões base a serem reconciliadas.]{Previsões base a serem reconciliadas. Em azul, o conjunto de treino e, em verde, as previsões $h$ passos à frente para fora da amostra.}
+  \label{fig:modelagem-1}
+\end{figure}
+```
 
 ```{r}
 #| label: tbl-lb-pvalue
@@ -1060,7 +1067,7 @@ Os restultados também mostram que o resultado da reconciliação ótima é sens
 
 Contrariamente aos resultados de @spiliotis_hierarchical_2021, as implementações de ML baseados em árvore de decisão (*XGBoost*, *ranger* e *lightGBM*) não foram capazes de superar os métodos analíticos em nenhum nível de agregação.
 
-As tabelas a seguir apresentam os resultados obtidos para o experimento. As métricas utilizadas foram a Raiz do Erro Médio Escalado Quadrático (*Root Mean Squared Scaled Error* — RMSSE) e o erro médio escalado absoluto (*Mean Absolute Scaled Error* — MASE). Para fins de comparação, além da base de dados de interesse, o Estban, o experimento foi executado também para a base de dados "Tourism", disponível no pacote {tsibble} [@R-tsibble], e seus resultados reportados no apêndice \ref{apendice_tourism}.
+As tabelas a seguir apresentam os resultados obtidos para o experimento. As métricas utilizadas foram a Raiz do Erro Médio Escalado Quadrático (*Root Mean Squared Scaled Error* — RMSSE) e o erro médio escalado absoluto (*Mean Absolute Scaled Error* — MASE).
 
 A @tbl-estban-results-analiticos contém as medidas de acurácia RMSSE e MASE para os métodos analíticos de reconciliação ótima BU (*bottom-up*) e MinT, e para as previsões base, ou seja, sem aplicar qualquer método de reconciliação. A primeira coluna especifica o método utilizado, enquanto as demais colunas apresentam a média da performance em cada nível de agregação.
 
@@ -1350,7 +1357,7 @@ rbind(
   transform(
     modelo = ifelse(modelo == "ranger", "random forest", modelo)
   ) |>
-  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 7) |>
   pack_rows("MASE", 8, 14) |>
   kable_styling(latex_options = c("striped")) |>
@@ -1379,7 +1386,9 @@ rbind(
   readRDS("data/tourism/preds_ml/preds/one-step-ahead/resumo.RDS")[["rmsse"]],
   readRDS("data/tourism/preds_ml/preds/one-step-ahead/resumo.RDS")[["mase"]]
  ) |>
- # substituindo "glmnet" por "elastic net"
+  # convertendo colunas numéricas em científico
+  sapply(function(x) format(x, scientific = TRUE, digits = 4)) |>
+  # substituindo "glmnet" por "elastic net"
   transform(
     modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
   ) |>
@@ -1387,7 +1396,7 @@ rbind(
   transform(
     modelo = ifelse(modelo == "ranger", "random forest", modelo)
   ) |>
-  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 7) |>
   pack_rows("MASE", 8, 14) |>
   kable_styling(latex_options = c("striped"))
@@ -1456,19 +1465,19 @@ rbind(
   readRDS("data/tourism_monthly/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
   readRDS("data/tourism_monthly/preds_analitico/acuracia_analiticos.rds")[["mase"]]
  ) |>
-  kbl(booktabs = TRUE, digits = 3) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 3) |>
   pack_rows("MASE", 4, 6) |>
   kable_styling(latex_options = c("striped")) |>
-  # bottom
+  # agregado
   column_spec(
-    6,
-    bold = c(F, F, T, F, F, T)
+    2,
+    bold = c(T, F, F, T, F, F)
   ) |>
-  # hierarquia
+  # state
   column_spec(
-    7,
-    bold = c(F, F, T, F, F, T)
+    3,
+    bold = c(T, F, F, F, F, T)
   )
 ```
 
@@ -1491,25 +1500,7 @@ rbind(
   kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 7) |>
   pack_rows("MASE", 8, 14) |>
-  kable_styling(latex_options = c("striped")) |>
-  # agregado
-  column_spec(
-    2,
-    bold = c(F, F, F, F, F, T, F, F, F, F, F, F, T, F),
-    underline = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
-  ) |>
-  # state
-  column_spec(
-    3,
-    bold = c(F, F, F, F, F, T, F, F, F, F, F, F, T, F),
-    underline = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
-  ) |>
-  # purpose
-  column_spec(
-    5,
-    bold = c(F, F, F, F, F, T, F, F, F, F, F, F, T, F),
-    underline = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
-  )
+  kable_styling(latex_options = c("striped"))
 ```
 
 ```{r}
@@ -1528,24 +1519,27 @@ rbind(
   transform(
     modelo = ifelse(modelo == "ranger", "random forest", modelo)
   ) |>
-  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 7) |>
   pack_rows("MASE", 8, 14) |>
   kable_styling(latex_options = c("striped")) |>
-  # state
+  # zone
   column_spec(
-    3,
-    underline = c(F, F, F, F, T, T, F, F, F, F, F, T, T, F)
+    4,
+    underline = c(F, F, F, T, F, F, F, F, T, F, T, F, F, F),
+    bold = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
   ) |>
   # region
   column_spec(
-    4,
-    bold = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F)
-  ) |>
-  # purpose
-  column_spec(
     5,
-    underline = c(F, F, F, F, F, F, F, F, F, F, F, T, F, F)
+    bold = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F),
+    underline = c(F, T, F, T, F, F, F, F, T, F, T, F, F, F)
+  ) |>
+  # hierarquia
+  column_spec(
+    6,
+    bold = c(F, F, F, F, T, F, F, F, F, F, F, T, F, F),
+    underline = c(F, F, F, T, F, F, F, F, T, F, T, F, F, F)
   )
 ```
 
@@ -1557,7 +1551,9 @@ rbind(
   readRDS("data/tourism_monthly/preds_ml/preds/one-step-ahead/resumo.RDS")[["rmsse"]],
   readRDS("data/tourism_monthly/preds_ml/preds/one-step-ahead/resumo.RDS")[["mase"]]
  ) |>
- # substituindo "glmnet" por "elastic net"
+  # convertendo colunas numéricas em científico
+  sapply(function(x) format(x, scientific = TRUE, digits = 4)) |>
+  # substituindo "glmnet" por "elastic net"
   transform(
     modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
   ) |>
@@ -1565,7 +1561,7 @@ rbind(
   transform(
     modelo = ifelse(modelo == "ranger", "random forest", modelo)
   ) |>
-  kbl(booktabs = TRUE, format = "latex", digits = 2) |>
+  kbl(booktabs = TRUE, format = "latex", digits = 3) |>
   pack_rows("RMSSE", 1, 7) |>
   pack_rows("MASE", 8, 14) |>
   kable_styling(latex_options = c("striped"))
