@@ -24,8 +24,9 @@
 				// Add Jupyter and Python vscode extensions
 				"GitHub.copilot-chat",
 				"GitHub.copilot",
-        "quarto.quarto",
-        "REditorSupport.r"
+				"quarto.quarto",
+				"REditorSupport.r",
+				"analytic-signal.preview-pdf"
 			]
 		}
 	}
