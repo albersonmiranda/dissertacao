@@ -1250,17 +1250,20 @@ Os resultados se mostraram bastante sensíveis à estratégia utilizada. Na mét
 
 Em geral, as medidas RMSSE e MASE se mostraram bastante correlacionadas, com os métodos que obtiveram melhor performance em uma métrica também obtendo melhor performance na outra. A exceção foi para o método *lasso* na estratégia *rolling forecast*, que obteve performance melhor que o MinT, em termos de MASE, para o nível agregado, sendo o único resultado positivo para a estratégia *rolling forecast*.
 
-# PREVISÃO PARA O TURISMO DOMÉSTICO AUSTRALIANO — TRIMESTRAL AGRUPADO {#sec-tourism_grouped}
+# PREVISÃO PARA O TURISMO DOMÉSTICO AUSTRALIANO {#sec-tourism}
 
 ## Introdução
 
-A base de dados "Tourism" consiste na quantidade trimestral de pernoites
-em visitas na Austrália entre 1998 e 2016. A estrutura é hierárquica e
+A base de dados "overnight trips" consiste na quantidade trimestral de viagens domésticas que duram uma noite na Austrália entre 1998 e 2017. A estrutura é hierárquica e
 agrupada, composta por 3 níveis hierárquicos --- \emph{State} (Estados),
 \emph{Region} (Regiões) e total ---, e agrupado por \emph{Purpose}
 (Propósito).
 
 <!-- TODO: de onde veio essa base? FPP3, {tsibble} -->
+
+A base de dados "domestic visitor nights" registra o número total de noites que os visitantes domésticos passam em viagens dentro da Austrália. A estrutura desse dataset é estritamente hierárquica, composta por 4 níveis hierárquicos: \emph{State} (Estados), \emph{Zones} (Zonas), \emph{Region} (Regiões) e total.
+
+<!-- TODO: de onde veio essa base? Kourentzes, Spiliotis -->
 
 ## Resultados
 
@@ -1386,8 +1389,8 @@ rbind(
   readRDS("data/tourism/preds_ml/preds/one-step-ahead/resumo.RDS")[["rmsse"]],
   readRDS("data/tourism/preds_ml/preds/one-step-ahead/resumo.RDS")[["mase"]]
  ) |>
-  # convertendo colunas numéricas em científico
-  sapply(function(x) format(x, scientific = TRUE, digits = 4)) |>
+  # aplicando notação científica quando necessário
+  sapply(function(x) prettyNum(x, digits = 4)) |>
   # substituindo "glmnet" por "elastic net"
   transform(
     modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
@@ -1430,54 +1433,36 @@ tempo |>
   kable_styling(latex_options = c("striped"))
 ```
 
-# PREVISÃO PARA O TURISMO DOMÉSTICO AUSTRALIANO — MENSAL HIERÁRQUICO {#sec-tourism_hierarchical}
-
-## Introdução
-
-A base de dados "Tourism" consiste na quantidade trimestral de pernoites
-em visitas na Austrália entre 1998 e 2016. A estrutura é hierárquica e
-agrupada, composta por 3 níveis hierárquicos --- \emph{State} (Estados),
-\emph{Region} (Regiões) e total ---, e agrupado por \emph{Purpose}
-(Propósito).
-
-<!-- TODO: de onde veio essa base? Kourentzes, Spiliotis -->
-
-## Resultados
-
-Assim como na base de dados Estban, aqui também não houve uma combinação
-de método e estratégia que fosse consistentemente melhor ao longo de
-todos os níveis de agregação. Entretanto, uma tendência pode ser
-observada em ambas bases de dados, com os métodos de ML se mostrando a
-melhor opção para estimação nos níveis ao topo da hierarquia, enquanto
-os métodos analíticos se mostram melhor opção para os níveis ao fundo da
-hierarquia.
-
-Nessa base de dados, o método SVM na estratégia \emph{rolling forecast}
-se mostrou a melhor combinação para os níveis mais agregados, alcançando
-93\% de incremento de performance em relação ao MinT, em termos de
-RMSSE, ou seja, o MinT teve quase o dobro do erro que o SVM. Já a estratégia \emph{reduced fitted base} teve performance muito baixa, com probelmas de estimação e necessidade de imputação de dados. Além da perda de performance nas medidas de acurácia, a estratégia \emph{reduced fitted base} também teve tempo de processamento muito longos em relação às outras estratégias. Nessa estratégia também foi observada presença de valores negativos para os métodos \emph{elastic net} e SVM, de forma que foram excluídos do \emph{benchmark}.
 
 ```{r}
-#| tbl-cap: "Resultados Tourism: Acurácia dos métodos analíticos de reconciliação"
+#| tbl-cap: "Resultados para \"visitor nights\": Acurácia dos métodos analíticos de reconciliação"
 #| label: tbl-tourism-monthly-results-analiticos
+
+td_data = readRDS("data/tourism_monthly/preds_analitico/acuracia_top_down.rds")
+
+td_rmsse = td_data |> subset(rownames(td_data) == "RMSSE")
+
+td_mase = td_data |> subset(rownames(td_data) == "MASE")
 
 rbind(
   readRDS("data/tourism_monthly/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
-  readRDS("data/tourism_monthly/preds_analitico/acuracia_analiticos.rds")[["mase"]]
+  td_rmsse,
+  readRDS("data/tourism_monthly/preds_analitico/acuracia_analiticos.rds")[["mase"]],
+  td_mase
  ) |>
   kbl(booktabs = TRUE, format = "latex", digits = 3) |>
-  pack_rows("RMSSE", 1, 3) |>
-  pack_rows("MASE", 4, 6) |>
+  pack_rows("RMSSE", 1, 4) |>
+  pack_rows("MASE", 5, 8) |>
   kable_styling(latex_options = c("striped")) |>
   # agregado
   column_spec(
     2,
-    bold = c(T, F, F, T, F, F)
+    bold = c(F, F, F, T, F, F, F, T)
   ) |>
   # state
   column_spec(
     3,
-    bold = c(T, F, F, F, F, T)
+    bold = c(F, F, F, T, F, F, F, T)
   )
 ```
 
@@ -1551,8 +1536,8 @@ rbind(
   readRDS("data/tourism_monthly/preds_ml/preds/one-step-ahead/resumo.RDS")[["rmsse"]],
   readRDS("data/tourism_monthly/preds_ml/preds/one-step-ahead/resumo.RDS")[["mase"]]
  ) |>
-  # convertendo colunas numéricas em científico
-  sapply(function(x) format(x, scientific = TRUE, digits = 4)) |>
+  # aplicando notação científica quando necessário
+  sapply(function(x) prettyNum(x, digits = 4)) |>
   # substituindo "glmnet" por "elastic net"
   transform(
     modelo = ifelse(modelo == "glmnet", "elastic net", modelo)
@@ -1599,8 +1584,17 @@ tempo |>
 
 # CONCLUSÃO
 
+<!-- TODO: conclusões:
+1. estratégias de previsão in-sample importam
+2. métodos de ML podem aprimorar a reconciliação
+3. os diferentes métodos podem tender a melhorar as previsões nos níveis mais agregados ou nos mais desagregados, a depender das características das séries temporais
+-->
+
 Para pesquisas futuras, pode-se investigar se a performance dos diferentes métodos e estratégias estão relacionadas às características das séries temporais, por exemplo:
 
+- Existem características específicas das séries temporais que favorecem o uso de métodos de ML em níveis agregados ou desagregados?
+- Séries estritamente hierárquicas irão favorecer métodos analíticos nos níveis mais agregados, enquanto séries hierárquicas agrupadas favorecerão métodos de ML?
+- Existe motivo teórico para que os métodos de ML baseados em árvore de decisão tenham baixa performance nos níveis inferiores de séries hierárquicas agrupadas?
 - Os efeitos do ruído de previsão: se os diferentes métodos e estratégias exibem aumento ou deterioração de performance quando as previsões individuais são mais ou menos ruidosas (i.e. se a variância do erro das previsões individuais é maior ou menor).
 - Os efeitos de correlação entre as séries: se os métodos e estratégias exibem aumento ou deterioração de performance quando as séries temporais no menor nível hierárquico são mais ou menos correlacionadas.
 - Os efeitos de componentes sazonais: se os métodos e estratégias exibem aumento ou deterioração de performance quando as séries temporais do menor nível hierárquico possuem ou não componentes sazonais.
