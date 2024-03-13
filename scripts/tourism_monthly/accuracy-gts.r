@@ -56,16 +56,14 @@ accuracy.gts_new <- function(object, test, levels, ..., f = NULL) {
     histy <- hts::aggts(object, levels, forecasts = FALSE)
   }
   if (!is.null(histy)) {
-    scale <- colMeans(abs(diff(histy, lag = max(1, round(stats::frequency(histy))))),
-      na.rm = TRUE
-    )
-    scale_rmsse <- colMeans(diff(histy, lag = max(1, round(stats::frequency(histy))))^2,
-      na.rm = TRUE
-    )
+    # MASE
+    scale <- colMeans(abs(diff(histy, lag = max(1, round(stats::frequency(histy))))), na.rm = TRUE)
     q <- sweep(res, 2, scale, "/")
-    q_rmsse <- sqrt(sweep(res^2, 2, scale_rmsse, "/"))
     mase <- colMeans(abs(q), na.rm = TRUE)
-    rmsse <- colMeans(q_rmsse, na.rm = TRUE)
+    # RMSSE
+    mse = colMeans(res^2, na.rm = TRUE)
+    scale_rmsse <- colMeans(diff(histy, lag = max(1, round(stats::frequency(histy))))^2, na.rm = TRUE)
+    rmsse = sqrt(mse / scale_rmsse)
   }
   pe <- res / x * 100 # percentage error
 
