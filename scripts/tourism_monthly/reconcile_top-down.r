@@ -35,18 +35,27 @@ preds_hts = tourism_hts_train |>
     parallel = TRUE
   )
 
-# acurácia
+# acurácia de cada nível
 source("scripts/tourism_monthly/accuracy-gts.r")
-
-acuracia_top_down = lapply(1:3, function(i) {
+acuracia_top_down = lapply(c(0:3, NULL), function(i) {
   accuracy.gts_new(preds_hts, tourism_hts_test, levels = c(i)) |>
-  rowMeans()
+    rowMeans()
 })
 
-accuracy.gts_new(preds_hts, tourism_hts_test) |>
-  rowMeans()
+acuracia_top_down = do.call("rbind", acuracia_top_down)
 
-hts::accuracy.gts(preds_hts, tourism_hts_test, levels = 1) |> 
-  rowMeans()
-# previsões de cada nó
-hts::aggts(preds_hts, levels = c(1, 2, 3))
+# acurácia média
+acuracia_top_down_hier = accuracy.gts_new(preds_hts, tourism_hts_test) |> rowMeans(na.rm = TRUE)
+
+# juntando
+acuracia_top_down = rbind(acuracia_top_down, acuracia_top_down_hier) |>
+  t()
+
+# renomeando colunas
+colnames(acuracia_top_down) = c("agregado", "state", "zone", "region", "hierarquia")
+
+# adicionar coluna de nome do modelo
+acuracia_top_down = transform(acuracia_top_down, .model = "td")
+
+# save
+saveRDS(acuracia_top_down, "data/tourism_monthly/preds_analitico/acuracia_top_down.rds")
