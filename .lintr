@@ -1,4 +1,4 @@
-linters: with_defaults(
+linters: linters_with_defaults(
     assignment_linter = NULL,
     indentation_linter(2),
     line_length_linter(120)

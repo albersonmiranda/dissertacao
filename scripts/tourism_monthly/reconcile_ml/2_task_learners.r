@@ -8,7 +8,7 @@ pacman::p_load(
 )
 
 # tipo de previsões treino: one-step-ahead, rolling_forecast ou fitted_base
-tipo = "fitted_base"
+tipo = "rolling_forecast"
 
 # true data (y_t)
 true_data = readRDS("data/tourism_monthly/tourism_monthly.rds") |>
