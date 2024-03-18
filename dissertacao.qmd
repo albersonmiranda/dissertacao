@@ -1294,7 +1294,7 @@ Em geral, as medidas RMSSE e MASE se mostraram bastante correlacionadas, com os 
 A base de dados "overnight trips" consiste na quantidade trimestral de viagens domésticas que duram uma noite na Austrália entre 1998 e 2017. A estrutura é hierárquica e agrupada, composta por 3 níveis hierárquicos --- \emph{State} (Estados), \emph{Region} (Regiões) e total ---, e agrupado por \emph{Purpose}
 (Propósito). Essa base de dados foi utilizada em @athanasopoulos_hierarchical_2009 para comparar a performance da combinação ótima contra BU e algumas variações de TD e é também utilizada em @hyndman_forecasting_2021 como recurso didático no capítulo de previsão hierárquica.
 
-A base de dados "domestic visitor nights" registra o número total de noites que os visitantes domésticos passam em viagens dentro da Austrália. A estrutura desse dataset é estritamente hierárquica, composta por 4 níveis hierárquicos: \emph{State} (Estados), \emph{Zones} (Zonas), \emph{Region} (Regiões) e total. Essa base de dados foi utilizada em trabalhos como @wickramasuriya_hierarchical_2019, @kourentzes_cross-temporal_2019 e @spiliotis_hierarchical_2021.
+A base de dados "domestic visitor nights" registra o número total de noites que os visitantes domésticos passam em viagens dentro da Austrália. A estrutura desse dataset é estritamente hierárquica, composta por 4 níveis hierárquicos: \emph{State} (Estados), \emph{Zones} (Zonas), \emph{Region} (Regiões) e total. Essa base de dados foi utilizada em trabalhos como @wickramasuriya_optimal_2019, @kourentzes_cross-temporal_2019 e @spiliotis_hierarchical_2021.
 
 <!-- TODO: citar {hts} -->
 
