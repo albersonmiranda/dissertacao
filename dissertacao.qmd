@@ -570,62 +570,36 @@ $$ {#eq-mint4}
 
 Uma revisão sistemática descrevendo os avanços e diferentes abordagens para reconciliação de previsões hierárquicas pode ser encontrada em @athanasopoulos_forecast_2023. Isto posto, a presente dissertação foca em estender a abordagem de combinação ótima por ML, realizada em trabalhos como de @spiliotis_hierarchical_2021, para a reconciliação de séries temporais hierárquicas e agrupadas, avaliando a efetividade de 7 implementações de métodos de ML (RF, XGB, *Lasso*, *ridge*, *elastic net*, SVM e LGBM), propondo variações metodológicas para a obtenção do conjunto de treinamento dos modelos de ML e obtendo ganhos significativos de performance em três estudos de caso.
 
-# ESTENDENDO O *FRAMEWORK* DE RECONCILIAÇÃO ÓTIMA VIA *MACHINE LEARNING*
+# ESTENDENDO O *FRAMEWORK* DE COMBINAÇÃO ÓTIMA VIA *MACHINE LEARNING*
 
 ## Introdução
 
-O objetivo do experimento consiste em comparar o ganho de desempenho dos métodos de reconciliação em relação às previsões base, ou seja, dada a performance das previsões individuais, o quanto mais precisas elas se tornam ao aplicar um determinado método de reconciliação. 
+A ideia da reconciliação de previsões por combinação consiste em encontrar combinações, lineares ou não, que minimizem o erro de combinação contemporânea dentro da amostra e tenham o menor erro de generalização para o conjunto de previsões base, incoerentes, para fora da amostra. O objetivo é que, dada a performance das previsões base individuais $\hat{y}_t$, as previsões reconciliadas $\tilde{y}_t$, obtidas por combinação e agregadas de maneira BU, se tornem mais precisas por conta da incorporação de informações dos diferentes níveis hierárquicos e demais nós da estrutura. 
 
-Embora os métodos de ML também sejam utilizados no contexto de previsão de séries temporais, é importante ressaltar que este não é caso deste trabalho. As previsões de séries temporais são realizadas anteriormente, na obtenção das previsões base $\hat{y}_t$. Nada impede que essas previsões sejam obtidas por um modelo de ML, mas isso não é o foco deste trabalho. A aplicação dos métodos de ML aqui ocorrem na reconciliação, ou seja, na combinação contemporânea, *cross section*, das previsões base que, por sua vez, podem ter sido obtidas através de qualquer método.
+Embora os métodos de ML também sejam utilizados no contexto de previsão de séries temporais, é importante ressaltar que este não é caso deste trabalho. As previsões de séries temporais são realizadas anteriormente, na obtenção das previsões base $\hat{y}_t$. Nada impede que essas previsões sejam obtidas por métodos de ML, inclusive utilizando técnicas de previsão hierárquica na predição de séries individuais [@athanasopoulos_forecasting_2017], entretanto, a aplicação dos métodos de ML aqui ocorrem na reconciliação, ou seja, na combinação contemporânea, *cross section*, das previsões base que, por sua vez, podem ter sido obtidas através de qualquer método.
 
-Para isso, serão utilizadas as abordagens trabalhadas em @spiliotis_hierarchical_2021: a de nível único *bottom-up*^[Como o banco de dados Estban é agrupado, a desagregação não é única e as abordagem *top-down* e *middle-out* não podem ser aplicadas [@athanasopoulos_forecast_2023].], o método analítico de reconciliação ótima *MinT-Shrink* e os métodos de reconciliação ótima baseados em *machine learning*: *gradient boosting*, especificamente o *XGBoost*, e *Random Forest*. Adicionalmente, serão avaliados os métodos *Elastic Net* (*Lasso*, *Ridge* e *Elastic Net*) e *Support Vector Machines*, além de outra implementação de *gradient boosting*, o *LightGBM*. Uma breve introdução sobre cada um desses métodos pode ser encontrado no Apêndice \ref{apendice_metodos_ml}.
+Nesse sentido, este trabalho busca estender o *framework* de combinação ótima utilizando métodos de ML para a reconciliação de séries temporais hierárquicas e agrupadas. Além de avaliar 7 implementações de métodos de ML (RF, XGB, *Lasso*, *ridge*, *elastic net*, SVM e LGBM)^[Uma breve introdução sobre cada um desses métodos pode ser encontrado no Apêndice \ref{apendice_metodos_ml}.], propõe variações metodológicas para a obtenção do conjunto de treinamento dos modelos de ML.
 
-## Métodos de *machine learning* para reconciliação ótima
+## Metodologia de combinação ótima via *machine learning*
 
-@spiliotis_hierarchical_2021 propõem estimar essa combinação através de métodos de ML ao invés de MQG. Sua abordagem consiste nas etapas transcritas a seguir, quase *ipsis litteris*:
+@spiliotis_hierarchical_2021 propõem estimar essa combinação em uma abordagem que constitui-se nas seguintes etapas:
 
-1. Seja $k$ a quantidade de níveis da hierarquia, $m$ a quantidade de séries e $n$ o tamanho de cada série. As séries são divididas em uma série de conjuntos de treinamento e conjuntos de teste, com cada conjunto de treinamento compreendendo as primeiras $p < n$ observações (para $p = q, q + 1, ..., n - 1$) e o conjunto de teste correspondente compreendendo apenas as observações no tempo $p + 1$.
-2. Um modelo de previsão é ajustado para cada série em cada conjunto de treinamento e previsões um passo à frente são produzidas para cada conjunto de teste.
-3. Um modelo de ML separado^[Os autores trabalharam com *random forest* e *XGBoost*.] é construído para prever cada uma das $m_k$ séries inferiores da hierarquia. O conjunto de treinamento de cada modelo consiste em $n - p$ observações e $m + 1$ variáveis. As primeiras $m$ variáveis (usadas como preditores ou entradas) são as previsões um passo à frente produzidas durante o processo de *rolling origin* para as $m$ séries da hierarquia, e a última variável (a variável explicada) é o valor real da série de nível inferior nos tempos correspondentes. A função de perda dos modelos é a soma dos erros quadráticos, e os hiperparâmetros dos modelos de ML são determinados arbitrariamente pelo usuário ou por meio de um procedimento de otimização.
-4. A amostra completa das séries (todas as $n$ observações) é usada para produzir previsões base de $h$ passos à frente para as $m$ séries da hierarquia, onde $h$ é o horizonte de previsão de interesse.
-5. Os modelos $m_k$ que foram construídos na 3ª etapa são usados para fornecer previsões para as séries do nível inferior da hierarquia, usando as previsões base produzidas na 4ª etapa como entrada. Esse processo é repetido h vezes, cada vez para um horizonte de previsão diferente.
-6. As previsões produzidas pelos modelos de ML na 5ª etapa são agregadas (somadas) para que as previsões reconciliadas sejam produzidas para o restante dos níveis hierárquicos.
+@. Previsões base:
+Para cada série $y_t$, incluindo os nós de agregação, utiliza-se todo o conjunto de treinamento, de tamanho $T$, para produzir previsões $h$ passos à frente, $\hat{y}_{t+h|T}$, utilizando qualquer método de previsão. Essas são as previsões base a serem reconciliadas.
 
-```{=latex}
-\begin{figure}[hbtp]
-  \centering
-  \includegraphics{img/spiliotis.png}
-  \caption[Abordagem de reconciliação ótima por ML.]{Abordagem de reconciliação ótima por ML. Fonte: \cite{spiliotis_hierarchical_2021}.}
-  \label{fig:spiliotis}
-\end{figure}
-```
+![Previsões base a serem reconciliadas. Em azul, o conjunto de treino e, em verde, as previsões $h$ passos à frente para fora da amostra.](img/modelagem_1.png){#fig-modelagem-1 fig-scap="Previsões base a serem reconciliadas" width=70%}
 
-A maior parte dos métodos de \textit{machine learning} são altamente parametrizáveis, sendo sua performance de generalização (para fora da amostra) sensível à escolha de seus hiperparâmetros. Quando disponível, os hiperparâmetros a serem otimizados e seus espaços de busca seguiram a recomendação em \cite{bischl_hyperparameter_2021}.
-
-Os conjuntos de hiperparâmetros e seus intervalos são apresentados no Apêndice \ref{apendice_hiperparametros}. Para a otimização, foram utilizadas dois calibradores: (i) busca em grade (com resolução de 10 combinações), mais custoso em tempo de processamento, para os métodos com menor quantidade de hiperparâmetros a serem otimizados, e (ii) otimização bayesiana (na configuração padrão do pacote {mlr3MBO}), mais eficiente para os métodos com maior quantidade de hiperparâmetros. A estratégia de reamostragem utilizada foi a validação cruzada *k-fold* com $k=10$.
-
-A otimização bayesiana foi usada em todos os métodos, exceto no *elastic net*, uma vez que apenas um (no caso do *lasso* e *ridge*) ou dois hiperparâmetros foram otimizados. A medida de performance utilizada para a otimização foi a raiz do erro quadrático médio (*root mean squared error* — RMSE).
-
-Por fim, cada modelo foi calibrado individualmente, ou seja, em todos os estudos de caso, cada nó possui um conjunto de hiperparâmetros otimizados para cada um dos 7 métodos de ML empregados para reconciliação ótima.
-
-Foram avaliadas três estratégias para obtenção das previsões reconciliadas. A primeira é a proposta por @spiliotis_hierarchical_2021, adaptada à base de dados Estban e com as janelas de treino e previsão mais próximas ao caso de uso de uma instituição financeira. Ela consiste em:
-
-@. *rolling forecast*:
-A amostra treino é separada em $p$ subamostras para todas as séries em todos os níveis de agregação, com a primeira separação abrangindo $y_1$ até $Y_Q$, a segunda $y_1$ até $Y_{Q+1}$ e assim sucessivamente até a última separação abrangendo $y_1$ até $Y_{Q+p-1}$. Para cada subamostra foi treinado um modelo (de mesmo algoritmo usado na [seção @sec-previsoes_base]) e obtida previsão um passo a frente. Para este trabalho, a amostra treino foi divida em 50%, com $Q=120$ e $p=108$.
+@. *Rolling forecast*:
+A amostra treino é separada em $p$ subamostras para todas as séries em todos os níveis de agregação, com a primeira separação abrangindo $y_1$ até $y_Q$, a segunda $y_1$ até $y_{Q+1}$ e assim sucessivamente até a última separação abrangendo $y_1$ até $y_{Q+p-1}$. Para cada subamostra é treinado um modelo que, mais uma vez, pode ser estimado utilizando qualquer método. Então, é realizada previsão um passo a frente. Essas previsões são então concatenadas para formar o conjunto de treinamento para os modelos de ML.
 
 ![Esquema de modelagem *rolling forecast*](img/modelagem_2.png){#fig-modelagem-2 width=70%}
 
-@. Treino dos modelos de *machine learning*:
-Para cada série do nível mais desagregado, $y_m$, é treinado um modelo de ML com $n+1$ variáveis, compostas pelas $n$ séries previstas — que incluem todos os níveis de agregação —, mais a própria $y_m$ como variável explicada (@tbl-modelagem). Cada uma das $n$ séries contam com $p$ previsões obtidas no passo 1, representadas na @fig-modelagem-2 pela cor verde. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos.
-    
-@. Reconciliação ótima:
-Com os modelos treinados no passo 2, passa-se as previsões base obtidas na [seção @sec-previsoes_base] como regressores para se obter as previsões reconciliadas $h$ passos à frente das séries do nível mais desagregado $\tilde{y}_m$.
-
-@. Agregação: Assim como nos métodos analíticos de combinação ótima, a obtenção das previsões reconciliadas para os demais níveis de hierárquicos $\tilde{y}_n$ se dá através da agregação semelhante ao *bottom-up*, mas ao invés de se somar as previsões base $\hat{y}_m$, somam-se as previsões reconciliadas $\tilde{y}_m$.
+@. Treino dos modelos de ML:
+Para cada série do nível mais desagregado, $y_m$, é treinado um modelo de ML com $n+1$ variáveis, compostas pelas $n$ séries previstas — que incluem todos os níveis de agregação —, mais a própria $y_m$ como variável explicada (@tbl-modelagem). Cada uma das $n$ séries contam com $p$ previsões obtidas no passo 2, representadas na @fig-modelagem-2 pela cor verde. Isso resulta em um modelo de reconciliação ótima para cada elemento do menor nível da hierarquia, combinando informações disponíveis de todos os níveis hierárquicos.
 
 ```{r}
 #| label: tbl-modelagem
-#| tbl-cap: "Conjunto de dados para predição dos modelos de ML"
+#| tbl-cap: "Conjunto de treinamento para predição dos modelos de ML"
   tibble::tribble(
     ~`Var. Explicada`, ~`Variável 1`, ~`Variável 2`, ~..., ~`Variável n`,
     "$y_{1,Q+1}$", "$\\hat{y}_{1,Q+1}$", "$\\hat{y}_{2,Q+1}$", "...", "$\\hat{y}_{n,Q+1}$",
@@ -637,17 +611,32 @@ Com os modelos treinados no passo 2, passa-se as previsões base obtidas na [se�
   kable_styling(latex_options = c("striped"))
 ```
 
-Dessa forma, essa metodologia é semelhante à aplicada na reconciliação ótima analítica, se afastando principalmente em três pontos: (i) a utilização de algoritmos de ML ao invés de MQG, (ii) a não atribuição de peso de forma obrigatória para todos os nós da hierarquia e (iii) no ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021].
+@. Reconciliação ótima:
+Com os modelos treinados no passo 3, passa-se as previsões base obtidas no passo 1 como regressores para se obter as previsões reconciliadas $h$ passos à frente das séries do nível mais desagregado $\tilde{y}_m$.
+
+@. Agregação: Assim como nos métodos analíticos de combinação ótima, a obtenção das previsões reconciliadas para os demais níveis de hierárquicos $\tilde{y}_n$ se dá através da agregação BU, mas ao invés de se somar as previsões base $\hat{y}_m$, somam-se as previsões reconciliadas $\tilde{y}_m$.
+
+Dessa forma, essa metodologia é semelhante à aplicada na reconciliação ótima analítica, se afastando principalmente em três pontos: (i) a utilização de algoritmos de ML ao invés de MQG, (ii) a não atribuição de peso de forma obrigatória para todos os nós da hierarquia e (iii) no ajuste de um modelo individual para cada série do nível mais desagregado, permitindo maior especialização e sendo capaz de se adaptar melhor aos diferentes padrões de cada série [@spiliotis_hierarchical_2021]. A 
+
+![Metodologia de combinação ótima via ML. Estratégia *rolling forecast* (Fonte: @spiliotis_hierarchical_2021)](img/modelagem_rolling.png){#fig-modelagem-rolling fig-scap="Metodologia de combinação ótima via ML. Estratégia *rolling forecast*"}
 
 Um ponto negativo na metodologia proposta por @spiliotis_hierarchical_2021 é o processo de *rolling origin* (passo 1). Estimar um modelo para cada conjunto de treinamento sequencialmente em um cenário de largas hierarquias e diversos grupos pode ser muito custoso em tempo de processamento. No caso do banco de dados Estban, temos `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia)))` agências e `r with(subset(estban, !is_aggregated(verbete)), length(unique(verbete)))` verbetes, totalizando `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia))) * with(subset(estban, !is_aggregated(verbete)), length(unique(verbete)))` séries a serem estimadas. Para cada uma delas, devem ser ajustados $p$ modelos, somando ao todo `r scales::number(108 * 158, big.mark = ".", decimal.mark = ",")` modelos.
 
 Nesse sentido, uma alternativa é o processo de reestimação, que consiste na reestimação de um modelo para um novo conjunto de dados. Nessa estratégia, que chamaremos de *reduced fitted values*, os $m$ modelos são treinados até $Q$ e então reajustados para o restante do conjunto de dados [$Q$, $Q+p$], se esquivando do processo de *rolling origin*. Uma restrição dessa abordagem é que, fixados os hiperparâmetros anteriores, não necessariamente todos modelos alcançarão convergência no reajuste de seus coeficientes para o novo conjunto de dados.
 
+![Metodologia de combinação ótima via ML. Estratégia *reduced fitted base*](img/modelagem_refit.png){#fig-modelagem-refit}
+
 As duas estratégias possuem uma fragilidade em comum: a necessidade de realização de previsões para dentro do conjunto de treinamento. Isso pode ser um problema para séries temporais com poucas observações ou incompletas. No caso da base de dados Estban, algumas das agências foram criadas após o período escolhido para a separação do conjunto de treino em $Q$ (dezembro/2012), sendo necessário sua exclusão do dataset e invalidando o uso da metodologia para essas unidades.
 
 Nesses casos, uma 3º estratégia para permitir o uso dos métodos de ML é usar os valores ajustados dos modelos das previsões base $\hat{y}$ ([seção @sec-previsoes_base]) como input para os modelos de ML. Isso signfica usar previsões 1 passo à frente obtidas ao longo de todo o período $q=1, 2, 3, ..., Q+p$. Além de permitir a inclusão de séries incompletas — agências criadas durante o período, no caso da base de dados Estban —, essa abordagem também aumenta o tamanho da amostra treino em $Q$ observações, o que pode melhorar a performance dos modelos de ML. Chamaremos essa estratégia de *fitted base*.
 
-Em suma, vamos realizar o experimento através da metodologia de @spiliotis_hierarchical_2021, com a adição de 5 métodos de ML, e também testar duas outras possibilidades não investigadas em seu artigo original, doravante denominadas *fitted base* e *reduced fitted base*.
+A maior parte dos métodos de \textit{machine learning} são altamente parametrizáveis, sendo sua performance de generalização (para fora da amostra) sensível à escolha de seus hiperparâmetros. Quando disponível, os hiperparâmetros a serem otimizados e seus espaços de busca seguiram a recomendação em \cite{bischl_hyperparameter_2021}.
+
+Os conjuntos de hiperparâmetros e seus intervalos são apresentados no Apêndice \ref{apendice_hiperparametros}. Para a otimização, foram utilizadas dois calibradores: (i) busca em grade (com resolução de 10 combinações), mais custoso em tempo de processamento, para os métodos com menor quantidade de hiperparâmetros a serem otimizados, e (ii) otimização bayesiana (na configuração padrão do pacote {mlr3MBO}), mais eficiente para os métodos com maior quantidade de hiperparâmetros. A estratégia de reamostragem utilizada foi a validação cruzada *k-fold* com $k=10$.
+
+A otimização bayesiana foi usada em todos os métodos, exceto no *elastic net*, uma vez que apenas um (no caso do *lasso* e *ridge*) ou dois hiperparâmetros foram otimizados. A medida de performance utilizada para a otimização foi a raiz do erro quadrático médio (*root mean squared error* — RMSE).
+
+Por fim, cada modelo foi calibrado individualmente, ou seja, em todos os estudos de caso, cada nó possui um conjunto de hiperparâmetros otimizados para cada um dos 7 métodos de ML empregados para reconciliação ótima.
 
 ## O processo de ajuste e sobreajuste
 
@@ -1070,15 +1059,6 @@ Uma vez que o foco deste trabalho está no incremento de performance proporciona
 
 Os modelos foram treinados com dados de 2003 a 2021 e as previsões $h$ passos à frente foram realizadas para o ano de 2022, com $h={1, 2, 3, ..., 12}$ (Figura \ref{fig:modelagem-1}). Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são descorrelatados. Isso sugere que os modelos de previsão base são, em sua maior parte, adequados para o propósito deste trabalho.
 
-```{=latex}
-\begin{figure}[hbtp]
-  \centering
-  \includegraphics[width=0.7\textwidth]{img/modelagem_1.png}
-  \caption[Previsões base a serem reconciliadas.]{Previsões base a serem reconciliadas. Em azul, o conjunto de treino e, em verde, as previsões $h$ passos à frente para fora da amostra.}
-  \label{fig:modelagem-1}
-\end{figure}
-```
-
 ```{r}
 #| label: tbl-lb-pvalue
 #| tbl-cap: "Resultados do teste de Ljung-box para as previsões base ($\\alpha = 0.05$)"
@@ -1170,7 +1150,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação, estratégia rolling forecast."
 #| label: tbl-estban-results-ml-rolling
 
 rbind(
@@ -1197,7 +1177,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação, estratégia fitted base"
 #| label: tbl-estban-results-ml-fitted
 
 rbind(
@@ -1219,7 +1199,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação. Estratégia reduced fitted base."
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação, estratégia reduced fitted base"
 #| label: tbl-estban-results-ml-refit
 
 rbind(
@@ -1338,7 +1318,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados para \"overnight trips\": Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
+#| tbl-cap: "Resultados para \"overnight trips\": Acurácia dos métodos de ML de reconciliação, estratégia rolling forecast"
 #| label: tbl-tourism-results-ml-rolling
 
 rbind(
@@ -1378,7 +1358,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados para \"overnight trips\": Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
+#| tbl-cap: "Resultados para \"overnight trips\": Acurácia dos métodos de ML de reconciliação, estratégia fitted base"
 #| label: tbl-tourism-results-ml-fitted
 
 rbind(
@@ -1415,7 +1395,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados para \"overnight trips\": Acurácia dos métodos de ML de reconciliação. Estratégia reduced fitted base."
+#| tbl-cap: "Resultados para \"overnight trips\": Acurácia dos métodos de ML de reconciliação, estratégia reduced fitted base"
 #| label: tbl-tourism-results-ml-refit
 
 rbind(
@@ -1500,7 +1480,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados para \"visitor nights\": Acurácia dos métodos de ML de reconciliação. Estratégia rolling forecast."
+#| tbl-cap: "Resultados para \"visitor nights\": Acurácia dos métodos de ML de reconciliação, estratégia rolling forecast"
 #| label: tbl-tourism-monthly-results-ml-rolling
 
 rbind(
@@ -1537,7 +1517,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados para \"visitor nights\": Acurácia dos métodos de ML de reconciliação. Estratégia fitted base."
+#| tbl-cap: "Resultados para \"visitor nights\": Acurácia dos métodos de ML de reconciliação, estratégia fitted base"
 #| label: tbl-tourism-monthly-results-ml-fitted
 
 rbind(
@@ -1577,7 +1557,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados para \"visitor nights\": Acurácia dos métodos de ML de reconciliação. Estratégia reduced fitted base."
+#| tbl-cap: "Resultados para \"visitor nights\": Acurácia dos métodos de ML de reconciliação, estratégia reduced fitted base"
 #| label: tbl-tourism-monthly-results-ml-refit
 
 rbind(
