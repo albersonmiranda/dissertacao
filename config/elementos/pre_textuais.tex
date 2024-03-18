@@ -117,7 +117,7 @@
 
 \setlength{\absparsep}{18pt}
 \begin{resumo}
-  O campo de pesquisa em métodos para previsões de séries temporais hierárquicas tem se mostrado fértil na última década, com seus avanços contribuindo para ganhos de acurácia na previsão de uma ampla gama de coleções de séries temporais. Recentemente, métodos de \textit{machine learning} (ML) têm sido incorporados à literatura de séries temporais hierárquicas, com trabalhos como os de \textcite{spiliotis_hierarchical_2021} e \textcite{makridakis_m5_2022} demonstrando resultados promissores. Este trabalho estende a exploração desses métodos na reconciliação ótima de séries temporais hierárquicas e agrupadas, investigando abordagens como \textit{random forest}, \textit{gradient boosting}, \textit{elastic net} e \textit{support vector machines}, e avaliando tanto sua performance preditiva quanto sua praticidade em termos de tempo de processamento. Além disso, o trabalho explora os efeitos de diferentes estratégias de obtenção do conjunto de treinamento para os modelos de ML, utilizando previsões para dentro da amostra obtidas via \textit{rolling origin forecasting}, valores ajustados de modelos reestimados (\textit{reduced fitted base}) e valores ajustados dos modelos de previsão base (\textit{fitted base}). Para avaliar a metodologia proposta, foram realizados três estudos de caso, sendo o primeiro relacionado a uma aplicação em economia bancária no Brasil, enquanto os demais envolvem bases de dados relacionadas ao setor de turismo doméstico australiano, amplamente utilizadas na literatura de séries temporais hierárquicas: 1. previsão de saldos de empréstimos e financiamentos do Banco do Estado do Espírito Santo; 2. previsão da quantidade trimestral de viagens; e 3. previsão da quantidade mensal de noites que os visitantes passam em viagens. Os resultados revelam que não há método ou estratégia que alcance consistentemente a melhor performance em todas as bases de dados ou níveis hierárquicos. Portanto, a escolha do método de reconciliação e da estratégia para obtenção do conjunto de treinamento depende não apenas da amostra, mas também do nível hierárquico de interesse do pesquisador. A combinação correta do método de ML e da estratégia pode resultar em até 91\% de ganho de performance em relação aos métodos analíticos de reconciliação ótima..
+  O campo de pesquisa em métodos para previsões de séries temporais hierárquicas tem se mostrado fértil na última década, com seus avanços contribuindo para ganhos de acurácia na previsão de uma ampla gama de coleções de séries temporais. Recentemente, métodos de \textit{machine learning} (ML) têm sido incorporados à literatura de séries temporais hierárquicas, com trabalhos como os de \textcite{spiliotis_hierarchical_2021} e \textcite{makridakis_m5_2022} demonstrando resultados promissores. Este trabalho estende a exploração desses métodos na reconciliação ótima de séries temporais hierárquicas e agrupadas, investigando abordagens como \textit{random forest}, \textit{gradient boosting}, \textit{elastic net} e \textit{support vector machines}, e avaliando tanto sua performance preditiva quanto sua praticidade em termos de tempo de processamento. Além disso, o trabalho explora os efeitos de diferentes estratégias de obtenção do conjunto de treinamento para os modelos de ML, utilizando previsões para dentro da amostra obtidas via \textit{rolling origin forecasting}, valores ajustados de modelos reestimados (\textit{reduced fitted base}) e valores ajustados dos modelos de previsão base (\textit{fitted base}). Para avaliar a metodologia proposta, foram realizados três estudos de caso, sendo o primeiro relacionado a uma aplicação em economia bancária no Brasil, enquanto os demais envolvem bases de dados relacionadas ao setor de turismo doméstico australiano, amplamente utilizadas na literatura de séries temporais hierárquicas: 1. previsão de saldos de empréstimos e financiamentos do Banco do Estado do Espírito Santo; 2. previsão da quantidade trimestral de viagens; e 3. previsão da quantidade mensal de noites que os visitantes passam em viagens. Os resultados revelam que não há método ou estratégia que alcance consistentemente a melhor performance em todas as bases de dados ou níveis hierárquicos. Portanto, a escolha do método de reconciliação e da estratégia para obtenção do conjunto de treinamento depende não apenas da amostra, mas também do nível hierárquico de interesse do pesquisador. A combinação correta do método de ML e da estratégia pode resultar em até 91\% de ganho de performance em relação aos métodos analíticos de reconciliação ótima.
 
   \textbf{Palavras-chave}: Séries Temporais Hierárquicas. Reconciliação Ótima. \textit{Machine Learning}. Economia Bancária.
 \end{resumo}
@@ -151,18 +151,23 @@
 
 % lista de abreviaturas 
 \begin{siglas}
+  \item[Banestes] BANco do ESTado do Espírito Santo
   \item[ETS] \textit{Exponentional Smoothing}
   \item[Favar] \textit{Factor Augmented Vector Autoregression}
   \item[Lasso] \textit{Least Absolute Shrinkage and Selection Operator}
+  \item[LGBM] \textit{Light Gradient Boosting Machine}
   \item[MCRL] Modelo Clássico de Regressão Linear
   \item[MASE] \textit{Mean Absolute Scaled Error}
   \item[MinT] \textit{Minimum Trace}
+  \item[ML] \textit{Machine Learning}
   \item[MQGF] Mínimos Quadrados Generalizados Factíveis
   \item[MQO] Mínimos Quadrados Ordinários
   \item[MQP] Mínimos Quadrados Ponderados
   \item[PIB] Produto Interno Bruto
+  \item[RF] \textit{Random Forest}
   \item[RMSSE] \textit{Root Mean Squared Scaled Error}
   \item[SFN] Sistema Financeiro Nacional
+  \item[SVM] \textit{Support Vector Machines}
   \item[SVR] \textit{Support Vector Regression}
   \item[XGBoost] \textit{Extreme Gradient Boosting}
 \end{siglas}
@@ -181,8 +186,8 @@
   \item[$ k $] Número de níveis na hierarquia
   \item[$ \mathbfit{S} $] Matriz de soma
   \item[$ \mathbfit{G} $] Matriz de reconciliação
-  \item[$\{...\}$] Conjunto
-  \item[$|\{...\}|$] Cardinalidade de um conjunto
+  \item[$ \{...\} $] Conjunto
+  \item[$ |\{...\}| $] Cardinalidade de um conjunto
 \end{simbolos}
 
 % sumário 
