@@ -15,6 +15,8 @@ RUN install2.r --error --skipinstalled -n -1 \
         ranger \
         xgboost \
         DiceKriging \
+        e1071 \
+        lightgbm \
     && rm -rf /tmp/downloaded_packages
 
 # Install Python packages

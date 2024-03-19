@@ -6,7 +6,7 @@ source("scripts/tourism/reconcile_ml/trafos.r")
 
 # configurações
 library("mlr3temporal")
-inner_resampling = rsmp("forecast_cv", folds = 10, fixed_window = FALSE, horizon = 12, window_size = 60)
+inner_resampling = rsmp("forecast_cv", folds = 10, fixed_window = FALSE, horizon = 4, window_size = 12)
 measure = msr("regr.rmse")
 terminator = trm("combo", list(
   trm("stagnation", iters = 3),
