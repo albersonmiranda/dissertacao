@@ -171,7 +171,7 @@ search_space$trafo = trafo_svm
 
 # tuner
 svm = auto_tuner(
-  tuner = tuner_grid,
+  tuner = tuner_mbo,
   learner = learners$svm,
   resampling = inner_resampling,
   measure = measure,
@@ -207,7 +207,7 @@ search_space$trafo = trafo_lightgbm
 
 # tuner
 lightgbm = auto_tuner(
-  tuner = tuner_grid,
+  tuner = tuner_mbo,
   learner = learners$lightgbm,
   resampling = inner_resampling,
   measure = measure,
