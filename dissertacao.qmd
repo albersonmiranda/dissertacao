@@ -43,6 +43,7 @@ knitr::write_bib(
     .packages(),
     "basedosdados",
     "mlr3",
+    "mlr3mbo"
     "xgboost",
     "e1071",
     "ranger",
@@ -580,7 +581,7 @@ Embora os métodos de ML também sejam utilizados no contexto de previsão de s�
 
 Nesse sentido, este trabalho busca estender o *framework* de combinação ótima utilizando métodos de ML para a reconciliação de séries temporais hierárquicas e agrupadas. Além de avaliar 7 implementações de métodos de ML (RF, XGB, *Lasso*, *ridge*, *elastic net*, SVM e LGBM)^[Uma breve introdução sobre cada um desses métodos pode ser encontrado no Apêndice \ref{apendice_metodos_ml}.], propõe variações metodológicas para a obtenção do conjunto de treinamento dos modelos de ML.
 
-## Metodologia de combinação ótima via *machine learning*
+## Metodologia de combinação ótima via *machine learning* {#sec-metodologia_ml}
 
 @spiliotis_hierarchical_2021 propõem estimar essa combinação em uma abordagem que constitui-se nas seguintes etapas:
 
@@ -690,7 +691,9 @@ A prática usual em *budgeting*^[O orçamento é um documento no qual é definid
 
 Esse é o caso do Banestes. Com 134 agências distribuídas pelos 78 municípios capixabas, realizar o *budgeting* para R$ 5,5 bi de faturamento^[Conforme demonstrativos publicados referentes ao exercício de 2022 [@banco_do_estado_do_espirito_santo_demonstracoes_2022].] não é uma tarefa trivial. Além de uma estrutura hierárquica de alta dimensionalidade por conta da quantidade de agências, se tratando de um banco múltiplo^[Para ser classificado como banco múltiplo, a instituição financeira deve operar com, no mínimo, duas carteiras dentre: comercial; investimento ou desenvolvimento; crédito imobiliário; de crédito, financiamento e investimento, e; arrendamento mercantil [@conselho_monetario_nacional_resolucao_1994].] que opera com diversas carteiras, as $n$ modalidades de crédito^[Crédito consignado, rural, imobiliário, pessoal, capital de giro, desconto de títulos etc.] expandem a estrutura para um total de $n \times 134$ séries temporais a serem estimadas.
 
-Dada tal complexidade, a abordagem *top-down* se coloca como uma opção viável em termos de tempo de processamento e análise. No entanto, conforme descemos na hierarquia, menos precisa ela se torna e, além disso, as características individuais das séries temporais do menor nível hierárquicos são ignoradas.
+Dada tal complexidade, a abordagem *top-down* se coloca como uma opção viável em termos de tempo de processamento e análise. No entanto, conforme descemos na hierarquia, menos precisa ela se torna e, além disso, as características individuais das séries temporais do menor nível hierárquicos são ignoradas. No sentido inverso, caso se escolha estimar modelos para cada uma das 134 agências e agregá-las (*bottom-up*), ignora-se a influência que os níveis mais agregados — aqui a carteira de crédito da região ou de todo o estado — podem ter na estimação do saldo de crédito de cada agência. De qualquer forma, utiliza-se informação incompleta. Nesse sentido, a reconciliação ótima pode incrementar em grande medida a acurácia das previsões de saldos de crédito de instituições financeiras, permitindo a elaboração do *guidance* e do orçamento de forma mais precisa.
+
+Neste estudo de caso, buscou-se aprimorar as previsões de saldos de empréstimos e financiamentos do Banco do Estado do Espírito Santo através da aplicação da metodologia de combinação ótima via ML. Para o *benchmarking*, foram testadas 7 implementações de métodos de ML (XGB, RF, LGBM, *Elastic Net*, *Lasso*, *ridge* e SVM), 2 métodos analíticos (*bottom-up* e MinT), 3 estratégias de aquisição do conjunto de treinamento para os modelos de ML (*rolling forecast*, *fitted values* e *reduced fitted values*) e 2 estratégias de validação cruzada (aleatória e *rolling origin*).
 
 ## Revisão de literatura
 
@@ -700,7 +703,7 @@ Já para níveis abaixo do agregado de crédito, poucos trabalhos foram encontra
 
 No que diz respeito à previsão de séries temporais em largas hierarquias, @prayoga_top-down_2017 trabalharam na previsão do fluxo de caixa do Banco da Indonésia, utilizando uma hierarquia de 3 níveis. Porém, utilizaram apenas a abordagem *top-down* para reconciliação. Inversamente, @li_hierarchical_2016 compararam dois métodos de *machine learning* para previsão da produção de energia solar no estado da Flórida/EUA, redes neurais artificiais e SVM, em uma abordagem *bottom-up*, caracterizando ambos trabalhos como de nível único.
 
-<!-- TODO: aplicações macroeconômicas na em Athanasopoulos 2023 -->
+Aplicações de reconciliação ótima foram realizadas a nível macroeconômico para previsão do PIB australiano, índices de inflação no Reino Unido e México, e previsão de desemprego no Brasil [@athanasopoulos_forecast_2023]. Entretanto, não foram encontradas referências à aplicação de reconciliação ótima para previsão hierárquica de saldos de empréstimos e financiamentos de bancos, tanto a nível individual quanto para o agregado de crédito de uma economia, de forma que este trabalho possa ser o primeiro a aplicar a abordagem de combinação ótima via ML para esse contexto.
 
 ## Metodologia
 
@@ -708,7 +711,7 @@ Os dados usados nesse trabalho são dados terciários obtidos do *datalake* púb
 
 O que compõe os verbetes de crédito, ou seja, os valores das séries temporais a serem trabalhadas, são os saldos de crédito ativo (empréstimos e financiamentos), que correspondem ao principal mais os juros calculados até 59 dias de atraso^[Não são consideradas crédito ativo as operações de crédito liquidadas ou que tenham sido transferidas para prejuízo. São transferidas para prejuízo as operações de crédito em atraso há mais 6 meses após sua classificação de risco em H, que é a mínima [@conselho_monetario_nacional_resolucao_1999].]. Além das estatísticas bancárias, foram obtidas informações de regiões, mesorregiões e microrregiões dos estados, também a partir *datalake* Base dos Dados, com o objetivo de enriquecer a estrutura hierárquica dos dados do ESTBAN, limitada aos municípios.
 
-Em relação à cobertura temporal, utilizaremos dados entre 2003 e 2022. Por conta da limitação imposta pelo processo de *rolling origin* (1ª etapa da metodologia de @spiliotis_hierarchical_2021), que requer previsões para dentro do conjunto de treinamento, apesar do Banestes contar com 134 agências, foram mantidas apenas as agências com série completa, ou seja, que já estavam em atividade em 2003.
+Em relação à cobertura temporal, utilizou-se dados entre 2003 e 2022. Por brevidade, optou-se por não trabalhar com dados faltantes^[Ver @sec-metodologia_ml.]. Portanto, apesar do Banestes contar com 134 agências, foram mantidas apenas as agências com série completa, ou seja, que já estavam em atividade em 2003.
 
 Por fim, o conjunto de dados conta com séries mensais de saldos de empréstimos e financiamentos de `r with(subset(estban, !is_aggregated(cnpj_agencia)), length(unique(cnpj_agencia)))` agências bancárias, distribuídas por `r with(subset(estban, !is_aggregated(nome)), length(unique(nome)))` municípios, entre `r format(min(estban$ref), "%B de %Y")` e `r format(max(estban$ref), "%B de %Y")`, totalizando `r scales::number(nrow(subset(estban, !is_aggregated(cnpj_agencia) & !is_aggregated(verbete))), big.mark = ".", decimal.mark = ",")` observações. Esses dados então são organizados de forma hierárquica por estado, mesorregião, microrregião, município e agência bancária; e, de forma agrupada, por verbete. Com a estrutura hierárquica e agrupada, o conjunto de dados alcança `r scales::number(nrow(estban))` observações.
 
@@ -782,8 +785,6 @@ O estado do Espírito Santo está localizado no sudeste brasileiro e é dividido
 
 O Estado do Espírito Santo e suas meso e microrregiões.
 :::
-
-As microrregiões que compõem cada mesorregião são apresentadas na @tbl-microrregioes e na @fig-mapa-es. Já os municípios que compõem cada microrregião são apresentados na @tbl-municipios. A @fig-mapa-municipalidades mostra a quantidade de agências por município.
 
 ```{r}
 #| label: tbl-microrregioes
@@ -958,14 +959,16 @@ plots = temp |>
       facet_wrap(~ factor(nome_mesorregiao), scales = "free_y") +
       labs(x = "", y = "Saldo (em R$ mi)", color = "microrregião") +
       tema +
+      guides(
+        color = guide_legend(position = "inside")
+      ) +
       theme(
         legend.key.size = unit(0.2, "cm"),
         legend.title = element_text(size = 6),
         legend.text = element_text(size = 6),
-        legend.position = c(0.08, 0.9),
-        legend.justification = c(0.08, 0.9),
         strip.text = element_text(size = 6),
-        axis.title.y = element_text(size = 6)
+        axis.title.y = element_text(size = 6),
+        legend.justification.inside = c(0.08, 0.9)
       )
 
   })
@@ -1033,21 +1036,10 @@ estban |>
   theme(legend.position = "bottom")
 ```
 
-O *software* usado foi o R [@R-base]. As previsões base, as previsões hierárquicas de nível único e a reconciliação ótima através da MinT foram realizados com os pacotes {fable} [@R-fable] e {fabletools} [@R-fabletools]. Já metodologia de *machine learning* (reamostragem, otimização de hiperparâmetros, treino e predição) foi executada com o pacote {mlr3} [@R-mlr3] e suas extensões. As implementações do XGBoost e LightGBM foram realizadas com seus pacotes homônimos {xgboost} [@R-xgboost] e {ligthgbm} [@R-lightgbm], do Elastic Net com o pacote {glmnet} [@R-glmnet], a do Random Forest com o pacote {ranger} [@R-ranger] e a do SVM com o pacote {e1071} [@R-e1071].
 
-Boa parte dos métodos de ML são altamente parametrizáveis, sendo sua performance de generalização (para fora da amostra) sensível à escolha de seus hiperparâmetros. Para os métodos avaliados neste trabalho, os conjuntos de hiperparâmetros a serem otimizados e seus respectivos espaços de busca são apresentados no Apêndice @apendice_hiperparametros, de acordo com a recomendação em @bischl_hyperparameter_2021.
+Em relação às previsões base, uma vez que o foco deste trabalho está no incremento de performance proporcionado pela reconciliação ótima sobre um conjunto de previsões individuais para fora da amostra e não na qualidade destas, elas foram obtidas por meio de métodos simples para previsão de séries temporais, especificamente o algoritmo de Hyndman-Koehler-Snyder-Grose para suavização exponencial (ETS) [@hyndman_state_2002]. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
 
-Para a otimização, foram utilizadas dois calibradores: (i) busca em grade (com resolução de 10 combinações), mais custoso em tempo de processamento, para os métodos com menor quantidade de hiperparâmetros a serem otimizados, e (ii) otimização bayesiana (na configuração padrão do pacote {mlr3MBO}), mais eficiente para os métodos com maior quantidade de hiperparâmetros. A estratégia de reamostragem utilizada foi a validação cruzada *k-fold* aleatória e com origem móvel, ambas com $k=10$. Para a segunda, utilizou-se janela mínima de 5 anos e $|\Omega^b| = 12$, compatível com o horizonte de previsão para o experimento.
-
-A otimização bayesiana foi usada em todos os métodos, exceto no *elastic net*, uma vez que apenas um (no caso do *Lasso* e *ridge*) ou dois hiperparâmetros foram otimizados. A medida de performance utilizada para a otimização foi a raiz do erro quadrático médio (*root mean squared error* — RMSE).
-
-Por fim, cada modelo foi calibrado individualmente, ou seja, cada série $y_m$ possui um conjunto de hiperparâmetros otimizados para cada um dos 7 métodos de ML empregados para combinação ótima.
-
-## Previsões base {#sec-previsoes_base}
-
-Uma vez que o foco deste trabalho está no incremento de performance proporcionado pela reconciliação ótima sobre um conjunto de previsões base e não na qualidade destas, elas foram obtidas por meio de métodos básicos para previsão de séries temporais, especificamente o algoritmo de Hyndman-Koehler-Snyder-Grose para suavimento exponencial (ETS) [@hyndman_state_2002]. Esses métodos são amplamente utilizados na literatura de séries temporais e, portanto, servem como *benchmark* para a avaliação dos métodos de reconciliação ótima.
-
-Os modelos foram treinados com dados de 2003 a 2021 e as previsões $h$ passos à frente foram realizadas para o ano de 2022, com $h={1, 2, 3, ..., 12}$ (Figura \ref{fig:modelagem-1}). Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são descorrelatados. Isso sugere que os modelos de previsão base são, em sua maior parte, adequados para o propósito deste trabalho.
+Os modelos de previsão base foram treinados com dados de 2003 a 2021 e as previsões $h$ passos à frente foram realizadas para o ano de 2022, com $h={1, 2, 3, ..., 12}$ (@fig-modelagem-1). Para verificar a qualidade básica do ajuste, foram realizados testes de Ljung-Box para os resíduos das previsões. Considerando nível de significância de $\alpha=0.05$ e 12 defasagens, cerca de 80% dos modelos não rejeitam a hipótese nula de que os resíduos são descorrelatados. Isso sugere que os modelos de previsão base são, em sua maior parte, adequados para o propósito deste trabalho.
 
 ```{r}
 #| label: tbl-lb-pvalue
@@ -1062,11 +1054,19 @@ prop.table(table(testes_lb$h_0)) |>
   kable_styling(latex_options = c("striped"))
 ```
 
+O *software* usado foi o R [@R-base]. As previsões base, as previsões hierárquicas de nível único e a reconciliação ótima através da MinT foram realizados com os pacotes {fable} [@R-fable] e {fabletools} [@R-fabletools]. Já metodologia de *machine learning* (reamostragem, otimização de hiperparâmetros, treino e predição) foi executada com o pacote {mlr3} [@R-mlr3] e suas extensões. As implementações do XGB e LGBM utilizadas foram as de seus pacotes homônimos {xgboost} [@R-xgboost] e {ligthgbm} [@R-lightgbm]. Para as configurações de *Elastic Net* foi utilizado o pacote {glmnet} [@R-glmnet]. Já para os métodos de RF e SVM foram usados os pacotes {ranger} [@R-ranger] e {e1071} [@R-e1071], respectivamente.
+
+Boa parte dos métodos de ML são altamente parametrizáveis, sendo sua performance de generalização sensível à escolha de seus hiperparâmetros. Para os métodos avaliados neste trabalho, os conjuntos de hiperparâmetros a serem otimizados e seus respectivos espaços de busca são apresentados no Apêndice \ref{apendice_hiperparametros}, de acordo com a recomendação em @bischl_hyperparameter_2021.
+
+Para a otimização, foram utilizadas dois calibradores: (i) busca em grade, com resolução de 10 combinações, mais custoso em tempo de processamento, para os métodos de menor quantidade de hiperparâmetros a serem otimizados; e (ii) otimização bayesiana, na configuração padrão do pacote {mlr3MBO} [@R-mlr3mbo], mais eficiente para os métodos com maior quantidade de hiperparâmetros. As estratégias de reamostragem utilizadas foram a validação cruzada *k-fold* aleatória e a *k-fold* com origem móvel, ambas com $k=10$. Para a segunda, utilizou-se janela mínima de 5 anos e $|\Omega^b| = 12$, compatível com o horizonte de previsão para o experimento.
+
+A otimização bayesiana foi usada em todos os métodos, exceto no *elastic net*, uma vez que apenas um (no caso do *Lasso* e *ridge*) ou dois hiperparâmetros foram otimizados. A medida de performance utilizada para a otimização foi a raiz do erro quadrático médio (*root mean squared error* — RMSE).
+
+Por fim, cada modelo foi calibrado individualmente, ou seja, cada série $y_m$ possui um conjunto de hiperparâmetros otimizados para cada um dos 7 métodos de ML empregados para combinação ótima.
+
 ## Resultados
 
-Neste trabalho, foram apresentados experimentos de reconciliação ótima para séries temporais hierárquicas e agrupadas, utilizando métodos analíticos e de *machine learning* com o objetivo de obter coerência e ganhos de acurácia nas previsões de saldos de empréstimos e financiamentos do Banco do Estado do Espírito Santo. Pesquisas anteriores já haviam mostrado que a reconciliação ótima pode trazer ganhos de acurácia, e que métodos de *machine learning* podem ser competitivos em relação aos métodos analíticos.
-
-Este trabalho trouxe, além dos métodos de floresta aleatória e *gradient boosting* já trabalhados em @spiliotis_hierarchical_2021, o método de regressão regularizada *elastic net* e o *support vector machines*, além de avaliar outro método de *gradient boosting*, o *lightGBM*. Paralelamente, este trabalho propôs duas estratégias alternativas para a metodologia de reconciliação ótima baseada em *machine learning* proposta originalmente em @spiliotis_hierarchical_2021.
+<!-- ! PAREI AQUI -->
 
 Os resultados obtidos para a base de dados Estban mostraram, primeiramente, que não houve uma combinação de método e estratégia que obtivesse melhor performance de maneira consistente ao longo de todos os níveis hierárquicos. Dessa forma, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador. Para os níveis ao topo da hierarquia, a combinação correta de método e estratégia de estimação (*elastic net* + *reduced fitted base*) gerou até 91% de ganho de performance no nível mais agregado, permitindo à instituição financeira maior precisão para tomada de decisão e planejamento estratégico, além de sinalizar maior confiança nas estimativas comunicadas ao mercado e aos investidores. Por outro lado, para os níveis inferiores na estrutura hierárquica, os métodos analíticos se mostraram a melhor escolha. Isso sugere que, com o objetivo de elaboração de metas individuais — seja para as agências ou superintendências regionais —, os métodos analíticos ainda são preferíveis.
 
@@ -1256,6 +1256,12 @@ Para os níveis ao topo da hierarquia, os métodos de ML se mostraram a melhor o
 Os resultados se mostraram bastante sensíveis à estratégia utilizada. Na métrica RMSS, nenhum método utilizando as estratégias *rolling forecast* e *fitted base* foi capaz de superar o MinT em qualquer nível de agregação, enquanto na estratégia *reduced fitted base* os métodos de ML mostraram ganhos de performance com os métodos SVM e nas três configurações do *elastic net*.
 
 Em geral, as medidas RMSSE e MASE se mostraram bastante correlacionadas, com os métodos que obtiveram melhor performance em uma métrica também obtendo melhor performance na outra. A exceção foi para o método *lasso* na estratégia *rolling forecast*, que obteve performance melhor que o MinT, em termos de MASE, para o nível agregado, sendo o único resultado positivo para a estratégia *rolling forecast*.
+
+## CONCLUSÃO
+
+Neste trabalho, foram apresentados experimentos de reconciliação ótima para séries temporais hierárquicas e agrupadas, utilizando métodos analíticos e de *machine learning* com o objetivo de obter coerência e ganhos de acurácia nas previsões de saldos de empréstimos e financiamentos do Banco do Estado do Espírito Santo. Pesquisas anteriores já haviam mostrado que a reconciliação ótima pode trazer ganhos de acurácia, e que métodos de *machine learning* podem ser competitivos em relação aos métodos analíticos.
+
+Este trabalho trouxe, além dos métodos de floresta aleatória e *gradient boosting* já trabalhados em @spiliotis_hierarchical_2021, o método de regressão regularizada *elastic net* e o *support vector machines*, além de avaliar outro método de *gradient boosting*, o *lightGBM*. Paralelamente, este trabalho propôs duas estratégias alternativas para a metodologia de reconciliação ótima baseada em *machine learning* proposta originalmente em @spiliotis_hierarchical_2021.
 
 # PREVISÃO PARA O TURISMO DOMÉSTICO AUSTRALIANO {#sec-tourism}
 
