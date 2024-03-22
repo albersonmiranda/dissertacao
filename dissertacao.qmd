@@ -1063,19 +1063,40 @@ A otimização bayesiana foi usada em todos os métodos, exceto no *elastic net*
 
 Por fim, cada modelo foi calibrado individualmente, ou seja, cada série $y_m$ possui um conjunto de hiperparâmetros otimizados para cada um dos 7 métodos de ML empregados para combinação ótima.
 
+```{r}
+#| label: fig-previsoes
+#| fig-cap: Previsões para fora da amostra
+
+# caminho
+caminho = list.files("data/estban/preds_ml/preds/rolling_forecast", full.names = TRUE) |>
+  (function(arquivo) subset(x = arquivo, !grepl("resumo", x = arquivo) & grepl("preds", x = arquivo)))()
+
+# extrair do caminho o que está entre "preds_" e ".RDS"
+nomes = gsub(".*preds_(.*?)\\.RDS.*", "\\1", caminho)
+
+# juntar previsões
+predicoes = lapply(readRDS(caminho[1])[[1]], function(x) {
+  data.table::as.data.table(x)[[3]]
+}) |>
+  stack() |>
+  transform(ref = 1:12)
+
+colnames(predicoes) = c("preds", "nomes", "ref")
+```
+
 ## Resultados
 
 As tabelas a seguir apresentam os resultados obtidos para o experimento. As métricas utilizadas foram a Raiz do Erro Médio Escalado Quadrático (*Root Mean Squared Scaled Error* — RMSSE) e o erro médio escalado absoluto (*Mean Absolute Scaled Error* — MASE), que permitem a comparação independentemente da escala — essencial no contexto de previsão hierárquica, onde a agregação torna natural a diferença de escala.
 
 A @tbl-estban-results-analiticos contém as medidas de acurácia RMSSE e MASE para os métodos analíticos de reconciliação ótima BU (*bottom-up*) e MinT, e para as previsões base, ou seja, sem aplicar qualquer método de reconciliação. A primeira coluna especifica o método utilizado, enquanto as demais colunas apresentam a média da performance em cada nível de agregação.
 
-As @tbl-estban-results-ml-rolling, @tbl-estban-results-ml-fitted e @tbl-estban-results-ml-refit reportam as medidas de acurácia para os métodos de reconciliação ótima baseados em ML utilizando validação cruzada aleatória, enquanto as @tbl-estban-results-ml-rolling-fcv, @tbl-estban-results-ml-fitted-fcv e @tbl-estban-results-ml-refit-fcv. Já as @tbl-estban-tempo-ml e @tbl-estban-tempo-ml-fcv reportam o tempo de processamento para as etapas de calibragem, treino e predição desses métodos^[Os métodos analíticos não tiveram seu tempo de processamento medidos porque executam quase que instantaneamente, já sinalizando uma vantagem para esses métodos.].
+As @tbl-estban-results-ml-rolling, @tbl-estban-results-ml-fitted e @tbl-estban-results-ml-refit reportam as medidas de acurácia para os métodos de reconciliação ótima baseados em ML utilizando validação cruzada aleatória, enquanto as @tbl-estban-results-ml-rolling-fcv, @tbl-estban-results-ml-fitted-fcv e @tbl-estban-results-ml-refit-fcv exibem os resultado para validação cruzada com origem móvel. Já as @tbl-estban-tempo-ml e @tbl-estban-tempo-ml-fcv reportam o tempo de processamento para as etapas de calibragem, treino e predição desses métodos^[Os métodos analíticos não tiveram seu tempo de processamento medidos porque executam quase que instantaneamente, já sinalizando uma vantagem para esses métodos.].
 
-Em geral, os métodos baseados em árvore, além de requererem maior tempo de processamento devido a sua complexidade no espaço de hiperparâmetros, também tenderam a perder qualidade de performance conforme suas previsões são agregadas para formação dos níveis superiores da hierarquia. Contrariamente, os métodos de regressão regularizada e o SVM se mostraram mais robustos à agregação.
+Em geral, os métodos baseados em árvore, além de requererem maior tempo de processamento devido a sua complexidade no espaço de hiperparâmetros, também tenderam a perder qualidade conforme suas previsões são agregadas para formação dos níveis superiores da hierarquia. Contrariamente, os métodos de regressão regularizada se mostraram mais robustos à agregação.
 
 Nas tabelas a seguir, **negrito** indica a melhor performance entre os métodos para aquele determinado nível de agregação, e \underline{sublinhado} indica que aquele método de ML superou o método analítico de melhor performance naquele nível de agregação.
 
-Nos resultados para a base de dados Estban, estão incluídas as médias de performance para cada nível hierárquico e agrupado. As colunas "agregado", "mesorregiao", "microrregiao", "municipio" e "agencia", fazem referência à estrutura hierárquica, ou seja, tratam o verbete de forma agregada. Já as colunas "verbete", "bottom" e "hierarquia", incluem também a estrutura agrupada, tratando o verbete de forma desagregada. Detalhadamente:
+Nos resultados para a base de dados Estban estão incluídas as médias de performance para cada nível hierárquico e agrupado. As colunas "agregado", "mesorregiao", "microrregiao", "municipio" e "agencia", fazem referência à estrutura hierárquica, ou seja, tratam o verbete de forma agregada. Já as colunas "verbete", "bottom" e "hierarquia", incluem também a estrutura agrupada, tratando o verbete de forma desagregada. Detalhadamente:
 
 - Agregado: performance do método para a série que representa o total, com os verbetes agregados, (@fig-agregado).
 - Mesorregião: a média das performances do método para as séries do agregado de cada mesorregião, com os verbetes agregados (@fig-meso).
