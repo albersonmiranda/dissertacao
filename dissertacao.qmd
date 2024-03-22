@@ -1053,7 +1053,7 @@ prop.table(table(testes_lb$h_0)) |>
   kable_styling(latex_options = c("striped"))
 ```
 
-O *software* usado foi o R [@R-base]. As previsões base, as previsões hierárquicas de nível único e a reconciliação ótima através da MinT foram realizados com os pacotes {fable} [@R-fable] e {fabletools} [@R-fabletools]. Já metodologia de *machine learning* (reamostragem, otimização de hiperparâmetros, treino e predição) foi executada com o pacote {mlr3} [@R-mlr3] e suas extensões. As implementações do XGB e LGBM utilizadas foram as de seus pacotes homônimos {xgboost} [@R-xgboost] e {ligthgbm} [@R-lightgbm]. Para as configurações de *Elastic Net* foi utilizado o pacote {glmnet} [@R-glmnet]. Já para os métodos de RF e SVM foram usados os pacotes {ranger} [@R-ranger] e {e1071} [@R-e1071], respectivamente.
+O *software* usado foi o R [@R-base]. As previsões base, as previsões hierárquicas de nível único e a reconciliação ótima através da MinT foram realizados com os pacotes {fable} [@R-fable] e {fabletools} [@R-fabletools]. Já metodologia de *machine learning* (reamostragem, otimização de hiperparâmetros, treino e predição) foi executada com o pacote {mlr3} [@R-mlr3] e suas extensões. As implementações do XGB e LGBM utilizadas foram as de seus pacotes homônimos {xgboost} [@R-xgboost] e {ligthgbm} [@R-lightgbm]. Para as configurações de *Elastic Net* foi utilizado o pacote {glmnet} [@R-glmnet]. Já para os métodos de RF e SVM foram usados os pacotes {ranger} [@R-ranger] e {e1071} [@meyer__aut_e1071_2023], respectivamente.
 
 Boa parte dos métodos de ML são altamente parametrizáveis, sendo sua performance de generalização sensível à escolha de seus hiperparâmetros. Para os métodos avaliados neste trabalho, os conjuntos de hiperparâmetros a serem otimizados e seus respectivos espaços de busca são apresentados no Apêndice \ref{apendice_hiperparametros}, de acordo com a recomendação em @bischl_hyperparameter_2021.
 
@@ -1069,7 +1069,7 @@ As tabelas a seguir apresentam os resultados obtidos para o experimento. As mét
 
 A @tbl-estban-results-analiticos contém as medidas de acurácia RMSSE e MASE para os métodos analíticos de reconciliação ótima BU (*bottom-up*) e MinT, e para as previsões base, ou seja, sem aplicar qualquer método de reconciliação. A primeira coluna especifica o método utilizado, enquanto as demais colunas apresentam a média da performance em cada nível de agregação.
 
-As @tbl-estban-results-ml-rolling, @tbl-estban-results-ml-fitted e @tbl-estban-results-ml-refit reportam as medidas de acurácia para os métodos de reconciliação ótima baseados em *machine learning*. Já a @tbl-estban-tempo-ml reporta o tempo de processamento para as etapas de calibragem, treino e predição desses métodos^[Os métodos analíticos não tiveram seu tempo de processamento medidos porque executam quase que instantaneamente, já sinalizando uma vantagem para esses métodos.].
+As @tbl-estban-results-ml-rolling, @tbl-estban-results-ml-fitted e @tbl-estban-results-ml-refit reportam as medidas de acurácia para os métodos de reconciliação ótima baseados em ML utilizando validação cruzada aleatória, enquanto as @tbl-estban-results-ml-rolling-fcv, @tbl-estban-results-ml-fitted-fcv e @tbl-estban-results-ml-refit-fcv. Já as @tbl-estban-tempo-ml e @tbl-estban-tempo-ml-fcv reportam o tempo de processamento para as etapas de calibragem, treino e predição desses métodos^[Os métodos analíticos não tiveram seu tempo de processamento medidos porque executam quase que instantaneamente, já sinalizando uma vantagem para esses métodos.].
 
 Em geral, os métodos baseados em árvore, além de requererem maior tempo de processamento devido a sua complexidade no espaço de hiperparâmetros, também tenderam a perder qualidade de performance conforme suas previsões são agregadas para formação dos níveis superiores da hierarquia. Contrariamente, os métodos de regressão regularizada e o SVM se mostraram mais robustos à agregação.
 
@@ -1180,7 +1180,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação, estratégia *fitted base* + validação cruzada aleatória"
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação, estratégia *fitted values* + validação cruzada aleatória"
 #| label: tbl-estban-results-ml-fitted
 
 rbind(
@@ -1202,7 +1202,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação, estratégia *fitted base* + validação cruzada com origem móvel"
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação, estratégia *fitted values* + validação cruzada com origem móvel"
 #| label: tbl-estban-results-ml-fitted-fcv
 
 rbind(
@@ -1224,7 +1224,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação, estratégia *reduced fitted base* + validação cruzada aleatória"
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação, estratégia *reduced fitted values* + validação cruzada aleatória"
 #| label: tbl-estban-results-ml-refit
 
 rbind(
@@ -1257,7 +1257,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação, estratégia *reduced fitted base* + validação cruzada com origem móvel"
+#| tbl-cap: "Resultados Estban: Acurácia dos métodos de ML de reconciliação, estratégia *reduced fitted values* + validação cruzada com origem móvel"
 #| label: tbl-estban-results-ml-refit-fcv
 
 rbind(
@@ -1290,7 +1290,8 @@ rbind(
   # microrregião
   column_spec(
     4,
-    bold = c(T, T, F, F, F, F, F, T, T, F, F, F, F, F)
+    bold = c(F, T, F, F, F, F, F, F, T, F, F, F, F, F),
+    underline = c(T, F, F, F, F, F, F, T, F, F, F, F, F, F)
   )
 ```
 
@@ -1314,7 +1315,7 @@ tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
 
 # nomeando df
 colnames(tempo) = c("xgb", "random forest", "elastic net", "lasso", "ridge", "svm", "lightgbm")
-rownames(tempo) = c("reduced fitted base", "fitted base", "rolling forecast")
+rownames(tempo) = c("reduced fitted values", "fitted values", "rolling forecast")
 
 # tabela
 tempo |>
@@ -1342,7 +1343,7 @@ tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
 
 # nomeando df
 colnames(tempo) = c("xgb", "random forest", "elastic net", "lasso", "ridge", "svm", "lightgbm")
-rownames(tempo) = c("reduced fitted base", "fitted base", "rolling forecast")
+rownames(tempo) = c("reduced fitted values", "fitted values", "rolling forecast")
 
 # tabela
 tempo |>
@@ -1352,9 +1353,9 @@ tempo |>
 
 Para a base de dados Estban, não houve uma combinação de método e estratégia que fosse consistentemente melhor ao longo de todos os níveis de agregação. Portanto, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador^[Se o objetivo é a elaboração de *guidance*, por exemplo, o pesquisador deve preferir o método e estratégia que geram as  previsões mais precisas para o nível agregado. Já para elaboração de metas individuais, os níveis individuais ou regionais podem ser preferíveis.].
 
-Para os níveis ao topo da hierarquia, os métodos de ML se mostraram a melhor opção para estimação. No nível agregado, o *elastic net* na estratégia *reduced fitted base* (@tbl-estban-results-ml-refit) se mostrou a melhor opção para a estimação do agregado, com 91% de ganho de performance sobre o MinT (@tbl-estban-results-analiticos), em termos de RMSSE, ou seja, o MinT obteve quase o dobro do erro do *elastic net*. Da mesma forma, para o nível de mesorregião, o *elastic net* na configuração *lasso* teve a melhor performance, sendo 7% melhor que BU. Por outro lado, tanto nos níveis hierárquicos abaixo, quanto nos níveis agrupados, os métodos de ML não foram capazes de superar os métodos analíticos.
+Para os níveis ao topo da hierarquia, os métodos de ML se mostraram a melhor opção para estimação. No nível agregado, o *elastic net* na estratégia *reduced fitted values* + validação cruzada aleatória (@tbl-estban-results-ml-refit) se mostrou a melhor opção para a estimação do agregado, com 91% de ganho de performance sobre o MinT (@tbl-estban-results-analiticos), em termos de RMSSE, ou seja, o MinT obteve quase o dobro do erro do *elastic net*. Para os níveis de meso e microrregião, o *elastic net* na configuração *Lasso* e na estratégia *reduced fitted values* + validação cruzada com origem móvel obteve as melhores performances, sendo 10% melhor que BU para mesorregião e 6% melhor que o BU para microrregião (@tbl-estban-results-ml-refit-fcv). Por outro lado, tanto nos níveis hierárquicos abaixo, quanto no nível agrupado, os métodos de ML não foram capazes de superar os métodos analíticos.
 
-Os resultados se mostraram bastante sensíveis à estratégia utilizada. Na métrica RMSS, nenhum método utilizando as estratégias *rolling forecast* e *fitted base* foi capaz de superar o MinT em qualquer nível de agregação, enquanto na estratégia *reduced fitted base* os métodos de ML mostraram ganhos de performance com os métodos SVM e nas três configurações do *elastic net*.
+Os resultados se mostraram bastante sensíveis à estratégia utilizada. Na métrica RMSS, nenhum método utilizando as estratégias *rolling forecast* e *fitted values* foi capaz de superar o MinT em qualquer nível de agregação, enquanto na estratégia *reduced fitted values* os métodos de ML mostraram ganhos de performance nas três configurações do *elastic net* em ao menos um nível de agregação.
 
 Em geral, as medidas RMSSE e MASE se mostraram bastante correlacionadas, com os métodos que obtiveram melhor performance em uma métrica também obtendo melhor performance na outra. A exceção foi para o método *lasso* na estratégia *rolling forecast*, que obteve performance melhor que o MinT, em termos de MASE, para o nível agregado, sendo o único resultado positivo para a estratégia *rolling forecast*.
 
@@ -1364,11 +1365,11 @@ Neste estudo de caso, foram apresentados experimentos de reconciliação ótima 
 
 Este trabalho trouxe, além dos métodos de RF e XGB já trabalhados em @spiliotis_hierarchical_2021, o método de regressão regularizada *elastic net* e o SVM, além de avaliar outra implementação de *gradient boosting*, o LGBM. Paralelamente, este trabalho propôs duas estratégias alternativas para aquisição do conjunto de treinamento dos modelos de ML e também avaliou a estratégia de validação cruzada com origem móvel para a tarefa de combinação ótima.
 
-Os resultados obtidos para a base de dados Estban mostraram, primeiramente, que não houve uma combinação de método e estratégia que obtivesse melhor performance de maneira consistente ao longo de todos os níveis hierárquicos. Dessa forma, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador. Para os níveis ao topo da hierarquia, a combinação correta de método e estratégia de estimação (*elastic net* + *reduced fitted base*) gerou 91% de ganho de performance no nível mais agregado, o que imputaria a instituição financeira maior precisão para tomada de decisão e planejamento estratégico, além de sinalizar maior confiança nas estimativas comunicadas ao mercado e aos investidores.
+Os resultados obtidos para a base de dados Estban mostraram, primeiramente, que não houve uma combinação de método e estratégia que obtivesse melhor performance de maneira consistente ao longo de todos os níveis hierárquicos. Dessa forma, a escolha do método e da estratégia a serem utilizados dependerá do objetivo do pesquisador. Para os níveis ao topo da hierarquia, a combinação correta de método e estratégia de estimação (*elastic net* + *reduced fitted values*) gerou 91% de ganho de performance no nível mais agregado, o que imputaria a instituição financeira maior precisão para tomada de decisão e planejamento estratégico, além de sinalizar maior confiança nas estimativas comunicadas ao mercado e aos investidores.
 
-Por outro lado, para os níveis inferiores na estrutura hierárquica, os métodos analíticos se mostraram a melhor escolha. Isto sugere que, com o objetivo de elaboração de metas individuais — seja para as agências ou superintendências regionais —, os métodos analíticos ainda são preferíveis.
+Por outro lado, para os níveis inferiores na estrutura hierárquica (municípios e agências), os métodos analíticos se mostraram a melhor escolha. Isto sugere que, com o objetivo de elaboração de metas individuais — seja para as agências ou superintendências regionais —, os métodos analíticos ainda são preferíveis, enquanto para microrregiões, mesorregiões e total, os métodos de ML demonstram maior acurácia.
 
-Os restultados também mostram que o resultado da reconciliação ótima é sensível à estratégia utilizada. Apenas na estratégia *reduced fitted base* que os ganhos de performance foram observados, enquanto nas estratégias *rolling forecast* e *fitted base* os métodos de ML não foram capazes de superar os métodos analíticos.
+Os restultados também mostram que o resultado da reconciliação ótima é sensível à estratégia utilizada. Apenas na estratégia *reduced fitted values* que os ganhos de performance foram observados, enquanto nas estratégias *rolling forecast* e *fitted values* os métodos de ML não foram capazes de superar os métodos analíticos.
 
 Contrariamente aos resultados de @spiliotis_hierarchical_2021, as implementações de ML baseados em árvore de decisão (XGB, RF e LGBM) não foram capazes de superar os métodos analíticos em nenhum nível de agregação.
 
@@ -1396,7 +1397,7 @@ hierarquia.
 Nessa base de dados, o método SVM na estratégia \emph{rolling forecast}
 se mostrou a melhor combinação para os níveis mais agregados, alcançando
 93\% de incremento de performance em relação ao MinT, em termos de
-RMSSE, ou seja, o MinT teve quase o dobro do erro que o SVM. Já a estratégia \emph{reduced fitted base} teve performance muito baixa, com probelmas de estimação e necessidade de imputação de dados. Além da perda de performance nas medidas de acurácia, a estratégia \emph{reduced fitted base} também teve tempo de processamento muito longos em relação às outras estratégias. Nessa estratégia também foi observada presença de valores negativos para os métodos \emph{elastic net} e SVM, de forma que foram excluídos do \emph{benchmark}.
+RMSSE, ou seja, o MinT teve quase o dobro do erro que o SVM. Já a estratégia \emph{reduced fitted values} teve performance muito baixa, com probelmas de estimação e necessidade de imputação de dados. Além da perda de performance nas medidas de acurácia, a estratégia \emph{reduced fitted values} também teve tempo de processamento muito longos em relação às outras estratégias. Nessa estratégia também foi observada presença de valores negativos para os métodos \emph{elastic net} e SVM, de forma que foram excluídos do \emph{benchmark}.
 
 ```{r}
 #| tbl-cap: "Resultados para \"overnight trips\": Acurácia dos métodos analíticos de reconciliação"
@@ -1463,7 +1464,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados para \"overnight trips\": Acurácia dos métodos de ML de reconciliação, estratégia fitted base"
+#| tbl-cap: "Resultados para \"overnight trips\": Acurácia dos métodos de ML de reconciliação, estratégia fitted values"
 #| label: tbl-tourism-results-ml-fitted
 
 rbind(
@@ -1500,7 +1501,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados para \"overnight trips\": Acurácia dos métodos de ML de reconciliação, estratégia reduced fitted base"
+#| tbl-cap: "Resultados para \"overnight trips\": Acurácia dos métodos de ML de reconciliação, estratégia reduced fitted values"
 #| label: tbl-tourism-results-ml-refit
 
 rbind(
@@ -1543,7 +1544,7 @@ tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
 
 # nomeando df
 colnames(tempo) = c("xgb", "random forest", "elastic net", "lasso", "ridge", "svm", "lightgbm")
-rownames(tempo) = c("fitted base", "rolling forecast", "reduced fitted base")
+rownames(tempo) = c("fitted values", "rolling forecast", "reduced fitted values")
 
 # tabela
 tempo |>
@@ -1622,7 +1623,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados para \"visitor nights\": Acurácia dos métodos de ML de reconciliação, estratégia fitted base"
+#| tbl-cap: "Resultados para \"visitor nights\": Acurácia dos métodos de ML de reconciliação, estratégia fitted values"
 #| label: tbl-tourism-monthly-results-ml-fitted
 
 rbind(
@@ -1662,7 +1663,7 @@ rbind(
 ```
 
 ```{r}
-#| tbl-cap: "Resultados para \"visitor nights\": Acurácia dos métodos de ML de reconciliação, estratégia reduced fitted base"
+#| tbl-cap: "Resultados para \"visitor nights\": Acurácia dos métodos de ML de reconciliação, estratégia reduced fitted values"
 #| label: tbl-tourism-monthly-results-ml-refit
 
 rbind(
@@ -1705,7 +1706,7 @@ tempo = sapply(as.data.frame(tempo), function(x) as.numeric(x))
 
 # nomeando df
 colnames(tempo) = c("xgb", "random forest", "elastic net", "lasso", "ridge", "svm", "lightgbm")
-rownames(tempo) = c("fitted base", "rolling forecast", "reduced fitted base")
+rownames(tempo) = c("fitted values", "rolling forecast", "reduced fitted values")
 
 # tabela
 tempo |>
