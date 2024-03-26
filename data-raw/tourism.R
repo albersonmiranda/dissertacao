@@ -18,7 +18,7 @@ tourism = tsibble::tourism |>
   )
 
 # turismo mensal
-# TODO: Thanks to professor Nikolaos Kourentzes for the dataset
+# Thanks to professor Nikolaos Kourentzes for the dataset
 tourism_monthly = read.csv("data-raw/VN2017.csv") |>
   transform(
     ref = seq.Date(as.Date("1998-01-01"), as.Date("2017-12-01"), by = "month"),
