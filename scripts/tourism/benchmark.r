@@ -26,7 +26,7 @@ analiticos_best = analiticos_best[sapply(analiticos_best, function(x) !all(is.na
 analiticos_best = split(analiticos_best, analiticos_best$metrica)
 
 # tipo
-tipo = "rolling_forecast"
+tipo = "fitted_base"
 cv = "_fcv"
 
 # métodos de ML
