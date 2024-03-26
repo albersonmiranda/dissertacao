@@ -3,8 +3,8 @@
 
 # métodos analíticos
 analiticos = rbind(
-  readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
-  readRDS("data/tourism/preds_analitico/acuracia_analiticos.rds")[["mase"]]
+  readRDS("data/tourism_monthly/preds_analitico/acuracia_analiticos.rds")[["rmsse"]],
+  readRDS("data/tourism_monthly/preds_analitico/acuracia_analiticos.rds")[["mase"]]
 ) |>
   transform(metrica = c(rep("rmsse", 3), rep("mase", 3)))
 
@@ -26,13 +26,13 @@ analiticos_best = analiticos_best[sapply(analiticos_best, function(x) !all(is.na
 analiticos_best = split(analiticos_best, analiticos_best$metrica)
 
 # tipo
-tipo = "rolling_forecast"
+tipo = "one-step-ahead"
 cv = "_fcv"
 
 # métodos de ML
 ml = rbind(
-  readRDS(paste0("data/tourism/preds_ml/preds/", tipo, "/resumo", cv, ".RDS"))[["rmsse"]],
-  readRDS(paste0("data/tourism/preds_ml/preds/", tipo, "/resumo", cv, ".RDS"))[["mase"]]
+  readRDS(paste0("data/tourism_monthly/preds_ml/preds/", tipo, "/resumo", cv, ".RDS"))[["rmsse"]],
+  readRDS(paste0("data/tourism_monthly/preds_ml/preds/", tipo, "/resumo", cv, ".RDS"))[["mase"]]
 ) |>
   transform(metrica = c(rep("rmsse", 7), rep("mase", 7)))
 
