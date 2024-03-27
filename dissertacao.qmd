@@ -674,7 +674,7 @@ Nesta seção, foram apresentadas a abordagem para a reconciliação de previsõ
 
 Além disso, discutiu-se a importância da validação cruzada na otimização de hiperparâmetros para modelos de ML no cenário de combinação ótima. Em particular, destacou-se a necessidade de considerar a dependência temporal nos dados ao escolher o método de validação cruzada. Nesse sentido, propus o uso da validação cruzada com origem móvel como uma alternativa para calibração dos modelos de combinação ótima.
 
-# PREVISÃO DE SALDOS DE EMPRÉSTIMOS E FINANCIAMENTOS DO BANCO DO ESTADO DO ESPÍRITO SANTO {#sec-estban}
+# PREVISÕES DE SALDOS DE EMPRÉSTIMOS E FINANCIAMENTOS DO BANCO DO ESTADO DO ESPÍRITO SANTO {#sec-estban}
 
 ## Introdução
 
@@ -1397,7 +1397,7 @@ Os restultados também mostram que o resultado da reconciliação ótima é sens
 
 Contrariamente aos resultados de @spiliotis_hierarchical_2021, as implementações de ML baseados em árvore de decisão (XGB, RF e LGBM) não foram capazes de superar os métodos analíticos em nenhum nível de agregação.
 
-# PREVISÃO PARA O TURISMO DOMÉSTICO AUSTRALIANO {#sec-tourism}
+# PREVISÕES PARA O TURISMO DOMÉSTICO AUSTRALIANO {#sec-tourism}
 
 ## Metodologia
 
