@@ -9,6 +9,7 @@ format:
     keep-tex: false
     latex-max-runs: 4
     output-file: dissertacao.pdf
+    biblatexoptions: [backend=biber, style=abnt, giveninits, backref=true, backrefstyle=three, citecounter=true]
 ---
 
 ```{r config}

@@ -3,3 +3,5 @@
 nul
 /.quarto/
 bmr.rds
+
+**/*.quarto_ipynb
